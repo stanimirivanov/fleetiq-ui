@@ -1,2 +1,9 @@
 packages:
   - 'packages/*'
+  - 'apps/*'
+  - 'libs/*'
+allowBuilds:
+  unrs-resolver: true
+  '@swc/core': false
+  esbuild: true
+  '@vaadin/vaadin-usage-statistics': false

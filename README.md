@@ -72,6 +72,9 @@ pnpm install
 
 ### 2. Development Commands
 
+**Note**: Make sure the protobuf stubs are generated before making any code
+changes.
+
 Start the application targets using Nx:
 
 ```bash

@@ -37,7 +37,7 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
-      "path": "../../libs/shared-core/tsconfig.lib.json"
+      "path": "../../libs/shared-core"
     }
   ]
 }

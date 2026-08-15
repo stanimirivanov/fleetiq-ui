@@ -1,73 +1,98 @@
-import { useEffect, useState } from 'react';
-import { mapPositionUpdateToVehicle, useFleetStore } from '@fleetiq-ui/shared-core';
+import { useCallback } from 'react';
+import {
+  mapPositionUpdateToVehicle,
+  useFleetStore,
+} from '@fleetiq-ui/shared-core';
 import { apiClient } from '../api/transport';
+import { useResilientStream } from '../hooks/useResilientStream';
+import { Code, ConnectError } from '@connectrpc/connect';
 
 export function App() {
   const vehicles = useFleetStore((state) => state.vehicles);
   const updatePosition = useFleetStore((state) => state.updateVehiclePosition);
-  
-  // Track connection status for UI feedback
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // AbortController allows us to gracefully cancel the stream if the component unmounts
-    const abortController = new AbortController();
+  // Memoize the stream factory so the hook doesn't restart on every render
+  const createFleetStream = useCallback(
+    (signal: AbortSignal) =>
+      apiClient.watchFleet(
+        { vins: ['VIN-VARNA-01', 'VIN-SOFIA-02'], minUpdateIntervalSeconds: 2 },
+        { signal }
+      ),
+    []
+  );
 
-    async function connectToTelemetryStream() {
-      setIsConnected(true);
-      setError(null);
-      
-      try {
-        const stream = apiClient.watchFleet(
-          { vins: ['VIN-VARNA-01', 'VIN-SOFIA-02'], minUpdateIntervalSeconds: 2 }, 
-          { signal: abortController.signal }
-        );
+  const {
+    state,
+    error,
+    retryCount,
+    nextRetryIn,
+    isConnected,
+    isConnecting,
+    hasError,
+  } = useResilientStream(createFleetStream, {
+    // Optional: fine-tune resilience
+    baseDelayMs: 500,
+    maxDelayMs: 15000,
+    heartbeatTimeoutMs: 8000, // Reconnect if silent for 8s (backend ticks every 2s)
+    maxRetries: Infinity,
 
-        // Iterate over the stream as chunks arrive from Fastify
-        for await (const response of stream) {
-          const vehicleModel = mapPositionUpdateToVehicle(response);
-          updatePosition(vehicleModel);
-        }
-      } catch (err: any) {
-        // Ignore abort/cancellation errors caused by component unmounting or React Strict Mode
-        const isCanceled = 
-          err.name === 'AbortError' || 
-          err.code === 'canceled' || 
-          err.message?.includes('aborted');
+    // Wire each message into your global store
+    onMessage: (response) => {
+      const vehicleModel = mapPositionUpdateToVehicle(response);
+      updatePosition(vehicleModel);
+    },
 
-        if (!isCanceled) {
-          console.error("Telemetry stream error:", err);
-          setError(err.message);
-          setIsConnected(false);
+    onConnect: () => console.log('Fleet stream connected'),
+    onDisconnect: (err) => console.warn('Fleet stream lost:', err.message),
+
+    shouldRetry: (err) => {
+      if (err instanceof ConnectError) {
+        // Don't burn retries on auth failures — those need user action
+        if (
+          err.code === Code.Unauthenticated ||
+          err.code === Code.PermissionDenied
+        ) {
+          return false;
         }
       }
-    }
-
-    connectToTelemetryStream();
-
-    // Cleanup: cancel the stream when the App component is removed from the DOM
-    return () => {
-      abortController.abort();
-      setIsConnected(false);
-    };
-  }, [updatePosition]);
+      return true;
+    },
+  });
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>FleetIQ Web Operator Console</h1>
-      
-      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <h2>Active Vehicles Feed</h2>
-        {isConnected ? (
-          <span style={{ color: '#00ff00', fontWeight: 'bold' }}>● LIVE STREAMING</span>
-        ) : (
-          <span style={{ color: error ? '#ff0000' : '#ffa500', fontWeight: 'bold' }}>
-            {error ? `● ERROR: ${error}` : '● DISCONNECTED'}
+
+      <div
+        style={{
+          marginBottom: '1rem',
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
+        <h2 style={{ margin: 0 }}>Active Vehicles Feed</h2>
+
+        {isConnected && (
+          <span style={{ color: '#22c55e', fontWeight: 'bold' }}>● LIVE</span>
+        )}
+        {isConnecting && (
+          <span style={{ color: '#f59e0b', fontWeight: 'bold' }}>
+            ⟳{' '}
+            {state === 'reconnecting'
+              ? `RECONNECTING #${retryCount}`
+              : 'CONNECTING'}
+            {nextRetryIn ? ` (in ${Math.ceil(nextRetryIn / 1000)}s)` : ''}
+          </span>
+        )}
+        {hasError && (
+          <span style={{ color: '#ef4444', fontWeight: 'bold' }}>
+            ● ERROR: {error?.message}
           </span>
         )}
       </div>
-      
+
       <pre
         style={{
           background: '#1e1e1e',
@@ -75,7 +100,7 @@ export function App() {
           padding: '1rem',
           borderRadius: '8px',
           overflow: 'auto',
-          maxHeight: '600px'
+          maxHeight: '600px',
         }}
       >
         {JSON.stringify(vehicles, null, 2)}

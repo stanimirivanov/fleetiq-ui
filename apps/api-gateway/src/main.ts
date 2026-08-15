@@ -1,15 +1,23 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { fastifyConnectPlugin } from '@connectrpc/connect-fastify';
-import { FleetStreaming } from '@fleetiq-ui/shared-core';
-import { VehicleStatus } from '@fleetiq-ui/shared-core';
+import { FleetStreaming, VehicleStatus } from '@fleetiq-ui/shared-core';
 
 async function bootstrap() {
 const server = Fastify({ logger: true });
 
 // Required for browser clients connecting to gRPC-Web / Connect
 await server.register(cors, {
-  origin: true, 
+  origin: "http://localhost:4200", // set to true if you want to allow all in development
+  methods: ["POST", "GET", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type", 
+    "Connect-Protocol-Version", 
+    "Connect-Timeout-Ms", 
+    "Grpc-Timeout", 
+    "X-User-Agent"
+  ],
+  exposedHeaders: ["Connect-Content-Encoding"]
 });
 
 await server.register(fastifyConnectPlugin, {

@@ -6,6 +6,8 @@ export interface VehiclePosition {
   lng: number;
   speed: number;
   heading: number;
+  status: string;
+  lastTimestamp: number;
 }
 
 interface FleetState {

@@ -1,0 +1,23 @@
+{
+  "name": "shared-core",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared-core/src",
+  "projectType": "library",
+  "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "buf generate",
+        "cwd": "libs/shared-core"
+      },
+      "inputs": [
+        "{projectRoot}/proto/**/*.proto",
+        "{projectRoot}/buf.yaml",
+        "{projectRoot}/buf.gen.yaml"
+      ],
+      "outputs": [
+        "{projectRoot}/src/lib/gen"
+      ]
+    }
+  }
+}

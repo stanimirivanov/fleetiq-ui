@@ -84,9 +84,18 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "build": {
+      "dependsOn": ["^build", "^generate"]
+    },
+    "serve": {
+      "dependsOn": ["^generate"]
+    },
+    "generate": {
+      "cache": true
+    },
     "@nx/esbuild:esbuild": {
       "cache": true,
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^generate"],
       "inputs": [
         "production",
         "^production",

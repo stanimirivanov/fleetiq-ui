@@ -4,6 +4,7 @@ import { fastifyConnectPlugin } from '@connectrpc/connect-fastify';
 import { FleetStreaming } from '@fleetiq-ui/shared-core';
 import { VehicleStatus } from '@fleetiq-ui/shared-core';
 
+async function bootstrap() {
 const server = Fastify({ logger: true });
 
 // Required for browser clients connecting to gRPC-Web / Connect
@@ -54,10 +55,12 @@ await server.register(fastifyConnectPlugin, {
   },
 });
 
-server.listen({ port: 8080, host: '0.0.0.0' }, (err, address) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-  console.log(`🚀 API Gateway Mock gRPC Server listening at ${address}`);
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+  await server.listen({ port, host: '0.0.0.0' });
+  console.log(`🚀 API Gateway Mock gRPC Server listening on http://localhost:${port}`);
+}
+
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
 });

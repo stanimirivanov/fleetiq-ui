@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "composite": true,
+    "rootDir": ".",
+    "composite": false,
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "importHelpers": true,
@@ -12,13 +13,9 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@org/source"],
-    "noUncheckedSideEffectImports": false,
-    "types": ["*"],
     "paths": {
       "@fleetiq-ui/shared-core": ["libs/shared-core/src/index.ts"]
     }

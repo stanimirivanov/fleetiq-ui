@@ -7,3 +7,4 @@ allowBuilds:
   '@swc/core': false
   esbuild: true
   '@vaadin/vaadin-usage-statistics': false
+  '@bufbuild/buf': true

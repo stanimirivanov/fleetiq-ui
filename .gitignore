@@ -66,3 +66,6 @@ cache/
 
 
 test-output
+
+# Protobuf generated source
+/libs/shared-core/src/gen/

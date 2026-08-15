@@ -9,8 +9,9 @@ import { Code, ConnectError } from '@connectrpc/connect';
 
 // Map & WebGL imports
 import DeckGL from '@deck.gl/react';
-import { IconLayer, ScatterplotLayer } from '@deck.gl/layers';
-import Map from 'react-map-gl/maplibre';
+import { IconLayer, PathLayer } from '@deck.gl/layers';
+import Map, { Layer } from 'react-map-gl/maplibre';
+import type { FillExtrusionLayerSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 // A free dark-themed base map from CARTO
@@ -24,6 +25,21 @@ const INITIAL_VIEW_STATE = {
   pitch: 45,
   bearing: 0,
 };
+
+// OpenMapTiles (which Carto uses) stores building heights in "render_height"
+const buildingLayer = {
+  id: '3d-buildings',
+  source: 'openmaptiles', // The default source name in Carto's style.json
+  'source-layer': 'building',
+  type: 'fill-extrusion',
+  minzoom: 14, // Buildings only pop up when you zoom in close
+  paint: {
+    'fill-extrusion-color': '#111116', // Deep cyberpunk gray/black
+    'fill-extrusion-height': ['get', 'render_height'],
+    'fill-extrusion-base': ['get', 'render_min_height'],
+    'fill-extrusion-opacity': 0.8,
+  },
+} satisfies FillExtrusionLayerSpecification;
 
 export function AppGL() {
   const vehicles = useFleetStore((state) => state.vehicles);
@@ -76,21 +92,36 @@ export function AppGL() {
 
   // Define the Deck.gl WebGL layer
   const layers = [
+    new PathLayer({
+      id: 'fleet-trails',
+      data: vehicleArray,
+      pickable: false,
+      widthScale: 1,
+      widthMinPixels: 3,
+      jointRounded: true,
+      capRounded: true,
+      getPath: (d) => d.pathHistory || [], // Read the history from the store
+      getColor: (d) => {
+        // Match the line color to the vehicle status, but make it slightly transparent (alpha: 150)
+        if (d.status === 'MOVING') return [34, 197, 94, 150];
+        if (d.status === 'IDLE') return [245, 158, 11, 150];
+        return [239, 68, 68, 150];
+      },
+    }),
     new IconLayer({
       id: 'fleet-icons',
       data: vehicleArray,
       pickable: true,
-      // Use a simple white navigation arrow (you can replace with a car.png later)
-      iconAtlas:
-        'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-      iconMapping: {
-        marker: { x: 0, y: 0, width: 128, height: 128, mask: true },
-      },
-      getIcon: () => 'marker',
+      // Deck.gl allows defining icons per-object seamlessly
+      getIcon: () => ({
+        url: '/car-icon.png', // Path to your white top-down vehicle image
+        width: 128,
+        height: 128,
+        mask: true, // This allows getColor to dynamically tint the image
+      }),
       getPosition: (d) => [d.lng, d.lat],
-      getSize: 30,
-      // Map the heading from your simulator to the icon's rotation
-      getAngle: (d) => 360 - d.heading,
+      getSize: 30, // Adjust based on your visual preference
+      getAngle: (d) => d.heading, // Deck.gl rotates clockwise, matching standard compass headings
       getColor: (d) => {
         if (d.status === 'MOVING') return [34, 197, 94];
         if (d.status === 'IDLE') return [245, 158, 11];
@@ -98,7 +129,7 @@ export function AppGL() {
       },
       transitions: {
         getPosition: 2000,
-        getAngle: 2000, // The icon will smoothly rotate as the vehicle turns!
+        getAngle: 2000, // Smoothly animates the vehicle turning
       },
     }),
   ];
@@ -172,7 +203,10 @@ export function AppGL() {
           `VIN: ${object.id}\nSpeed: ${object.speed} km/h\nStatus: ${object.status}`
         }
       >
-        <Map mapStyle={MAP_STYLE} />
+        <Map mapStyle={MAP_STYLE}>
+          {/* This layer targets building data in standard vector tiles and extrudes them */}
+          <Layer {...buildingLayer} />
+        </Map>
       </DeckGL>
     </div>
   );

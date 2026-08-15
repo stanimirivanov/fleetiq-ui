@@ -1,3 +1,4 @@
+// Example location: libs/shared-core/src/store/useFleetStore.ts
 import { create } from 'zustand';
 
 export interface VehiclePosition {
@@ -8,20 +9,35 @@ export interface VehiclePosition {
   heading: number;
   status: string;
   lastTimestamp: number;
+  pathHistory: [number, number][];
 }
 
-interface FleetState {
+interface FleetStore {
   vehicles: Record<string, VehiclePosition>;
-  updateVehiclePosition: (vehicle: VehiclePosition) => void;
+  updateVehiclePosition: (
+    vehicleUpdate: Omit<VehiclePosition, 'pathHistory'>
+  ) => void;
 }
 
-export const useFleetStore = create<FleetState>((set) => ({
+export const useFleetStore = create<FleetStore>((set) => ({
   vehicles: {},
-  updateVehiclePosition: (vehicle) =>
-    set((state) => ({
-      vehicles: {
-        ...state.vehicles,
-        [vehicle.id]: vehicle,
-      },
-    })),
+
+  updateVehiclePosition: (vehicleUpdate) =>
+    set((state) => {
+      const existingVehicle = state.vehicles[vehicleUpdate.id];
+      const previousHistory = existingVehicle?.pathHistory || [];
+      const newPoint: [number, number] = [vehicleUpdate.lng, vehicleUpdate.lat];
+      const updatedHistory = [...previousHistory, newPoint].slice(-20);
+
+      return {
+        vehicles: {
+          ...state.vehicles,
+          [vehicleUpdate.id]: {
+            ...existingVehicle,
+            ...vehicleUpdate,
+            pathHistory: updatedHistory,
+          },
+        },
+      };
+    }),
 }));

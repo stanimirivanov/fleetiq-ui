@@ -9,7 +9,7 @@ import { Code, ConnectError } from '@connectrpc/connect';
 
 // Map & WebGL imports
 import DeckGL from '@deck.gl/react';
-import { ScatterplotLayer } from '@deck.gl/layers';
+import { IconLayer, ScatterplotLayer } from '@deck.gl/layers';
 import Map from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -35,10 +35,7 @@ export function AppGL() {
   // Memoize the stream factory so the hook doesn't restart on every render
   const createFleetStream = useCallback(
     (signal: AbortSignal) =>
-      apiClient.watchFleet(
-        { vins: ['VIN-VARNA-01', 'VIN-SOFIA-02'], minUpdateIntervalSeconds: 2 },
-        { signal }
-      ),
+      apiClient.watchFleet({ minUpdateIntervalSeconds: 2 }, { signal }),
     []
   );
 
@@ -79,29 +76,29 @@ export function AppGL() {
 
   // Define the Deck.gl WebGL layer
   const layers = [
-    new ScatterplotLayer({
-      id: 'fleet-layer',
+    new IconLayer({
+      id: 'fleet-icons',
       data: vehicleArray,
       pickable: true,
-      opacity: 0.8,
-      stroked: true,
-      filled: true,
-      radiusScale: 1,
-      radiusMinPixels: 6,
-      radiusMaxPixels: 100,
-      lineWidthMinPixels: 2,
-      getPosition: (d) => [d.lng, d.lat],
-      getFillColor: (d) => {
-        if (d.status === 'MOVING') return [34, 197, 94]; // Tailwind green-500
-        if (d.status === 'IDLE') return [245, 158, 11]; // Tailwind amber-500
-        return [239, 68, 68]; // Tailwind red-500
+      // Use a simple white navigation arrow (you can replace with a car.png later)
+      iconAtlas:
+        'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+      iconMapping: {
+        marker: { x: 0, y: 0, width: 128, height: 128, mask: true },
       },
-      getLineColor: () => [0, 0, 0],
-      getRadius: 50,
-
-      // Automatically interpolate movement smoothly between 2-second backend ticks
+      getIcon: () => 'marker',
+      getPosition: (d) => [d.lng, d.lat],
+      getSize: 30,
+      // Map the heading from your simulator to the icon's rotation
+      getAngle: (d) => 360 - d.heading,
+      getColor: (d) => {
+        if (d.status === 'MOVING') return [34, 197, 94];
+        if (d.status === 'IDLE') return [245, 158, 11];
+        return [239, 68, 68];
+      },
       transitions: {
         getPosition: 2000,
+        getAngle: 2000, // The icon will smoothly rotate as the vehicle turns!
       },
     }),
   ];

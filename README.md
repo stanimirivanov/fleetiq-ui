@@ -91,3 +91,33 @@ pnpm nx start mobile
 pnpm nx run-many -t serve -p web api-gateway
 ```
 
+## gRPC Mock Server
+
+There is a gRPC stream service implemented for development. It can be used to test the following error conditions:
+
+| #     | Failure                  | How It Works                                                                                 | What It Tests in Your React Hook                                |
+| ----- | ------------------------ | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **1** | **Cold-start rejection** | First `N` stream attempts throw `UNAVAILABLE`                                                | Exponential backoff + retry counter                             |
+| **2** | **Immediate gRPC error** | Returns `Internal`, `ResourceExhausted`, `Unauthenticated`, etc. instead of opening a stream | `shouldRetry` predicate; permanent vs. transient error handling |
+| **3** | **Silent hang**          | Accepts the HTTP/2 stream but never yields a message                                         | `heartbeatTimeoutMs` (detects zombie TCP)                       |
+| **4** | **Random drop**          | Yields 3-10 messages then either returns (graceful EOF) or throws (abrupt partition)         | Reconnect loop; state continuity across reconnects              |
+| **5** | **Artificial delay**     | Adds 0-3s (configurable) of lag between messages                                             | Heartbeat tolerance; "connected but slow" UI state              |
+| **6** | **Client abort**         | Respects `context.signal.aborted`                                                            | Proper cleanup; no memory leaks on unmount                      |
+
+
+### Quick Test Matrix
+Run the server with different profiles:
+
+```bash
+# Aggressive chaos (good for CI / stress test)
+FAILURE_DROP_PROB=0.5 FAILURE_HANG_PROB=0.2 FAILURE_ERROR_PROB=0.1 npm run start:api
+
+# Only test heartbeat timeout (silent hang)
+FAILURE_HANG_PROB=1.0 FAILURE_DROP_PROB=0 FAILURE_ERROR_PROB=0 npm run start:api
+
+# Only test initial retry storm
+FAILURE_INITIAL_COUNT=5 FAILURE_DROP_PROB=0 FAILURE_HANG_PROB=0 npm run start:api
+
+# Stable mode (verify normal operation still works)
+FAILURE_DROP_PROB=0 FAILURE_HANG_PROB=0 FAILURE_ERROR_PROB=0 FAILURE_DELAY_PROB=0 npm run start:api
+```

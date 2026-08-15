@@ -1,0 +1,15 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.autoSave": "afterDelay",
+  "eslint.workingDirectories": [{ "pattern": "./*/" }],
+  "prettier.configPath": "",
+  "prettier.ignorePath": ".gitignore",
+  "editor.rulers": [80],
+  "workbench.tree.indent": 8,
+  "explorer.compactFolders": false,
+  "vsicons.presets.angular": true,
+  "[json]": {
+    "editor.formatOnSave": false
+  }
+}

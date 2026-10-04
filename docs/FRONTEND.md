@@ -6,7 +6,7 @@ Web and mobile ship together around shared backend contracts. React owns renderi
 
 ## Current state
 
-The repository currently boots a Vite/React web shell and an Expo/React Native mobile shell. It has no API client, mock server, login, live data, asset views, or shared package. The shells show an explicit unconnected state. Do not infer planned behavior from directory names.
+The repository boots a Vite/React web shell and an Expo/React Native mobile shell. A shared package pins the partial backend OpenAPI baseline, generated transport types, runtime parsers, and synthetic fixtures. Web has opt-in MSW development handlers; mobile has an explicit fixture adapter. There is no production API client, login, live data, or asset view. Both shells still show an unconnected state.
 
 ## State ownership
 
@@ -24,9 +24,9 @@ Do not add Redux Toolkit alongside Atom by default. A second global store adds c
 
 ## API contract and mocking
 
-The backend owns OpenAPI and event schemas. Frontend work consumes a versioned contract artifact and generates transport types/client code in a dedicated package; generated files are never the domain model. Validate external payloads at the adapter boundary, especially timestamps, identifiers, units, nullability, tenant scope, and versioned events. Use MSW to serve contract-conforming fixtures to web feature tests and development. Mobile should use the same fixtures through a platform-neutral fixture/adapter seam rather than a browser service worker. No production code should silently fall back to mock data.
+The backend owns OpenAPI and future event schemas. The shared api-contract package pins one backend commit and generates transport types from its partial v1 OpenAPI artifact. Generated wire types are not domain models. Zod parsers validate unknown HTTP payloads at the boundary; future event payloads will need their own versioned parsers. The contract check verifies the artifact hash, generated output, fixture equality, parsers, and mock-backed app adapters.
 
-This work is the next PR slice, not implemented by the scaffold. Contract changes require fixture checks and explicit compatibility review.
+Web MSW starts only when VITE_API_MODE=mock is explicitly set during development. Add that value to an untracked apps/web/.env.local file or set it in the shell; production builds never start the worker. The native fixture adapter imports the same synthetic data and must be invoked explicitly. Neither path represents a browser-safe login. No production path falls back silently to fixtures. See [the contract package](../packages/api-contract/README.md).
 
 ## Feature shape
 

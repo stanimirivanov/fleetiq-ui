@@ -1,0 +1,27 @@
+{
+  "name": "@fleetiq/api-contract",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "generate": "openapi-typescript fleetiq-v1-ui-baseline.openapi.json -o src/generated.ts",
+    "generate:check": "openapi-typescript fleetiq-v1-ui-baseline.openapi.json -o src/generated.ts --check",
+    "test": "node --test src/*.test.ts",
+    "check": "node tools/check-contract.mjs && pnpm generate:check && pnpm test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.4",
+    "openapi-typescript": "7.13.0",
+    "typescript": "6.0.3"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  }
+}

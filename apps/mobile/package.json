@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@fleetiq/api-contract": "workspace:*",
     "expo": "~57.0.26",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-native": "0.86.3"
   },
   "devDependencies": {
+    "@types/node": "26.6.4",
     "@types/react": "~19.2.4",
     "typescript": "~6.0.3"
   },
@@ -17,7 +19,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "typecheck": "tsc --noEmit",
-    "check": "expo install --check && expo export --platform android --output-dir dist"
+    "check": "expo install --check && expo export --platform android --output-dir dist",
+    "test:contract": "node --test src/api/fixtureAssetCatalogue.test.ts"
   },
-  "private": true
+  "private": true,
+  "type": "module"
 }

@@ -7,4 +7,3 @@ Record accepted, specific gaps here with impact, owner, and review trigger. An u
 | Gap | Impact | Owner / review trigger |
 |:--|:--|:--|
 | Native device and accessibility validation unavailable in generic CI | Type checking and Expo compatibility do not prove Android/iOS interaction | UI maintainers; review at first interactive mobile feature and before release |
-| No contract fixture suite yet | UI cannot detect backend contract drift | UI and backend maintainers; next M01 contract slice |

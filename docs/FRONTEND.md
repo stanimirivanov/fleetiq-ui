@@ -6,14 +6,14 @@ Web and mobile ship together around shared backend contracts. React owns renderi
 
 ## Current state
 
-The repository boots a Vite/React web shell and an Expo/React Native mobile shell. A shared package pins the partial backend OpenAPI baseline, generated transport types, runtime parsers, and synthetic fixtures. Web has opt-in MSW development handlers; mobile has an explicit fixture adapter. There is no production API client, login, live data, or asset view. Both shells still show an unconnected state.
+The repository boots a Vite/React web shell and an Expo/React Native mobile shell. A shared package pins the partial backend OpenAPI baseline, generated transport types, runtime parsers, and synthetic fixtures. Web has opt-in MSW development handlers; mobile has an explicit fixture adapter. Both use the shared asset-catalogue loader shape and tenant parser. Both apps now have an asset identity list and identity-only route. They show contract-backed synthetic assets only in explicit development preview mode; production remains unconnected. There is no production API client, login, live data, or asset detail.
 
 ## State ownership
 
 | State | Owner | Rule |
 |:--|:--|:--|
-| Server-owned data | Feature API adapter and query/cache layer chosen with the first contract-backed feature | Avoid copying it into UI atoms. |
-| Complex RPC, subscription, stream lifecycle | Effect | Introduce it with a tested cancellation/retry use case. |
+| Server-owned data | Feature API adapter and local request state; add a query/cache layer when reuse or invalidation needs it | Avoid copying it into UI atoms. |
+| Complex RPC, subscription, stream lifecycle | Effect | Introduce it when multi-request or stream coordination needs more than local cancellation/retry. |
 | Granular derived UI state | Effect Atom | Introduce it with a real performance or coordination need; keep atoms feature-local. |
 | Web navigation, shareable filters and selection | React Router URL | Parse and validate URL input; define stable defaults. |
 | Mobile navigation state | Native navigation | Deep links use an explicit mapping to domain identifiers. |
@@ -24,13 +24,13 @@ Do not add Redux Toolkit alongside Atom by default. A second global store adds c
 
 ## API contract and mocking
 
-The backend owns OpenAPI and future event schemas. The shared api-contract package pins one backend commit and generates transport types from its partial v1 OpenAPI artifact. Generated wire types are not domain models. Zod parsers validate unknown HTTP payloads at the boundary; future event payloads will need their own versioned parsers. The contract check verifies the artifact hash, generated output, fixture equality, parsers, and mock-backed app adapters.
+The backend owns OpenAPI and future event schemas. The shared api-contract package pins one backend commit and generates transport types from its partial v1 OpenAPI artifact. Generated wire types are not domain models. Zod parsers validate unknown HTTP payloads at the boundary; future event payloads will need their own versioned parsers. The contract check verifies the artifact hash, generated output, fixture equality, parsers, the shared catalogue boundary, mock-backed app adapters, and web catalogue behavior.
 
-Web MSW starts only when VITE_API_MODE=mock is explicitly set during development. Add that value to an untracked apps/web/.env.local file or set it in the shell; production builds never start the worker. The native fixture adapter imports the same synthetic data and must be invoked explicitly. Neither path represents a browser-safe login. No production path falls back silently to fixtures. See [the contract package](../packages/api-contract/README.md).
+Use pnpm dev:web:preview to start Vite with MSW automatically; pnpm dev:mobile:web:preview or pnpm dev:mobile:preview starts Expo with its local fixture adapter. The plain dev commands show unconnected states. Web MSW starts only when VITE_API_MODE=mock is set during development, and production builds never start the worker. The native adapter is invoked only when EXPO_PUBLIC_API_MODE=mock in development. Neither path represents a browser-safe login. No production path falls back silently to fixtures. See [the contract package](../packages/api-contract/README.md).
 
 ## Feature shape
 
-Use a vertical feature directory under each app: model for pure client concepts, api for request/stream translation, and ui for platform views. Add folders only when needed. app composes routes, providers, and features. Shared packages may contain contract types, parsers, or pure behavior used on both platforms; they must not contain browser globals or native modules. Web and native map, charts, interaction, and accessibility often differ and belong in their owning apps.
+Use a vertical feature directory under each app: model for pure client concepts, api for request/stream translation, and ui for platform views. Add folders only when needed. app composes routes, providers, and features. Shared packages contain contract types, parsers, the catalogue loader boundary, or pure behavior used on both platforms; they must not contain browser globals or native modules. Web and native map, charts, interaction, and accessibility often differ and belong in their owning apps.
 
 ## Testing and accessibility
 

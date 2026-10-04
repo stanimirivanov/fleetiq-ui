@@ -1,23 +1,40 @@
+import { Link } from 'react-router';
+
 export function OverviewPage() {
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
+    <main className="min-h-screen bg-canvas px-6 py-10 text-foreground">
       <div className="mx-auto max-w-5xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent">
           FleetIQ
         </p>
         <h1 className="mt-8 text-4xl font-semibold tracking-tight">
           Fleet workspace
         </h1>
-        <p className="mt-4 max-w-2xl text-slate-300">
-          The web shell is ready. Asset views, live telemetry, and operator
-          workflows arrive as contract-backed feature slices.
+        <p className="mt-4 max-w-2xl text-muted">
+          The asset identity catalogue is available as a development preview.
+          Live telemetry and operator workflows are still being built.
         </p>
-        <div className="mt-10 rounded-xl border border-slate-700 bg-slate-900 p-6">
-          <h2 className="text-lg font-medium">Connected data</h2>
-          <p className="mt-2 text-slate-400">
-            No backend data is connected yet. This state is intentional.
+        <section className="mt-10 rounded-xl border border-outline bg-surface p-6">
+          <h2 className="text-lg font-medium">Asset catalogue preview</h2>
+          <p className="mt-2 text-muted">
+            Run <code>pnpm dev:web:preview</code> to see synthetic,
+            contract-backed assets. The preview starts its MSW handler
+            automatically; there is no separate mock server.
           </p>
-        </div>
+          <Link
+            className="mt-4 inline-block text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            to="/tenants/tenant-a/assets"
+          >
+            Open asset catalogue
+          </Link>
+        </section>
+        <section className="mt-4 rounded-xl border border-outline bg-surface p-6">
+          <h2 className="text-lg font-medium">Connected data</h2>
+          <p className="mt-2 text-muted">
+            No backend data is connected yet. Without preview mode, the
+            catalogue shows its unconnected state.
+          </p>
+        </section>
       </div>
     </main>
   );

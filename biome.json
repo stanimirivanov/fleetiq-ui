@@ -4,6 +4,8 @@
     "includes": [
       "**",
       "!**/assets",
+      "!**/dist",
+      "!**/.expo",
       "!**/pnpm-lock.yaml",
       "!**/LICENSE",
       "!packages/api-contract/src/generated.ts",
@@ -13,6 +15,11 @@
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "javascript": {
     "formatter": {

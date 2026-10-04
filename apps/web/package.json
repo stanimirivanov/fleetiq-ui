@@ -8,22 +8,27 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test:contract": "node --test src/mocks/handlers.test.ts"
+    "test:contract": "node --test src/mocks/handlers.test.ts src/features/assets/api/previewCatalogue.test.ts && node --import tsx --test src/features/assets/ui/AssetListPage.test.tsx"
   },
   "dependencies": {
     "@fleetiq/api-contract": "workspace:*",
+    "@fleetiq/asset-catalogue": "workspace:*",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-router": "7.12.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",
+    "@testing-library/react": "16.3.3",
+    "@types/jsdom": "28.0.3",
     "@types/node": "26.6.4",
     "@types/react": "19.2.4",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.1.1",
+    "jsdom": "29.1.1",
     "msw": "3.0.2",
     "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
     "typescript": "6.0.3",
     "vite": "8.3.2"
   }

@@ -2,26 +2,26 @@
 
 ## TL;DR
 
-FleetIQ defaults to an accessible light operator theme. Dark-theme support is planned as a separate slice; no screen follows an incomplete system-dark palette. Visual references guide hierarchy and interaction, not copied layouts or assets.
+FleetIQ supports light and dark operator themes on web and mobile. Light remains the default. Operators can choose Light, Dark, or System; explicit choices override device appearance, and System follows it. Status meaning and accessibility must survive both palettes.
 
-The light screenshots saved in offline-docs suggest a pale working canvas, white content surfaces, restrained blue emphasis, and clear status text. The dark report screenshot demonstrates a second viable density and contrast treatment. FleetIQ keeps its own equipment-neutral language and semantic asset model. A map-led surface should always have a keyboard-accessible list or detail alternative.
+The screenshots saved in offline-docs suggest a pale working canvas, white content surfaces, restrained blue emphasis, and clear status text for light mode; the dark report screenshot demonstrates a second viable density and contrast treatment. FleetIQ uses its own equipment-neutral language and semantic asset model. A map-led surface should always have a keyboard-accessible list or detail alternative.
 
-## Current light tokens
+## Semantic colors
 
-| Role | Value | Use |
-|:--|:--|:--|
-| Canvas | #F4F7FA | Page background |
-| Surface | #FFFFFF | Cards and panels |
-| Outline | #D8E0E8 | Nonessential separators |
-| Foreground | #142235 | Primary text |
-| Muted | #475569 | Secondary text |
-| Accent | #006B8F | Links, focus, emphasis |
-| Unknown | #825700 | Unknown-condition text and border |
+| Role | Light | Dark | Use |
+|:--|:--|:--|:--|
+| Canvas | #F4F7FA | #101B2A | Page background |
+| Surface | #FFFFFF | #18273A | Cards and panels |
+| Outline | #D8E0E8 | #3C5269 | Nonessential separators |
+| Foreground | #142235 | #F1F7FC | Primary text |
+| Muted | #475569 | #B8C8D7 | Secondary text |
+| Accent | #006B8F | #7AD3ED | Links, focus, emphasis |
+| Unknown | #825700 | #F5C777 | Unknown-condition text and border |
 
-The web Tailwind theme and native token module use the same values. On both canvas and surface, foreground, muted, accent, and unknown text exceed 4.5:1 WCAG contrast; the theme check enforces that. Status words remain visible independently of color. Native spacing remains 4/8/16/24/32 points with 16-point body and 30-point title text; web uses Tailwind's responsive scale.
+The web Tailwind theme and native token module use the same role names and values. On both canvas and surface, foreground, muted, accent, and unknown text exceed 4.5:1 WCAG contrast; `pnpm theme:check` enforces parity and contrast. Status words remain visible independently of color. Native spacing remains 4/8/16/24/32 points with 16-point body and 30-point title text; web uses Tailwind's responsive scale.
 
-## Evolution and validation
+## Preference and validation
 
-The app uses light browser and native system chrome now. There is no theme toggle or saved preference until dark colors, every state, and both platforms have been reviewed together. The dark-theme slice must define semantic dark tokens, user/system preference behavior, persistence, and contrast checks, then validate list, empty, error, focus, and status states in both modes.
+An absent, unreadable, or invalid saved preference uses Light. User choices are stored locally on each platform. System mode reacts to browser or device appearance changes; failure to save is visible in the control. Web updates the root palette and browser color scheme. Native updates navigation, surfaces, and status-bar contrast. See [decision 0005](design-docs/0005-theme-preference.md) for precedence and persistence.
 
-Distinguish fresh, stale, unknown, and alarm states with text and shape as well as color. Use consistent units, time-zone labels, provenance, and confidence when data warrants them. Adaptive density must be predictable and user-controllable. Validate rendered focus indicators and native screen-reader behavior on devices before release. External inspiration research remains outside Git in the user's offline-docs directory.
+Review list, empty, loading, error, focus, navigation, and unknown-status states in both themes. Distinguish fresh, stale, unknown, and alarm states with text and shape as well as color. Use consistent units, time-zone labels, provenance, and confidence when data warrants them. Adaptive density must be predictable and user-controllable. Validate rendered focus indicators and native screen-reader behavior on devices before release. External inspiration research remains outside Git in the user's offline-docs directory.

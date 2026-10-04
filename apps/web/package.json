@@ -8,11 +8,13 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test:contract": "node --test src/mocks/handlers.test.ts src/features/assets/api/previewCatalogue.test.ts && node --import tsx --test src/features/assets/ui/AssetListPage.test.tsx"
+    "test:contract": "node --test src/mocks/handlers.test.ts src/features/assets/api/previewCatalogue.test.ts && node --import tsx --test src/features/assets/ui/AssetListPage.test.tsx",
+    "test:theme": "node --import tsx --test src/theme/ThemeProvider.test.tsx"
   },
   "dependencies": {
     "@fleetiq/api-contract": "workspace:*",
     "@fleetiq/asset-catalogue": "workspace:*",
+    "@fleetiq/theme-preference": "workspace:*",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-router": "7.12.0"

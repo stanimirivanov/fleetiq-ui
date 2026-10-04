@@ -3,6 +3,7 @@ import type { AssetPageLoader } from '../features/assets/api/previewCatalogue';
 import { AssetIdentityPage } from '../features/assets/ui/AssetIdentityPage';
 import { AssetListPage } from '../features/assets/ui/AssetListPage';
 import { OverviewPage } from '../features/overview/OverviewPage';
+import { ThemeControl } from '../theme/ThemeControl';
 
 type AppProps = { assetLoader?: AssetPageLoader };
 
@@ -20,29 +21,32 @@ function IdentityRoute() {
   return <AssetIdentityPage tenantId={tenantId} assetId={assetId} />;
 }
 
-/** App composition owns routing and injects the optional development adapter. */
+/** App composition owns routing and the persistent appearance control. */
 export function App({ assetLoader }: AppProps) {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          assetLoader ? (
-            <Navigate to="/tenants/tenant-a/assets" replace />
-          ) : (
-            <OverviewPage />
-          )
-        }
-      />
-      <Route
-        path="/tenants/:tenantId/assets"
-        element={<CatalogueRoute assetLoader={assetLoader} />}
-      />
-      <Route
-        path="/tenants/:tenantId/assets/:assetId"
-        element={<IdentityRoute />}
-      />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <ThemeControl />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            assetLoader ? (
+              <Navigate to="/tenants/tenant-a/assets" replace />
+            ) : (
+              <OverviewPage />
+            )
+          }
+        />
+        <Route
+          path="/tenants/:tenantId/assets"
+          element={<CatalogueRoute assetLoader={assetLoader} />}
+        />
+        <Route
+          path="/tenants/:tenantId/assets/:assetId"
+          element={<IdentityRoute />}
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }

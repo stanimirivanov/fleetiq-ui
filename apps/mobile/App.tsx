@@ -1,5 +1,6 @@
 import type { AssetPageLoader } from '@fleetiq/asset-catalogue';
 import {
+  DefaultTheme,
   type LinkingOptions,
   NavigationContainer,
 } from '@react-navigation/native';
@@ -10,7 +11,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { createPreviewAssetPageLoader } from './src/features/assets/api/previewCatalogue';
 import { AssetIdentityScreen } from './src/features/assets/ui/AssetIdentityScreen';
 import { AssetListScreen } from './src/features/assets/ui/AssetListScreen';
-import { colors } from './src/theme/tokens';
+import { ThemeProvider, useTheme } from './src/theme/ThemeProvider';
 
 type RootStackParamList = {
   Assets: { tenantId?: string } | undefined;
@@ -33,12 +34,25 @@ const linking: LinkingOptions<RootStackParamList> = {
   },
 };
 
-/** Native composition owns navigation and chooses the explicit preview adapter. */
-export default function App() {
+function ThemedApp() {
+  const { scheme, colors } = useTheme();
+  const navigationTheme = {
+    ...DefaultTheme,
+    dark: scheme === 'dark',
+    colors: {
+      primary: colors.accent,
+      background: colors.canvas,
+      card: colors.surface,
+      text: colors.foreground,
+      border: colors.outline,
+      notification: colors.unknown,
+    },
+  };
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer linking={linking}>
-        <StatusBar style="dark" />
+      <NavigationContainer linking={linking} theme={navigationTheme}>
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <Stack.Navigator
           initialRouteName="Assets"
           screenOptions={{
@@ -85,5 +99,14 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
+  );
+}
+
+/** Native composition owns navigation and the persisted appearance choice. */
+export default function App() {
+  return (
+    <ThemeProvider>
+      <ThemedApp />
+    </ThemeProvider>
   );
 }

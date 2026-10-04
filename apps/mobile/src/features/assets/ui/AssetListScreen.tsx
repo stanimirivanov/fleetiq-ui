@@ -9,7 +9,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import { colors, spacing, typography } from '../../../theme/tokens';
+import { ThemeControl } from '../../../theme/ThemeControl';
+import { useTheme } from '../../../theme/ThemeProvider';
+import { palettes, spacing, type ThemeColors, typography } from '../../../theme/tokens';
 
 type State =
   | { kind: 'loading' }
@@ -24,6 +26,8 @@ type Props = {
 
 /** Native identity list backed only by an explicitly supplied page loader. */
 export function AssetListScreen({ tenantId, loadPage, onSelect }: Props) {
+  const { scheme, colors } = useTheme();
+  const styles = stylesByTheme[scheme];
   const [state, setState] = useState<State>({ kind: 'loading' });
   const [reload, setReload] = useState(0);
 
@@ -54,6 +58,7 @@ export function AssetListScreen({ tenantId, loadPage, onSelect }: Props) {
 
   return (
     <View style={styles.container}>
+      <ThemeControl />
       <Text style={styles.brand}>FleetIQ</Text>
       <Text style={styles.title} accessibilityRole="header">Assets</Text>
       <Text style={styles.muted}>Tenant {tenantId ?? 'not selected'}</Text>
@@ -106,17 +111,24 @@ export function AssetListScreen({ tenantId, loadPage, onSelect }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.canvas, paddingHorizontal: spacing.lg, paddingTop: spacing.xl },
-  brand: { color: colors.accent, fontSize: typography.label, fontWeight: '700', letterSpacing: 3, textTransform: 'uppercase' },
-  title: { color: colors.foreground, fontSize: typography.title, fontWeight: '600', marginTop: spacing.lg },
-  muted: { color: colors.muted, fontSize: typography.body, lineHeight: 24, marginTop: spacing.sm },
-  preview: { color: colors.foreground, backgroundColor: colors.surface, borderColor: colors.accent, borderWidth: 1, borderRadius: 10, padding: spacing.md, marginTop: spacing.lg },
-  feedback: { alignItems: 'center', gap: spacing.sm, marginTop: spacing.xl },
-  list: { gap: spacing.md, paddingVertical: spacing.lg },
-  card: { backgroundColor: colors.surface, borderColor: colors.outline, borderRadius: 12, borderWidth: 1, padding: spacing.lg, marginTop: spacing.md },
-  cardTitle: { color: colors.foreground, fontSize: 18, fontWeight: '600' },
-  unknown: { color: colors.unknown, fontSize: typography.label, marginTop: spacing.md },
-  action: { borderColor: colors.accent, borderWidth: 1, borderRadius: 8, alignSelf: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, marginTop: spacing.md },
-  actionText: { color: colors.accent, fontSize: typography.body, fontWeight: '600' },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.canvas, paddingHorizontal: spacing.lg, paddingTop: spacing.xl },
+    brand: { color: colors.accent, fontSize: typography.label, fontWeight: '700', letterSpacing: 3, textTransform: 'uppercase', marginTop: spacing.lg },
+    title: { color: colors.foreground, fontSize: typography.title, fontWeight: '600', marginTop: spacing.lg },
+    muted: { color: colors.muted, fontSize: typography.body, lineHeight: 24, marginTop: spacing.sm },
+    preview: { color: colors.foreground, backgroundColor: colors.surface, borderColor: colors.accent, borderWidth: 1, borderRadius: 10, padding: spacing.md, marginTop: spacing.lg },
+    feedback: { alignItems: 'center', gap: spacing.sm, marginTop: spacing.xl },
+    list: { gap: spacing.md, paddingVertical: spacing.lg },
+    card: { backgroundColor: colors.surface, borderColor: colors.outline, borderRadius: 12, borderWidth: 1, padding: spacing.lg, marginTop: spacing.md },
+    cardTitle: { color: colors.foreground, fontSize: 18, fontWeight: '600' },
+    unknown: { color: colors.unknown, fontSize: typography.label, marginTop: spacing.md },
+    action: { borderColor: colors.accent, borderWidth: 1, borderRadius: 8, alignSelf: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, marginTop: spacing.md },
+    actionText: { color: colors.accent, fontSize: typography.body, fontWeight: '600' },
+  });
+}
+
+const stylesByTheme = {
+  light: createStyles(palettes.light),
+  dark: createStyles(palettes.dark),
+};

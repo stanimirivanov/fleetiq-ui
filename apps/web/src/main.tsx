@@ -3,7 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { App } from './app/App';
 import type { AssetPageLoader } from './features/assets/api/previewCatalogue';
+import { initializeDocumentTheme, ThemeProvider } from './theme/ThemeProvider';
 import './styles.css';
+
+initializeDocumentTheme();
 
 async function prepareMockApi(): Promise<AssetPageLoader | undefined> {
   if (!import.meta.env.DEV || import.meta.env.VITE_API_MODE !== 'mock')
@@ -25,9 +28,11 @@ void prepareMockApi()
 
     createRoot(root).render(
       <StrictMode>
-        <BrowserRouter>
-          <App assetLoader={assetLoader} />
-        </BrowserRouter>
+        <ThemeProvider>
+          <BrowserRouter>
+            <App assetLoader={assetLoader} />
+          </BrowserRouter>
+        </ThemeProvider>
       </StrictMode>,
     );
   })

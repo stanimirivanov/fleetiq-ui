@@ -20,17 +20,23 @@ const tokenNames = [
   'accent',
   'unknown',
 ];
-const palette = {};
-for (const name of tokenNames) {
-  const web = css.match(
-    new RegExp(`--color-${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`),
-  )?.[1];
-  const mobile = native.match(
-    new RegExp(`\\b${name}:\\s*'(#[0-9a-fA-F]{6})'`),
-  )?.[1];
-  assert(web && mobile, `Missing ${name} theme token`);
-  assert.equal(web.toLowerCase(), mobile.toLowerCase(), `${name} must match`);
-  palette[name] = web;
+
+function block(source, marker) {
+  const start = source.indexOf(marker);
+  assert(start >= 0, `Missing ${marker} palette`);
+  const open = source.indexOf('{', start);
+  const close = source.indexOf('}', open);
+  assert(open >= 0 && close >= 0, `Incomplete ${marker} palette`);
+  return source.slice(open + 1, close);
+}
+
+function token(source, name, prefix) {
+  const line = source
+    .split('\n')
+    .find((item) => item.trimStart().startsWith(`${prefix}${name}:`));
+  const value = line?.match(/#[0-9a-fA-F]{6}/)?.[0];
+  assert(value, `Missing ${name} token`);
+  return value.toLowerCase();
 }
 
 function luminance(hex) {
@@ -52,16 +58,35 @@ function contrast(first, second) {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
-for (const background of ['canvas', 'surface']) {
-  for (const foreground of ['foreground', 'muted', 'accent', 'unknown']) {
-    assert(
-      contrast(palette[foreground], palette[background]) >= 4.5,
-      `${foreground} text needs at least 4.5:1 contrast on ${background}`,
-    );
+const webBlocks = {
+  light: block(css, ':root {'),
+  dark: block(css, ':root[data-theme="dark"] {'),
+};
+const nativeBlocks = {
+  light: block(native, 'light: {'),
+  dark: block(native, 'dark: {'),
+};
+for (const scheme of ['light', 'dark']) {
+  const palette = {};
+  for (const name of tokenNames) {
+    assert(css.includes(`--color-${name}: var(--theme-${name});`));
+    const web = token(webBlocks[scheme], name, '--theme-');
+    const mobile = token(nativeBlocks[scheme], name, '');
+    assert.equal(web, mobile, `${scheme} ${name} must match across platforms`);
+    palette[name] = web;
+  }
+  for (const background of ['canvas', 'surface']) {
+    for (const foreground of ['foreground', 'muted', 'accent', 'unknown']) {
+      assert(
+        contrast(palette[foreground], palette[background]) >= 4.5,
+        `${scheme} ${foreground} text needs 4.5:1 contrast on ${background}`,
+      );
+    }
   }
 }
-assert.match(css, /color-scheme:\s*light\s*;/);
-assert.equal(config.expo.userInterfaceStyle, 'light');
+assert(webBlocks.light.includes('color-scheme: light;'));
+assert(webBlocks.dark.includes('color-scheme: dark;'));
+assert.equal(config.expo.userInterfaceStyle, 'automatic');
 console.log(
-  'Web/native light tokens match and text colors meet 4.5:1 contrast',
+  'Web/native light and dark tokens match; text colors meet 4.5:1 contrast',
 );

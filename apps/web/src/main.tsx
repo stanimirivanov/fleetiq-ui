@@ -4,13 +4,23 @@ import { BrowserRouter } from 'react-router';
 import { App } from './app/App';
 import './styles.css';
 
-const root = document.getElementById('root');
-if (!root) throw new Error('FleetIQ root element is missing');
+async function prepareMockApi(): Promise<void> {
+  if (!import.meta.env.DEV || import.meta.env.VITE_API_MODE !== 'mock') return;
+  const { network } = await import('virtual:msw');
+  const { handlers } = await import('./mocks/handlers');
+  network.configure({ handlers });
+  await network.enable();
+}
 
-createRoot(root).render(
-  <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>,
-);
+void prepareMockApi().then(() => {
+  const root = document.getElementById('root');
+  if (!root) throw new Error('FleetIQ root element is missing');
+
+  createRoot(root).render(
+    <StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </StrictMode>,
+  );
+});

@@ -9,7 +9,7 @@ Start at AGENTS.md and CONTRIBUTING.md, then read only the row relevant to your 
 | App/package boundaries, imports | [Architecture](../ARCHITECTURE.md), [frontend guide](FRONTEND.md) |
 | Product terminology and screen behavior | [Product sense](PRODUCT_SENSE.md), [product specs](product-specs/index.md) |
 | Visual system and accessibility | [Design guide](DESIGN.md) |
-| API contract, state, web/mobile parity | [Frontend guide](FRONTEND.md) |
+| API contract, state, web/mobile parity | [Frontend guide](FRONTEND.md), [pinned contract package](../packages/api-contract/README.md) |
 | CI, agent guidance, checks | [Harness](HARNESS.md), [contributing](../CONTRIBUTING.md) |
 | Reliability, offline or live streams | [Reliability](RELIABILITY.md) |
 | Authentication, permissions, privacy | [Security](SECURITY.md), [reporting policy](../SECURITY.md) |

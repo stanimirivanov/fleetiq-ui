@@ -6,7 +6,7 @@ Web and mobile ship together around shared backend contracts. React owns renderi
 
 ## Current state
 
-The repository boots a Vite/React web shell and an Expo/React Native mobile shell. A shared package pins the partial backend OpenAPI baseline, generated transport types, runtime parsers, and synthetic fixtures. Web has opt-in MSW development handlers; mobile has an explicit fixture adapter. Both apps now have an asset identity list and identity-only route. They show contract-backed synthetic assets only in explicit development preview mode; production remains unconnected. There is no production API client, login, live data, or asset detail.
+The repository boots a Vite/React web shell and an Expo/React Native mobile shell. A shared package pins the partial backend OpenAPI baseline, generated transport types, runtime parsers, and synthetic fixtures. Web has opt-in MSW development handlers; mobile has an explicit fixture adapter. Both use the shared asset-catalogue loader shape and tenant parser. Both apps now have an asset identity list and identity-only route. They show contract-backed synthetic assets only in explicit development preview mode; production remains unconnected. There is no production API client, login, live data, or asset detail.
 
 ## State ownership
 
@@ -24,13 +24,13 @@ Do not add Redux Toolkit alongside Atom by default. A second global store adds c
 
 ## API contract and mocking
 
-The backend owns OpenAPI and future event schemas. The shared api-contract package pins one backend commit and generates transport types from its partial v1 OpenAPI artifact. Generated wire types are not domain models. Zod parsers validate unknown HTTP payloads at the boundary; future event payloads will need their own versioned parsers. The contract check verifies the artifact hash, generated output, fixture equality, parsers, mock-backed app adapters, and web catalogue behavior.
+The backend owns OpenAPI and future event schemas. The shared api-contract package pins one backend commit and generates transport types from its partial v1 OpenAPI artifact. Generated wire types are not domain models. Zod parsers validate unknown HTTP payloads at the boundary; future event payloads will need their own versioned parsers. The contract check verifies the artifact hash, generated output, fixture equality, parsers, the shared catalogue boundary, mock-backed app adapters, and web catalogue behavior.
 
-Web MSW starts only when VITE_API_MODE=mock is explicitly set during development. Add that value to an untracked apps/web/.env.local file or set it in the shell; production builds never start the worker. The native asset feature fixture adapter imports the same synthetic data and is invoked only when EXPO_PUBLIC_API_MODE=mock in development. Neither path represents a browser-safe login. No production path falls back silently to fixtures. See [the contract package](../packages/api-contract/README.md).
+Use pnpm dev:web:preview to start Vite with MSW automatically; pnpm dev:mobile:web:preview or pnpm dev:mobile:preview starts Expo with its local fixture adapter. The plain dev commands show unconnected states. Web MSW starts only when VITE_API_MODE=mock is set during development, and production builds never start the worker. The native adapter is invoked only when EXPO_PUBLIC_API_MODE=mock in development. Neither path represents a browser-safe login. No production path falls back silently to fixtures. See [the contract package](../packages/api-contract/README.md).
 
 ## Feature shape
 
-Use a vertical feature directory under each app: model for pure client concepts, api for request/stream translation, and ui for platform views. Add folders only when needed. app composes routes, providers, and features. Shared packages may contain contract types, parsers, or pure behavior used on both platforms; they must not contain browser globals or native modules. Web and native map, charts, interaction, and accessibility often differ and belong in their owning apps.
+Use a vertical feature directory under each app: model for pure client concepts, api for request/stream translation, and ui for platform views. Add folders only when needed. app composes routes, providers, and features. Shared packages contain contract types, parsers, the catalogue loader boundary, or pure behavior used on both platforms; they must not contain browser globals or native modules. Web and native map, charts, interaction, and accessibility often differ and belong in their owning apps.
 
 ## Testing and accessibility
 

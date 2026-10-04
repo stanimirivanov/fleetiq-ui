@@ -7,10 +7,10 @@ FleetIQ's React web and Expo/React Native mobile applications live in one worksp
 Use Node.js 24 or newer and the pinned pnpm version in package.json.
 
 - pnpm install --frozen-lockfile
-- pnpm dev:web
-- pnpm dev:mobile
+- pnpm dev:web:preview
+- pnpm dev:mobile:web:preview
 - pnpm check
 
-The web app runs with Vite. For synthetic API responses, set VITE_API_MODE=mock in an untracked apps/web/.env.local file before pnpm dev:web. Mocking is development-only; see [the shared contract](packages/api-contract/README.md). The mobile app runs with Expo. Set EXPO_PUBLIC_API_MODE=mock for its explicit asset preview; otherwise the catalogue stays unconnected. Android requires an emulator or device, and iOS native builds require macOS. Run commands at the repository root.
+Run commands at the repository root. pnpm dev:web:preview starts Vite with the development MSW handlers; open http://localhost:5173/tenants/tenant-a/assets; no separate mock server is needed. pnpm dev:mobile:web:preview starts the Expo app for a browser at its printed local URL (normally port 8081) with its local fixture adapter. Use pnpm dev:mobile:preview for an Android or iOS device. The plain pnpm dev:web and pnpm dev:mobile commands keep the unconnected state. Mocking is development-only; see [the shared contract](packages/api-contract/README.md) and [asset catalogue boundary](packages/asset-catalogue/README.md). Android needs an emulator or device, and iOS native builds require macOS.
 
 Read [AGENTS.md](AGENTS.md) for the short working agreement, [docs/README.md](docs/README.md) for task-specific guidance, and [ARCHITECTURE.md](ARCHITECTURE.md) for boundaries. The backend lives in the separate fleetiq-platform repository.

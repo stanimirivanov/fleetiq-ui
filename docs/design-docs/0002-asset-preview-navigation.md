@@ -21,3 +21,5 @@ Keep list data in feature-local request state for now. It has no cross-screen ca
 ## Consequences and review trigger
 
 The native stack and deep-link mapping must be checked on devices before release. Web cursor paging is supported; native paging remains deferred. Review the adapter and state ownership when production identity, multi-page native lists, asset detail, or live subscriptions arrive. Run contract-backed adapter tests, visible web state tests, TypeScript, dependency boundaries, and the Expo Android export in CI.
+
+The common loader and tenant parser moved to a shared package in [decision 0003](0003-shared-asset-catalogue-boundary.md); platform preview transports remain separate.

@@ -3,16 +3,20 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@expo/metro-runtime": "~57.0.16",
     "@fleetiq/api-contract": "workspace:*",
+    "@fleetiq/asset-catalogue": "workspace:*",
     "@react-navigation/native": "7.5.0",
     "@react-navigation/native-stack": "7.20.0",
     "expo": "~57.0.26",
     "expo-linking": "~57.0.11",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.86.3",
     "react-native-safe-area-context": "~5.7.0",
-    "react-native-screens": "~4.26.2"
+    "react-native-screens": "~4.26.2",
+    "react-native-web": "^0.21.3"
   },
   "devDependencies": {
     "@types/node": "26.6.4",
@@ -24,8 +28,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "typecheck": "tsc --noEmit",
-    "check": "expo install --check && expo export --platform android --output-dir dist",
-    "test:contract": "node --test src/features/assets/api/fixtureAssetCatalogue.test.ts"
+    "check": "expo install --check && expo export --platform android --output-dir dist/android && expo export --platform web --output-dir dist/web",
+    "test:contract": "node --test src/features/assets/api/previewCatalogue.test.ts"
   },
   "private": true,
   "type": "module"

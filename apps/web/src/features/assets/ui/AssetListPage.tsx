@@ -1,10 +1,7 @@
 import type { AssetPage } from '@fleetiq/api-contract';
+import { CatalogueRequestError, type AssetPageLoader } from '@fleetiq/asset-catalogue';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import {
-  CatalogueRequestError,
-  type AssetPageLoader,
-} from '../api/previewCatalogue';
 
 type CatalogueState =
   | { kind: 'loading' }

@@ -6,7 +6,7 @@ The first asset surface shows tenant-scoped asset identity on web and mobile fro
 
 ## Actor and entry
 
-An operator opens the asset list for a tenant. Web navigation uses /tenants/{tenantId}/assets and /tenants/{tenantId}/assets/{assetId}. Native navigation carries the same identifiers, including deep links with the fleetiq scheme. A development-only mock mode starts at tenant-a; production has no default tenant or fixture data.
+An operator opens the asset list for a tenant. Web navigation uses /tenants/{tenantId}/assets and /tenants/{tenantId}/assets/{assetId}. Native navigation carries the same identifiers, including deep links with the fleetiq scheme. The preview commands in the root README start at tenant-a; plain development and production modes have no fixture data.
 
 ## Data and behavior
 

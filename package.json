@@ -8,17 +8,21 @@
   },
   "scripts": {
     "dev:web": "pnpm --filter @fleetiq/web dev",
+    "dev:web:preview": "node tools/start-preview.mjs web",
     "dev:mobile": "pnpm --filter @fleetiq/mobile start",
-    "check": "pnpm format:check && pnpm lint && pnpm contract:check && pnpm typecheck && pnpm architecture && pnpm docs:check && pnpm build:web && pnpm check:mobile",
-    "format": "biome format --write .",
+    "dev:mobile:preview": "node tools/start-preview.mjs mobile",
+    "dev:mobile:web:preview": "node tools/start-preview.mjs mobile-web",
+    "check": "pnpm style:check && pnpm contract:check && pnpm typecheck && pnpm architecture && pnpm docs:check && pnpm build:web && pnpm check:mobile",
+    "format": "biome check --write .",
+    "style:check": "biome ci .",
     "format:check": "biome format .",
     "lint": "biome lint .",
-    "typecheck": "pnpm --filter @fleetiq/api-contract typecheck && pnpm --filter @fleetiq/web typecheck && pnpm --filter @fleetiq/mobile typecheck",
+    "typecheck": "pnpm --filter @fleetiq/api-contract typecheck && pnpm --filter @fleetiq/asset-catalogue typecheck && pnpm --filter @fleetiq/web typecheck && pnpm --filter @fleetiq/mobile typecheck",
     "architecture": "depcruise --config .dependency-cruiser.cjs apps packages",
     "docs:check": "node tools/check-docs.mjs",
     "build:web": "pnpm --filter @fleetiq/web build && node tools/check-web-build.mjs",
     "check:mobile": "pnpm --filter @fleetiq/mobile check",
-    "contract:check": "pnpm --filter @fleetiq/api-contract check && pnpm --filter @fleetiq/web test:contract && pnpm --filter @fleetiq/mobile test:contract"
+    "contract:check": "pnpm --filter @fleetiq/api-contract check && pnpm --filter @fleetiq/asset-catalogue test && pnpm --filter @fleetiq/web test:contract && pnpm --filter @fleetiq/mobile test:contract"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

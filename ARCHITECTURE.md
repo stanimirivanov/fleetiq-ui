@@ -4,13 +4,13 @@
 
 FleetIQ UI has two apps, an asset identity preview on each, and a shared, pinned backend contract package. It does not yet have live backend integration. Features own their models, API adapters, and views; the app layer composes them. Shared packages stay platform-neutral.
 
-The backend contract feeds separate web and mobile API adapters. Each adapter validates wire data for its feature. The app shells compose features. The shared contract package feeds both app adapters without importing their presentation code.
+The backend contract and shared asset-catalogue boundary feed separate web and mobile preview adapters. The shared boundary validates page shape and tenant scope. The app shells compose features. The shared contract package feeds both app adapters without importing their presentation code.
 
 ## Repository topology
 
 - apps/web: React, React Router, Vite, Tailwind CSS. Its src/app is composition and route wiring; src/features contains vertical product capabilities.
 - apps/mobile: Expo/React Native. Its App.tsx composes React Navigation; features follow the same domain names as web where useful.
-- packages/: api-contract holds the backend OpenAPI snapshot, generated wire types, runtime parsers, and synthetic fixtures used by both apps. A package cannot import either app or a platform UI framework. See [package guidance](packages/README.md).
+- packages/: api-contract holds the backend OpenAPI snapshot, generated wire types, runtime parsers, and synthetic fixtures. asset-catalogue holds the shared page-loader signature, tenant parser, and reusable HTTP boundary. A package cannot import either app or a platform UI framework. See [package guidance](packages/README.md).
 - tools/: deterministic repository checks.
 - docs/: canonical guides, product specs, decisions, and execution state.
 

@@ -18,15 +18,27 @@ async function prepareMockApi(): Promise<AssetPageLoader | undefined> {
   return createPreviewAssetPageLoader(window.location.origin);
 }
 
-void prepareMockApi().then((assetLoader) => {
-  const root = document.getElementById('root');
-  if (!root) throw new Error('FleetIQ root element is missing');
+void prepareMockApi()
+  .then((assetLoader) => {
+    const root = document.getElementById('root');
+    if (!root) throw new Error('FleetIQ root element is missing');
 
-  createRoot(root).render(
-    <StrictMode>
-      <BrowserRouter>
-        <App assetLoader={assetLoader} />
-      </BrowserRouter>
-    </StrictMode>,
-  );
-});
+    createRoot(root).render(
+      <StrictMode>
+        <BrowserRouter>
+          <App assetLoader={assetLoader} />
+        </BrowserRouter>
+      </StrictMode>,
+    );
+  })
+  .catch((error: unknown) => {
+    console.error('FleetIQ preview failed to start', error);
+    const root = document.getElementById('root');
+    if (!root) return;
+    const notice = document.createElement('p');
+    notice.setAttribute('role', 'alert');
+    notice.className = 'min-h-screen bg-canvas p-8 text-foreground';
+    notice.textContent =
+      'Development preview could not start. Check the browser console and restart the preview command.';
+    root.replaceChildren(notice);
+  });

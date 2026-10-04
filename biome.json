@@ -4,6 +4,8 @@
     "includes": [
       "**",
       "!**/assets",
+      "!**/dist",
+      "!**/.expo",
       "!**/pnpm-lock.yaml",
       "!**/LICENSE",
       "!packages/api-contract/src/generated.ts",

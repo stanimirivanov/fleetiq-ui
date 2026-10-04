@@ -1,4 +1,5 @@
 import type { AssetPage } from '@fleetiq/api-contract';
+import type { AssetPageLoader } from '@fleetiq/asset-catalogue';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -10,8 +11,6 @@ import {
 } from 'react-native';
 import { colors, spacing, typography } from '../../../theme/tokens';
 
-export type NativeAssetPageLoader = (tenantId: string) => Promise<AssetPage>;
-
 type State =
   | { kind: 'loading' }
   | { kind: 'ready'; page: AssetPage }
@@ -19,7 +18,7 @@ type State =
 
 type Props = {
   tenantId?: string;
-  loadPage?: NativeAssetPageLoader;
+  loadPage?: AssetPageLoader;
   onSelect: (assetId: string) => void;
 };
 
@@ -30,11 +29,11 @@ export function AssetListScreen({ tenantId, loadPage, onSelect }: Props) {
 
   useEffect(() => {
     if (!tenantId || !loadPage) return;
-    let active = true;
+    const controller = new AbortController();
     setState({ kind: 'loading' });
-    void loadPage(tenantId).then(
+    void loadPage(tenantId, null, controller.signal).then(
       (page) => {
-        if (active) {
+        if (!controller.signal.aborted) {
           setState(
             page.assets.every((asset) => asset.tenant_id === tenantId)
               ? { kind: 'ready', page }
@@ -43,11 +42,11 @@ export function AssetListScreen({ tenantId, loadPage, onSelect }: Props) {
         }
       },
       () => {
-        if (active) setState({ kind: 'error' });
+        if (!controller.signal.aborted) setState({ kind: 'error' });
       },
     );
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [tenantId, loadPage, reload]);
 

@@ -1,17 +1,15 @@
+import type { AssetPageLoader } from '@fleetiq/asset-catalogue';
 import {
-  NavigationContainer,
   type LinkingOptions,
+  NavigationContainer,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StatusBar } from 'expo-status-bar';
 import * as Linking from 'expo-linking';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { listFixtureAssets } from './src/features/assets/api/fixtureAssetCatalogue';
-import {
-  AssetListScreen,
-  type NativeAssetPageLoader,
-} from './src/features/assets/ui/AssetListScreen';
+import { createPreviewAssetPageLoader } from './src/features/assets/api/previewCatalogue';
 import { AssetIdentityScreen } from './src/features/assets/ui/AssetIdentityScreen';
+import { AssetListScreen } from './src/features/assets/ui/AssetListScreen';
 import { colors } from './src/theme/tokens';
 
 type RootStackParamList = {
@@ -21,8 +19,8 @@ type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const preview = __DEV__ && process.env.EXPO_PUBLIC_API_MODE === 'mock';
-const loadPage: NativeAssetPageLoader | undefined = preview
-  ? listFixtureAssets
+const loadPage: AssetPageLoader | undefined = preview
+  ? createPreviewAssetPageLoader()
   : undefined;
 
 const linking: LinkingOptions<RootStackParamList> = {

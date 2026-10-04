@@ -7,8 +7,8 @@ This is a current evidence ledger, not a claim of production readiness. Update i
 | Area | Current evidence | Gap |
 |:--|:--|:--|
 | Web shell | Type check, production build, and mock-exclusion check in pnpm check | No live backend or full browser end-to-end workflow |
-| Mobile shell | Type check, Expo dependency check, and Android JavaScript bundle | No device/emulator run or native interaction test |
-| Architecture | Import boundary check | Semantic boundaries still need review |
+| Mobile shell | Type check, Expo dependency check, and Android/web JavaScript exports | No device/emulator run or native interaction test |
+| Architecture | Import boundary check and shared catalogue page-loader contract | Semantic boundaries still need review |
 | Documentation | Local link and plan-structure check | Factual freshness needs maintainers |
 | API compatibility | Pinned OpenAPI snapshot, generated-type check, fixture drift check, parser tests, and mock-backed web/mobile adapter tests | Live backend compatibility, browser-safe identity, and event contracts remain |
 | Accessibility | Semantic asset links, text status, native accessible rows, and calculated token contrast | Rendered keyboard/focus, screen-reader, and device review remain |

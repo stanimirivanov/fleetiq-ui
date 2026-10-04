@@ -15,6 +15,7 @@ const markers = [
   'Primary machine',
   'urn:fleetiq:problem:unauthorized',
   'mockServiceWorker.js',
+  'contract-preview-only',
 ];
 for (const entry of entries) {
   if (!entry.isFile() || !entry.name.endsWith('.js')) continue;

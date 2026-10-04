@@ -14,7 +14,7 @@
     "format:check": "biome format .",
     "lint": "biome lint .",
     "typecheck": "pnpm --filter @fleetiq/web typecheck && pnpm --filter @fleetiq/mobile typecheck",
-    "architecture": "depcruise --config .dependency-cruiser.cjs apps",
+    "architecture": "depcruise --config .dependency-cruiser.cjs apps packages",
     "docs:check": "node tools/check-docs.mjs",
     "build:web": "pnpm --filter @fleetiq/web build",
     "check:mobile": "pnpm --filter @fleetiq/mobile check"

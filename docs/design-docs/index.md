@@ -7,3 +7,4 @@
 - [0003 - Shared asset catalogue boundary](0003-shared-asset-catalogue-boundary.md) separates common data semantics from platform preview transports.
 - [0004 - Light-first theme](0004-light-first-theme.md) records the light default and the separate dual-theme rollout.
 - [0005 - Theme preference](0005-theme-preference.md) records precedence, persistence, and platform adapters.
+- [0006 - Operator shell](0006-operator-shell.md) records persistent web navigation and the compact control language.

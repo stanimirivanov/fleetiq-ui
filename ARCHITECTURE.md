@@ -8,7 +8,7 @@ The backend contract and shared asset-catalogue boundary feed separate web and m
 
 ## Repository topology
 
-- apps/web: React, React Router, Vite, Tailwind CSS. Its src/app is composition and route wiring; src/features contains vertical product capabilities.
+- apps/web: React, React Router, Vite, Tailwind CSS. Its src/app owns the persistent operator shell, navigation, and route wiring; src/features contains vertical product capabilities.
 - apps/mobile: Expo/React Native. Its App.tsx composes React Navigation; features follow the same domain names as web where useful.
 - packages/: api-contract holds the backend OpenAPI snapshot, generated wire types, runtime parsers, and synthetic fixtures. asset-catalogue holds the shared page-loader signature, tenant parser, and reusable HTTP boundary. theme-preference holds platform-neutral appearance choice rules. A package cannot import either app or a platform UI framework. See [package guidance](packages/README.md).
 - tools/: deterministic repository checks.

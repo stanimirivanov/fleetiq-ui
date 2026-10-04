@@ -2,10 +2,10 @@ import { Link } from 'react-router';
 
 export function OverviewPage() {
   return (
-    <main className="min-h-screen bg-canvas px-6 py-10 text-foreground">
-      <div className="mx-auto max-w-5xl">
+    <main className="min-h-[calc(100dvh-4rem)] w-full px-5 py-8 sm:px-8 lg:px-10">
+      <div className="w-full">
         <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent">
-          FleetIQ
+          Overview
         </p>
         <h1 className="mt-8 text-4xl font-semibold tracking-tight">
           Fleet workspace
@@ -14,7 +14,7 @@ export function OverviewPage() {
           The asset identity catalogue is available as a development preview.
           Live telemetry and operator workflows are still being built.
         </p>
-        <section className="mt-10 rounded-xl border border-outline bg-surface p-6">
+        <section className="mt-10 rounded-2xl border border-outline bg-surface shadow-sm p-6">
           <h2 className="text-lg font-medium">Asset catalogue preview</h2>
           <p className="mt-2 text-muted">
             Run <code>pnpm dev:web:preview</code> to see synthetic,
@@ -28,7 +28,7 @@ export function OverviewPage() {
             Open asset catalogue
           </Link>
         </section>
-        <section className="mt-4 rounded-xl border border-outline bg-surface p-6">
+        <section className="mt-4 rounded-2xl border border-outline bg-surface shadow-sm p-6">
           <h2 className="text-lg font-medium">Connected data</h2>
           <p className="mt-2 text-muted">
             No backend data is connected yet. Without preview mode, the

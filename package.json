@@ -12,7 +12,7 @@
     "dev:mobile": "pnpm --filter @fleetiq/mobile start",
     "dev:mobile:preview": "node tools/start-preview.mjs mobile",
     "dev:mobile:web:preview": "node tools/start-preview.mjs mobile-web",
-    "check": "pnpm style:check && pnpm theme:check && pnpm contract:check && pnpm typecheck && pnpm architecture && pnpm docs:check && pnpm build:web && pnpm check:mobile",
+    "check": "pnpm style:check && pnpm theme:check && pnpm shell:check && pnpm contract:check && pnpm typecheck && pnpm architecture && pnpm docs:check && pnpm build:web && pnpm check:mobile",
     "format": "biome check --write .",
     "style:check": "biome ci .",
     "theme:check": "pnpm --filter @fleetiq/theme-preference test && node tools/check-theme.mjs && pnpm --filter @fleetiq/web test:theme",
@@ -23,7 +23,8 @@
     "docs:check": "node tools/check-docs.mjs",
     "build:web": "pnpm --filter @fleetiq/web build && node tools/check-web-build.mjs",
     "check:mobile": "pnpm --filter @fleetiq/mobile check",
-    "contract:check": "pnpm --filter @fleetiq/api-contract check && pnpm --filter @fleetiq/asset-catalogue test && pnpm --filter @fleetiq/web test:contract && pnpm --filter @fleetiq/mobile test:contract"
+    "contract:check": "pnpm --filter @fleetiq/api-contract check && pnpm --filter @fleetiq/asset-catalogue test && pnpm --filter @fleetiq/web test:contract && pnpm --filter @fleetiq/mobile test:contract",
+    "shell:check": "pnpm --filter @fleetiq/web test:shell"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

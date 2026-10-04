@@ -2,10 +2,26 @@
 
 ## TL;DR
 
-Create an accessible operator interface with clear status hierarchy, legible telemetry, and platform-appropriate interactions. Visual references guide patterns, not copied assets or feature commitments.
+FleetIQ defaults to an accessible light operator theme. Dark-theme support is planned as a separate slice; no screen follows an incomplete system-dark palette. Visual references guide hierarchy and interaction, not copied layouts or assets.
 
-Use a spatial-first view when location is central, but always pair it with a keyboard-accessible list or detail view. Distinguish fresh, stale, unknown, and alarm states with text and shape as well as color. Use consistent units, time zone labels, provenance, and confidence where data warrants them. Mobile prioritizes glanceable summaries and focused actions; web can expose denser comparison and exploration. Adaptive density must be predictable and user-controllable, never hide safety-critical information automatically.
+The light screenshots saved in offline-docs suggest a pale working canvas, white content surfaces, restrained blue emphasis, and clear status text. The dark report screenshot demonstrates a second viable density and contrast treatment. FleetIQ keeps its own equipment-neutral language and semantic asset model. A map-led surface should always have a keyboard-accessible list or detail alternative.
 
-The asset catalogue preview establishes the first tokens in web Tailwind theme and native theme constants. Both use canvas #020617, surface #0f172a, outline #475569, foreground #f8fafc, muted #cbd5e1, accent #67e8f9, and unknown #fbbf24. Native spacing uses 4/8/16/24/32 points and body/title sizes 16/30; web uses Tailwind's responsive spacing and type scale. Unknown condition is always written in text. Against the surface, foreground, muted, accent, and unknown text have calculated WCAG contrast ratios of 17.06:1, 12.02:1, 12.32:1, and 10.69:1 respectively. Validate rendered focus indicators and native screen-reader behavior on devices before release.
+## Current light tokens
 
-The web list uses a narrow single-column layout that expands within a maximum width on larger screens. Native keeps a single-column touch list. External inspiration research is intentionally kept outside Git in the user's offline-docs directory.
+| Role | Value | Use |
+|:--|:--|:--|
+| Canvas | #F4F7FA | Page background |
+| Surface | #FFFFFF | Cards and panels |
+| Outline | #D8E0E8 | Nonessential separators |
+| Foreground | #142235 | Primary text |
+| Muted | #475569 | Secondary text |
+| Accent | #006B8F | Links, focus, emphasis |
+| Unknown | #825700 | Unknown-condition text and border |
+
+The web Tailwind theme and native token module use the same values. On both canvas and surface, foreground, muted, accent, and unknown text exceed 4.5:1 WCAG contrast; the theme check enforces that. Status words remain visible independently of color. Native spacing remains 4/8/16/24/32 points with 16-point body and 30-point title text; web uses Tailwind's responsive scale.
+
+## Evolution and validation
+
+The app uses light browser and native system chrome now. There is no theme toggle or saved preference until dark colors, every state, and both platforms have been reviewed together. The dark-theme slice must define semantic dark tokens, user/system preference behavior, persistence, and contrast checks, then validate list, empty, error, focus, and status states in both modes.
+
+Distinguish fresh, stale, unknown, and alarm states with text and shape as well as color. Use consistent units, time-zone labels, provenance, and confidence when data warrants them. Adaptive density must be predictable and user-controllable. Validate rendered focus indicators and native screen-reader behavior on devices before release. External inspiration research remains outside Git in the user's offline-docs directory.

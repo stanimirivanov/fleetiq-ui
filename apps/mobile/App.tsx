@@ -38,7 +38,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer linking={linking}>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <Stack.Navigator
           initialRouteName="Assets"
           screenOptions={{
@@ -50,7 +50,7 @@ export default function App() {
           <Stack.Screen
             name="Assets"
             initialParams={preview ? { tenantId: 'tenant-a' } : undefined}
-            options={{ title: 'Assets' }}
+            options={{ headerShown: false }}
           >
             {({ navigation, route }) => (
               <SafeAreaView style={{ flex: 1, backgroundColor: colors.canvas }}>

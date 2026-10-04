@@ -12,7 +12,7 @@ An operator opens the asset list for a tenant. Web navigation uses /tenants/{ten
 
 The list displays each contract asset's name, internal ID, and versioned type. It does not infer condition, freshness, location, hierarchy, or permission from those fields. The identity route carries only the selected ID. It does not claim the asset exists or show a synthetic detail object. Web uses the contract cursor for explicit Load more. Native initially displays the single fixture page; pagination is deferred until a production client and a multi-page contract example exist.
 
-Both platforms show loading, empty, error, retry, and unconnected states. Web distinguishes 401 and 403 from generic failure. Native's fixture has no authenticated error surface and uses a generic failure state. Asset rows only appear when the response belongs to the requested tenant. A visual preview banner labels synthetic data. Unknown condition uses text as well as color.
+Both platforms show loading, empty, error, retry, and unconnected states. Web distinguishes 401 and 403 from generic failure. Native's fixture has no authenticated error surface and uses a generic failure state. Asset rows only appear when the response belongs to the requested tenant. A visual preview banner labels synthetic data. Unknown condition uses text as well as color. The screen uses the light operator theme until complete dark-theme support is available.
 
 ## Acceptance examples
 

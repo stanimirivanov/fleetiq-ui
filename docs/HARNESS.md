@@ -7,7 +7,7 @@ Read the short entry points, run fast deterministic checks during editing, and r
 | Tier | Guide or sensor | Purpose |
 |:--|:--|:--|
 | T0 | AGENTS.md, docs/README.md, architecture and product guides | Route a task to the narrow source of truth before editing. |
-| T1 | Biome CI (format, lint, import organization), TypeScript, dependency-cruiser, docs checker | Catch formatting, typing, import direction, and broken local documentation quickly. |
+| T1 | Biome CI (format, lint, import organization), theme parity/contrast, TypeScript, dependency-cruiser, docs checker | Catch formatting, typing, import direction, and broken local documentation quickly. |
 | T2 | Web build and mock-exclusion check, Expo dependency check and Android/web JavaScript exports, feature tests | Verify deliverability and behavior before review. |
 | T3 | Device/emulator runs, accessibility review, live-contract compatibility | Run when the affected feature requires platform or service evidence. |
 

@@ -17,7 +17,7 @@ Keep broad refactors, dependency upgrades, and unrelated formatting in separate 
 
 ## Verification
 
-pnpm check runs Biome CI (format, lint, and import organization), TypeScript checks for both apps and shared packages, architecture and documentation checks, a production Vite build, and Expo dependency compatibility plus Android and web exports. CI runs the same command with a frozen lockfile. When native behavior changes, additionally exercise Android and iOS on available devices or simulators; report platforms not run. Future API changes require contract fixture validation and a mocked integration run.
+pnpm check runs Biome CI (format, lint, and import organization), theme parity and contrast, TypeScript checks for both apps and shared packages, architecture and documentation checks, a production Vite build, and Expo dependency compatibility plus Android and web exports. CI runs the same command with a frozen lockfile. When native behavior changes, additionally exercise Android and iOS on available devices or simulators; report platforms not run. Future API changes require contract fixture validation and a mocked integration run.
 
 An unavailable check is **not run**, with the blocker and residual risk. Do not weaken checks for local convenience.
 

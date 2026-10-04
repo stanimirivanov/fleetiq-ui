@@ -5,3 +5,4 @@
 - [0001 - Workspace tooling](0001-workspace-tooling.md) records when to adopt Nx and how it relates to Biome and dependency-cruiser.
 - [0002 - Asset preview navigation](0002-asset-preview-navigation.md) records platform routes, explicit mock adapters, and feature-local request state.
 - [0003 - Shared asset catalogue boundary](0003-shared-asset-catalogue-boundary.md) separates common data semantics from platform preview transports.
+- [0004 - Light-first theme](0004-light-first-theme.md) records the light default and the separate dual-theme rollout.

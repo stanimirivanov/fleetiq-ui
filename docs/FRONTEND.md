@@ -6,7 +6,7 @@ Web and mobile ship together around shared backend contracts. React owns renderi
 
 ## Current state
 
-The repository boots a Vite/React web shell and an Expo/React Native mobile shell. A shared package pins the partial backend OpenAPI baseline, generated transport types, runtime parsers, and synthetic fixtures. Web has opt-in MSW development handlers; mobile has an explicit fixture adapter. Both use the shared asset-catalogue loader shape and tenant parser. Both apps now have an asset identity list and identity-only route. They show contract-backed synthetic assets only in explicit development preview mode; production remains unconnected. There is no production API client, login, live data, or asset detail.
+The repository boots a Vite/React web shell and an Expo/React Native mobile shell. A shared package pins the partial backend OpenAPI baseline, generated transport types, runtime parsers, and synthetic fixtures. Web has opt-in MSW development handlers; mobile has an explicit fixture adapter. Both use the shared asset-catalogue loader shape and tenant parser. Both apps now have an asset identity list and identity-only route. They show contract-backed synthetic assets only in explicit development preview mode; production remains unconnected. There is no production API client, login, live data, or asset detail. The light theme is the only supported palette until the separate dark-theme slice is complete.
 
 ## State ownership
 

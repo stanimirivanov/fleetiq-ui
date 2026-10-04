@@ -1,6 +1,6 @@
 # FleetIQ UI
 
-FleetIQ's React web and Expo/React Native mobile applications live in one workspace so they can deliver the same operator capabilities in parallel. The apps have a pinned backend contract and an asset identity preview using explicit development fixtures; no live backend data is connected yet.
+FleetIQ's React web and Expo/React Native mobile applications live in one workspace so they can deliver the same operator capabilities in parallel. The apps have a pinned backend contract and an asset identity preview using explicit development fixtures; no live backend data is connected yet. The app currently uses a light theme; dark-theme support is planned.
 
 ## Start
 

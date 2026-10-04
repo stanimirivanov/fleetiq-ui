@@ -1,0 +1,26 @@
+{
+  "name": "fleetiq-ui",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @fleetiq/web dev",
+    "dev:mobile": "pnpm --filter @fleetiq/mobile start",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm architecture && pnpm docs:check && pnpm build:web && pnpm check:mobile",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "typecheck": "pnpm --filter @fleetiq/web typecheck && pnpm --filter @fleetiq/mobile typecheck",
+    "architecture": "depcruise --config .dependency-cruiser.cjs apps",
+    "docs:check": "node tools/check-docs.mjs",
+    "build:web": "pnpm --filter @fleetiq/web build",
+    "check:mobile": "pnpm --filter @fleetiq/mobile check"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "dependency-cruiser": "18.5.0"
+  }
+}

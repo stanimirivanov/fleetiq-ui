@@ -1,0 +1,17 @@
+# IDEs and editors
+/.idea
+
+node_modules/
+**/node_modules/
+**/dist/
+**/.expo/
+**/.metro-health-check*
+**/*.tsbuildinfo
+apps/mobile/ios/
+apps/mobile/android/
+offline-docs/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store

@@ -1,0 +1,28 @@
+# Architecture
+
+## TL;DR
+
+FleetIQ UI has two app shells and no backend integration yet. Features own their models, API adapters, and views; the app layer composes them. Shared packages are created only for code used by both apps and must stay platform-neutral.
+
+The backend contract feeds separate web and mobile API adapters. Each adapter validates wire data for its feature. The app shells compose features. A future shared package may feed both features only if it stays platform-neutral.
+
+## Repository topology
+
+- apps/web: React, React Router, Vite, Tailwind CSS. Its src/app is composition and route wiring; src/features contains vertical product capabilities.
+- apps/mobile: Expo/React Native. Its src/shell is composition and future native navigation; features follow the same domain names as web where useful.
+- packages/: introduced when an actual shared contract or policy exists. A package cannot import either app or a platform UI framework.
+- tools/: deterministic repository checks.
+- docs/: canonical guides, product specs, decisions, and execution state.
+
+A feature's preferred internal shape is model (pure client rules), api (transport and runtime validation), and ui (platform presentation). Add only the folders the feature needs. A feature may depend on shared code and its own files. Cross-feature interaction goes through an explicitly reviewed public interface or app composition; never import private feature internals.
+
+## Dependency and trust direction
+
+The app shell composes features. UI depends on feature models, while feature models must not depend on UI, networking, DOM, or native APIs. API adapters translate untrusted wire payloads into validated client values. The backend remains authoritative for tenant scope, permissions, telemetry, commands, and durable state. Client checks improve experience but are not authorization.
+
+The architecture gate uses dependency-cruiser to reject cross-app and inward-direction violations. See [docs/FRONTEND.md](docs/FRONTEND.md) for state ownership and contract strategy. An import check proves structural direction, not domain correctness; reviewers still inspect boundaries and behavior.
+
+## Evolution
+
+Do not create a single universal component library. Share contracts and pure behavior first; share UI only when web and native have a real compatible interaction pattern. Record durable decisions in [docs/design-docs](docs/design-docs/index.md). The active [execution plan](docs/exec-plans/active/ui-foundation.md) tracks the next slices.
+

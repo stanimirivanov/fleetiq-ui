@@ -31,3 +31,7 @@
   --theme-accent: #7ad3ed;
   --theme-unknown: #f5c777;
 }
+
+html {
+  scrollbar-gutter: stable;
+}

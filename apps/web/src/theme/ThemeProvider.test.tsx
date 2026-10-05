@@ -18,19 +18,35 @@ afterEach(() => {
   document.documentElement.removeAttribute('data-theme');
 });
 
-test('light is default and an explicit dark choice survives remount', () => {
+test('one icon button cycles and saves light, dark, and system choices', () => {
   const view = render(
     <ThemeProvider>
       <ThemeControl />
     </ThemeProvider>,
   );
   assert.equal(document.documentElement.dataset.theme, 'light');
-  fireEvent.change(screen.getByLabelText('Appearance'), {
-    target: { value: 'dark' },
-  });
+  assert.equal(screen.queryByText('Appearance'), null);
+
+  fireEvent.click(
+    screen.getByRole('button', { name: /Theme: light. Switch to dark./ }),
+  );
   assert.equal(document.documentElement.dataset.theme, 'dark');
   assert.equal(window.localStorage.getItem(THEME_STORAGE_KEY), 'dark');
 
+  fireEvent.click(
+    screen.getByRole('button', { name: /Theme: dark. Switch to system./ }),
+  );
+  assert.equal(window.localStorage.getItem(THEME_STORAGE_KEY), 'system');
+
+  fireEvent.click(
+    screen.getByRole('button', { name: /Theme: system. Switch to light./ }),
+  );
+  assert.equal(document.documentElement.dataset.theme, 'light');
+  assert.equal(window.localStorage.getItem(THEME_STORAGE_KEY), 'light');
+
+  fireEvent.click(
+    screen.getByRole('button', { name: /Theme: light. Switch to dark./ }),
+  );
   view.unmount();
   render(
     <ThemeProvider>
@@ -64,9 +80,12 @@ test('system choice reacts to browser appearance changes', () => {
         <ThemeControl />
       </ThemeProvider>,
     );
-    fireEvent.change(screen.getByLabelText('Appearance'), {
-      target: { value: 'system' },
-    });
+    fireEvent.click(
+      screen.getByRole('button', { name: /Theme: light. Switch to dark./ }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: /Theme: dark. Switch to system./ }),
+    );
     assert.equal(document.documentElement.dataset.theme, 'light');
     dark = true;
     act(() => notify?.());

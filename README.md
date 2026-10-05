@@ -1,6 +1,6 @@
 # FleetIQ UI
 
-FleetIQ's React web and Expo/React Native mobile applications live in one workspace so they can deliver the same operator capabilities in parallel. The apps have a pinned backend contract and an asset identity preview using explicit development fixtures; no live backend data is connected yet. The app supports light and dark themes on both platforms; Light is the first-run default, with Dark and System choices saved locally.
+FleetIQ's React web and Expo/React Native mobile applications live in one workspace so they can deliver the same operator capabilities in parallel. The apps have a pinned backend contract and an asset identity preview using explicit development fixtures; no live backend data is connected yet. The app supports light and dark themes on both platforms; Light is the first-run default, with Dark and System choices saved locally. The web app keeps its product bar and navigation visible across overview, asset list, and identity routes.
 
 ## Start
 

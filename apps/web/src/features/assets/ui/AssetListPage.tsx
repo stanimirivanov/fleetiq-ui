@@ -77,10 +77,10 @@ export function AssetListPage({ tenantId, loadPage }: Props) {
   }, [loadPage, paging, state, tenantId]);
 
   return (
-    <main className="min-h-screen bg-canvas px-5 py-8 text-foreground sm:px-8">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-[calc(100dvh-4rem)] w-full px-5 py-8 sm:px-8 lg:px-10">
+      <div className="w-full">
         <header className="border-b border-outline pb-6">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-accent">FleetIQ</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-accent">Asset catalogue</p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight">Assets</h1>
           <p className="mt-2 text-muted">Tenant {tenantId}</p>
         </header>
@@ -89,7 +89,7 @@ export function AssetListPage({ tenantId, loadPage }: Props) {
             Development preview. Asset identities are synthetic; live condition is unavailable.
           </p>
         ) : (
-          <section className="mt-8 rounded-xl border border-outline bg-surface p-6">
+          <section className="mt-8 rounded-2xl border border-outline bg-surface shadow-sm p-6">
             <h2 className="text-lg font-semibold">Catalogue not connected</h2>
             <p className="mt-2 text-muted">A production identity and API client are required before tenant assets can be shown.</p>
           </section>
@@ -98,7 +98,7 @@ export function AssetListPage({ tenantId, loadPage }: Props) {
           <p className="mt-8 text-muted" role="status">Loading assets…</p>
         )}
         {loadPage && state.kind === 'error' && (
-          <section className="mt-8 rounded-xl border border-outline bg-surface p-6" role="alert">
+          <section className="mt-8 rounded-2xl border border-outline bg-surface shadow-sm p-6" role="alert">
             <h2 className="font-semibold">Assets unavailable</h2>
             <p className="mt-2 text-muted">{state.message}</p>
             <button className="mt-4 rounded-lg border border-accent px-4 py-2 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" onClick={() => setReload((value) => value + 1)} type="button">Retry</button>
@@ -107,11 +107,11 @@ export function AssetListPage({ tenantId, loadPage }: Props) {
         {loadPage && state.kind === 'ready' && (
           <section className="mt-8" aria-label="Asset catalogue">
             {state.page.assets.length === 0 ? (
-              <p className="rounded-xl border border-outline bg-surface p-6 text-muted" role="status">No assets are registered for this tenant.</p>
+              <p className="rounded-2xl border border-outline bg-surface shadow-sm p-6 text-muted" role="status">No assets are registered for this tenant.</p>
             ) : (
               <ul className="grid gap-3">
                 {state.page.assets.map((asset) => (
-                  <li className="rounded-xl border border-outline bg-surface p-5" key={asset.id}>
+                  <li className="rounded-2xl border border-outline bg-surface shadow-sm p-5" key={asset.id}>
                     <Link className="block rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent" to={'/tenants/' + encodeURIComponent(tenantId) + '/assets/' + encodeURIComponent(asset.id)}>
                       <span className="text-lg font-semibold">{asset.name}</span>
                       <span className="mt-1 block text-sm text-muted">ID {asset.id} · Type {asset.asset_type.id} v{asset.asset_type.version}</span>

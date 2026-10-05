@@ -6,6 +6,12 @@ FleetIQ supports light and dark operator themes on web and mobile. Light remains
 
 The screenshots saved in offline-docs suggest a pale working canvas, white content surfaces, restrained blue emphasis, and clear status text for light mode; the dark report screenshot demonstrates a second viable density and contrast treatment. FleetIQ uses its own equipment-neutral language and semantic asset model. A map-led surface should always have a keyboard-accessible list or detail alternative.
 
+## Operator shell and control language
+
+The web app uses a persistent 64-pixel product bar, a 256-pixel desktop navigation pane, and a flexible content pane. At narrow widths, navigation becomes a compact row below the bar. Every route uses the same content origin and padding, so moving between an asset list and identity does not shift the page. The browser reserves scrollbar width for the same reason. The shell contains only implemented destinations; future features do not appear as working navigation.
+
+FleetIQ uses an original graph-and-signal mark and simple outlined icons. Give the canvas breathing room, keep panels on the surface color with subtle borders and small shadows, use restrained blue for active navigation and focus, and keep headings and secondary text distinct. Use consistent rounded panels and compact utility controls. The top-bar theme icon cycles Light, Dark, and System; its accessible name states the current and next mode. No visible Appearance label is needed. The same single-icon interaction is used on mobile. Language, notifications, and account positions are labeled but unavailable until their product capabilities exist.
+
 ## Semantic colors
 
 | Role | Light | Dark | Use |

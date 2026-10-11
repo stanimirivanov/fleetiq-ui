@@ -97,3 +97,25 @@ Parent sequence: [Harness hardening](../active/2026-10-harness-hardening.md).
 Real-provider OIDC qualification, new backend endpoints, native mobile, map/stream
 APIs, universal static alias analysis, independent signed attestation, live
 recordings and the measured browser-quality work reserved for PR3.
+
+## CI fixture isolation correction (2026-10-11)
+
+Hosted Linux and Windows jobs exposed a test-context defect: the disposable Git
+repository inherited the enclosing workflow's PR revisions. Its ancestry check
+correctly rejected commits absent from that fixture. The pre-fix failure was
+reproduced locally with real enclosing-repository revisions.
+
+- Each disposable secret-scan fixture now supplies explicit local or fixture-owned
+  PR/push metadata. CI event JSON uses actual fixture commits and is refreshed
+  after every history change; no process-global CI flag is removed.
+- All three scopes exercise clean sources, staged-only secrets and secrets removed
+  from the working tree but retained in history, using the real pinned detector.
+  CI cases additionally reject an unrelated base commit.
+- Production scope selection, trusted-base policy intersection, scanner rules,
+  exception policy and workflow commands remain unchanged.
+- The verification guide now documents fixture-owned context. Final canonical
+  acceptance is run with simulated enclosing PR metadata; bounded receipts remain
+  under ignored .verification/. Hosted CI still needs its own rerun.
+- Browser and guide behavior are unchanged. The earlier guide evidence describes
+  its tested revision; publication continues to regenerate and qualify at the
+  selected SHA.

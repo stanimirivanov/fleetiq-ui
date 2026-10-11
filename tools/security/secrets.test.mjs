@@ -82,44 +82,86 @@ test('real pinned scanner ignores inline/config/env bypass and rejects synthetic
   writeFileSync(path.join(root, '.gitleaksignore'), 'fingerprint');
   assert.throws(() => scanDirectory(root, { detector }), /Fingerprint/u);
 });
-test('source/index/history selection catches staged-only and removed historical secrets', async (context) => {
-  const root = await ownedFixture(context);
-  const detector = qualifyDetector(repository);
-  context.after(() => detector.dispose());
-  git(root, ['init', '--quiet']);
-  git(root, ['config', 'user.email', 'fixture@example.invalid']);
-  git(root, ['config', 'user.name', 'Fixture']);
-  mkdirSync(path.join(root, 'tools/security'), { recursive: true });
-  writeFileSync(
-    path.join(root, 'tools/security/policy.json'),
-    JSON.stringify(DEFAULT_POLICY),
-  );
-  writeFileSync(path.join(root, '.gitignore'), 'ignored.txt\n');
-  writeFileSync(path.join(root, 'safe.txt'), 'normal fixture\n');
-  git(root, ['add', '.']);
-  git(root, ['commit', '--quiet', '-m', 'baseline']);
-  writeFileSync(path.join(root, 'ignored.txt'), token());
-  assert.equal(checkSecrets(root, { detector }).history, true);
-  writeFileSync(path.join(root, 'staged.txt'), `access_token = "${token()}"\n`);
-  git(root, ['add', 'staged.txt']);
-  writeFileSync(path.join(root, 'staged.txt'), 'corrected working tree\n');
-  const snapshot = await ownedFixture(context);
-  copyIndex(root, snapshot);
-  assert.ok(
-    readFileSync(path.join(snapshot, 'staged.txt'), 'utf8').includes(token()),
-  );
-  assert.throws(
-    () => checkSecrets(root, { detector }),
-    /Secret scan rejected/u,
-  );
-  git(root, ['commit', '--quiet', '-m', 'history contains synthetic secret']);
-  git(root, ['add', 'staged.txt']);
-  git(root, ['commit', '--quiet', '-m', 'remove synthetic secret']);
-  assert.throws(
-    () => checkSecrets(root, { detector }),
-    /Secret scan rejected/u,
-  );
-});
+for (const eventName of [undefined, 'pull_request', 'push']) {
+  test(`source/index/history selection catches staged-only and removed historical secrets (${eventName ?? 'local'})`, async (context) => {
+    const root = await ownedFixture(context);
+    const metadata = await ownedFixture(context);
+    const detector = qualifyDetector(repository);
+    context.after(() => detector.dispose());
+    git(root, ['init', '--quiet']);
+    git(root, ['config', 'user.email', 'fixture@example.invalid']);
+    git(root, ['config', 'user.name', 'Fixture']);
+    mkdirSync(path.join(root, 'tools/security'), { recursive: true });
+    writeFileSync(
+      path.join(root, 'tools/security/policy.json'),
+      JSON.stringify(DEFAULT_POLICY),
+    );
+    writeFileSync(path.join(root, '.gitignore'), 'ignored.txt\n');
+    writeFileSync(path.join(root, 'safe.txt'), 'normal fixture\n');
+    git(root, ['add', '.']);
+    git(root, ['commit', '--quiet', '-m', 'baseline']);
+    const base = git(root, ['rev-parse', 'HEAD']).trim();
+    writeFileSync(path.join(root, 'safe.txt'), 'clean incoming fixture\n');
+    git(root, ['add', '.']);
+    git(root, ['commit', '--quiet', '-m', 'incoming']);
+    const eventPath = path.join(metadata, 'event.json');
+    // A disposable Git history cannot inherit the enclosing workflow's SHAs.
+    // Production keeps process.env; each fixture owns its local/CI scan context.
+    const environment = eventName
+      ? {
+          GITHUB_ACTIONS: 'true',
+          GITHUB_EVENT_NAME: eventName,
+          GITHUB_EVENT_PATH: eventPath,
+        }
+      : {};
+    const writeEvent = (trustedBase = base) => {
+      const head = git(root, ['rev-parse', 'HEAD']).trim();
+      writeFileSync(
+        eventPath,
+        JSON.stringify(
+          eventName === 'pull_request'
+            ? {
+                pull_request: {
+                  base: { sha: trustedBase },
+                  head: { sha: head },
+                },
+              }
+            : { before: trustedBase, after: head },
+        ),
+      );
+    };
+    const scan = () => {
+      if (eventName) writeEvent();
+      return checkSecrets(root, { detector, environment });
+    };
+    writeFileSync(path.join(root, 'ignored.txt'), token());
+    assert.equal(scan().history, true);
+    if (eventName) {
+      writeEvent('f'.repeat(40));
+      assert.throws(
+        () => checkSecrets(root, { detector, environment }),
+        /Security prerequisite or command failed/u,
+      );
+    }
+    writeFileSync(
+      path.join(root, 'staged.txt'),
+      `access_token = "${token()}"\n`,
+    );
+    git(root, ['add', 'staged.txt']);
+    writeFileSync(path.join(root, 'staged.txt'), 'corrected working tree\n');
+    const snapshot = await ownedFixture(context);
+    copyIndex(root, snapshot);
+    assert.ok(
+      readFileSync(path.join(snapshot, 'staged.txt'), 'utf8').includes(token()),
+    );
+    assert.throws(scan, /Secret scan rejected/u);
+    git(root, ['commit', '--quiet', '-m', 'history contains synthetic secret']);
+    git(root, ['add', 'staged.txt']);
+    git(root, ['commit', '--quiet', '-m', 'remove synthetic secret']);
+    assert.throws(scan, /Secret scan rejected/u);
+  });
+}
+
 test('linked artifact/source directories are rejected before target bytes are read', async (context) => {
   const root = await ownedFixture(context);
   const external = await ownedFixture(context);

@@ -81,6 +81,11 @@ content invalidate the verdict. This comparison does not detect transient edits
 that are reverted before the final snapshot. Git redirection variables are cleared for inventory and revision
 reads so another checkout cannot supply a misleading source identity.
 
+Disposable Git fixtures must supply their own scan environment and event commits;
+they cannot inherit the enclosing workflow's PR or push revisions. Exercise
+fixture-owned CI event files as well as local full history. Never disable trusted
+event selection globally to make fixture tests pass.
+
 A launched nonzero command is failed; missing prerequisites or launch failures
 are not-run. After an incomplete stage, remaining checks are not-run. Interrupted
 children close before the final snapshot. Different final sources reject acceptance even

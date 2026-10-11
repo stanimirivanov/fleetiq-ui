@@ -14,3 +14,5 @@ derived state explicitly.
 
 Run focused component/browser checks, then the canonical acceptance and browser
 groups before handoff. Record every failed or unavailable check.
+
+Follow [trust and delivery](../../../../docs/development/security-delivery.md) for pure models, owned browser execution and dependency review.

@@ -10,7 +10,7 @@ on Git-ignored IDE content. Complete three harness PRs: self-validating context 
 verification; executable trust boundaries and secure delivery; measured browser
 quality. Keep semantic design review and real deployment qualification explicit.
 
-Status: active (agreed; PR1 completed; PR2 and PR3 pending)
+Status: active (agreed; PR1 and PR2 completed; PR3 pending)
 Milestone: M02 - Product Foundation
 Audit date: 11 October 2026
 Audited revision: 8761f7c8c958f5d92111e8fc3e6b279edacd3004
@@ -41,8 +41,7 @@ specific proposals below follow from this repository's evidence.
 
 The [completed first PR](../completed/2026-10-harness-context-verification.md)
 implements context and verification hardening. Its canonical gates and clean
-frozen installation passed. PR2 (trust boundaries/delivery) and PR3 (measured
-browser quality) remain pending. Findings below describe the dated baseline;
+frozen installation passed. [The completed trust and delivery PR](../completed/2026-10-harness-trust-delivery.md) adds graph/AST trust boundaries, source/history/advisory controls and exact-source guide release. PR3 (measured browser quality) remains pending. Findings below describe the dated baseline;
 upgraded coverage is recorded separately, preserving the original audit.
 
 ## Design decisions

@@ -11,6 +11,7 @@ export const documentationPolicy = {
     'docs/exec-plans/completed',
     'docs/exec-plans/tech-debt-tracker.md',
     'docs/development/verification.md',
+    'docs/development/security-delivery.md',
   ],
   guidanceRoutes: [
     {
@@ -21,6 +22,7 @@ export const documentationPolicy = {
         'docs/README.md',
         'docs/development/frontend-structure.md',
         'docs/development/verification.md',
+        'docs/development/security-delivery.md',
       ],
     },
     {
@@ -34,6 +36,7 @@ export const documentationPolicy = {
         'docs/development/testing.md',
         'docs/PLANS.md',
         'docs/development/verification.md',
+        'docs/development/security-delivery.md',
       ],
     },
     ...['app', 'features', 'shared'].map((owner) => ({
@@ -43,6 +46,7 @@ export const documentationPolicy = {
         'ARCHITECTURE.md',
         'docs/development/frontend-structure.md',
         'docs/development/verification.md',
+        'docs/development/security-delivery.md',
       ],
     })),
     {
@@ -51,6 +55,7 @@ export const documentationPolicy = {
       targets: [
         'docs/development/testing.md',
         'docs/development/verification.md',
+        'docs/development/security-delivery.md',
       ],
     },
     {
@@ -58,6 +63,7 @@ export const documentationPolicy = {
       maxWords: 400,
       targets: [
         'docs/development/verification.md',
+        'docs/development/security-delivery.md',
         'CONTRIBUTING.md',
         'contracts/http/README.md',
       ],

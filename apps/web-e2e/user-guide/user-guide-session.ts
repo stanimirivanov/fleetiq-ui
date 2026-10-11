@@ -1,4 +1,4 @@
-import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import { rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type {
@@ -8,6 +8,15 @@ import type {
   Page,
   Video,
 } from '@playwright/test';
+import {
+  captureOrigin,
+  captureRequest,
+} from '../../../tools/user-guide/capture-policy.mjs';
+import {
+  discardChapter,
+  ownedPath,
+  resetChapter,
+} from '../../../tools/user-guide/owned-output.mjs';
 import { browserScenarioMode } from './guide-mode';
 import type { GuideNarrator, GuideStepDefinition } from './guide-narrator';
 
@@ -44,8 +53,8 @@ export class UserGuideSession implements GuideNarrator {
 
   private readonly context: BrowserContext;
   private readonly definition: GuideDefinition;
-  private readonly directory: string;
   private readonly recordsGuide: boolean;
+  private readonly origin: string | undefined;
   private readonly video: Video | null;
   private readonly steps: RecordedStep[] = [];
   private closed = false;
@@ -55,12 +64,13 @@ export class UserGuideSession implements GuideNarrator {
     page: Page,
     definition: GuideDefinition,
     recordsGuide: boolean,
+    origin: string | undefined,
   ) {
     this.context = context;
     this.page = page;
     this.definition = definition;
-    this.directory = path.join(guideOutputRoot, definition.slug);
     this.recordsGuide = recordsGuide;
+    this.origin = origin;
     this.video = page.video();
   }
 
@@ -84,8 +94,8 @@ export class UserGuideSession implements GuideNarrator {
     const recordsGuide = browserScenarioMode() === 'user-guide';
     const directory = path.join(guideOutputRoot, options.slug);
     if (recordsGuide) {
-      await rm(directory, { recursive: true, force: true });
-      await mkdir(path.join(directory, 'assets'), { recursive: true });
+      captureOrigin(options.baseURL);
+      resetChapter(guideOutputRoot, options.slug);
     }
 
     const context = await browser.newContext({
@@ -95,6 +105,7 @@ export class UserGuideSession implements GuideNarrator {
       reducedMotion: 'reduce',
       timezoneId: 'UTC',
       viewport: guideViewport,
+      serviceWorkers: 'block',
       ...(recordsGuide
         ? {
             recordVideo: {
@@ -104,6 +115,27 @@ export class UserGuideSession implements GuideNarrator {
           }
         : {}),
     });
+    if (recordsGuide) {
+      const origin = captureOrigin(options.baseURL);
+      // Page-level contract fixtures may override this context-level API denial.
+      await context.route('**/*', async (route) => {
+        const decision = captureRequest(route.request().url(), origin);
+        if (decision === 'blocked') return route.abort('blockedbyclient');
+        if (decision === 'mock-api')
+          return route.fulfill({
+            status: 404,
+            contentType: 'application/problem+json',
+            body: JSON.stringify({
+              type: 'about:blank',
+              title: 'Synthetic guide: API unavailable',
+              status: 404,
+            }),
+          });
+        return route.continue();
+      });
+      // No live stream, provider, service-worker, or persisted browser session is recorded.
+      await context.routeWebSocket('**/*', (route) => route.close());
+    }
     const page = await context.newPage();
     return new UserGuideSession(
       context,
@@ -116,6 +148,7 @@ export class UserGuideSession implements GuideNarrator {
         title: options.title,
       },
       recordsGuide,
+      recordsGuide ? captureOrigin(options.baseURL) : undefined,
     );
   }
 
@@ -165,12 +198,20 @@ export class UserGuideSession implements GuideNarrator {
     }
 
     const videoName = `${this.definition.slug}.webm`;
+    const recordedVideo = await this.video.path();
+    ownedPath(guideOutputRoot, path.relative(guideOutputRoot, recordedVideo));
     await rename(
-      await this.video.path(),
-      path.join(this.directory, 'assets', videoName),
+      recordedVideo,
+      ownedPath(
+        guideOutputRoot,
+        `${this.definition.slug}/assets/${videoName}`,
+        { missing: true },
+      ),
     );
     await writeFile(
-      path.join(this.directory, 'guide.json'),
+      ownedPath(guideOutputRoot, `${this.definition.slug}/guide.json`, {
+        missing: true,
+      }),
       `${JSON.stringify(
         {
           schemaVersion: 2,
@@ -188,15 +229,22 @@ export class UserGuideSession implements GuideNarrator {
   async abort(): Promise<void> {
     await this.closeContext();
     if (this.recordsGuide) {
-      await rm(this.directory, { recursive: true, force: true });
+      discardChapter(guideOutputRoot, this.definition.slug);
     }
   }
 
   private async captureStep(step: GuideStepDefinition): Promise<void> {
+    if (
+      this.origin &&
+      captureRequest(this.page.url(), this.origin) === 'blocked'
+    )
+      throw new Error('Guide capture cannot record an unqualified location.');
     const image = `assets/step-${String(this.steps.length + 1).padStart(2, '0')}.png`;
     await this.page.screenshot({
       animations: 'disabled',
-      path: path.join(this.directory, image),
+      path: ownedPath(guideOutputRoot, `${this.definition.slug}/${image}`, {
+        missing: true,
+      }),
     });
     this.steps.push({ ...step, image });
   }

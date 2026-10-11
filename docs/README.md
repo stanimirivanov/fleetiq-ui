@@ -23,3 +23,5 @@ homes rather than growing the root README.
 - [Completed execution plans](exec-plans/completed/README.md): verified slices.
 - [Technical debt tracker](exec-plans/tech-debt-tracker.md): known debt with a
   trigger for action.
+
+- [Browser trust and delivery](development/security-delivery.md): model/transport sensors, scans, capture and exact-source publication.

@@ -13,3 +13,5 @@ the validated boundary. Do not broaden a shared component's layout responsibilit
 to satisfy one screen.
 
 Verify public import rules with actual-tool fixtures when changing boundaries.
+
+Read [trust and delivery](../../../../docs/development/security-delivery.md) before broadening adapter privileges. Permission belongs to an exact reviewed file, owner and rationale.

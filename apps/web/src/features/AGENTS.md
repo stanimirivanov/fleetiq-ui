@@ -14,3 +14,5 @@ Do not let a size limit replace cohesion or reactivity review.
 
 Run focused model/component/browser checks and canonical groups appropriate to
 the changed behavior. New constraints need a real violating fixture.
+
+Follow [trust and delivery](../../../../docs/development/security-delivery.md) for pure models, owned browser execution and dependency review.

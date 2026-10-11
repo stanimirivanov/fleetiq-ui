@@ -3,11 +3,12 @@ import {
   mkdir,
   readdir,
   readFile,
-  stat,
   writeFile,
 } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inspectMedia } from './media.mjs';
+import { inspectTree, ownedPath } from './owned-output.mjs';
 
 const defaultOutputRoot = fileURLToPath(
   new URL('../../dist/user-guide/', import.meta.url),
@@ -35,7 +36,7 @@ const modes = {
   },
 };
 
-const requiredChapters = new Map([
+export const requiredChapters = new Map([
   ['console-orientation', 'production-shell'],
   ['fleet-overview', 'development-sample'],
   ['map-workbench', 'development-sample'],
@@ -63,20 +64,13 @@ const asset = async (value, field, manifest) => {
   ) {
     fail(manifest, `${field} must be an assets/ PNG or WebM path`);
   }
-  const file = path.join(path.dirname(manifest), relative);
-  try {
-    if (!(await stat(file)).isFile())
-      fail(manifest, `${field} must identify a file`);
-  } catch (error) {
-    if (error?.code === 'ENOENT')
-      fail(manifest, `${field} does not exist: ${relative}`);
-    throw error;
-  }
+  const file = ownedPath(path.dirname(manifest), relative);
+  inspectMedia(file, path.extname(file));
   return relative;
 };
 
 const parseManifest = async (outputRoot, directory) => {
-  const manifest = path.join(outputRoot, directory, 'guide.json');
+  const manifest = ownedPath(outputRoot, `${directory}/guide.json`);
   if (!slugPattern.test(directory)) {
     fail(manifest, 'directory must be a safe guide slug');
   }
@@ -139,6 +133,8 @@ const verifyCoverage = (guides) => {
       );
     }
   }
+  if (guides.length !== requiredChapters.size)
+    throw new Error('User-guide contains an unregistered chapter.');
   const orders = new Set();
   for (const guide of guides) {
     if (orders.has(guide.order)) {
@@ -272,6 +268,7 @@ const homeSection = ({ mode, details, guides }) => {
 
 /** Assemble only validated, fully covered journeys into a static guide book. */
 export const assembleBook = async (outputRoot = defaultOutputRoot) => {
+  inspectTree(outputRoot);
   const entries = await readdir(outputRoot, { withFileTypes: true });
   const guideDirectories = entries.filter(
     (entry) => entry.isDirectory() && entry.name !== 'assets',
@@ -287,12 +284,12 @@ export const assembleBook = async (outputRoot = defaultOutputRoot) => {
 
   for (const guide of guides) {
     await writeFile(
-      path.join(outputRoot, guide.slug, 'README.md'),
+      ownedPath(outputRoot, `${guide.slug}/README.md`, { missing: true }),
       markdownPage(guide),
       'utf8',
     );
     await writeFile(
-      path.join(outputRoot, guide.slug, 'index.html'),
+      ownedPath(outputRoot, `${guide.slug}/index.html`, { missing: true }),
       chapterPage(guide, guides),
       'utf8',
     );
@@ -300,7 +297,7 @@ export const assembleBook = async (outputRoot = defaultOutputRoot) => {
 
   const sections = grouped(guides);
   await writeFile(
-    path.join(outputRoot, 'README.md'),
+    ownedPath(outputRoot, 'README.md', { missing: true }),
     `# FleetIQ User Guide
 
 Generated from verified Playwright journeys. The production-shell chapter shows the available console without connected fleet data. Development-sample chapters use synthetic data and do not represent live operations.
@@ -317,10 +314,15 @@ ${chapters.map((guide) => `- [${guide.title}](./${guide.slug}/README.md)`).join(
 `,
     'utf8',
   );
-  await mkdir(path.join(outputRoot, 'assets'), { recursive: true });
-  await copyFile(stylesheet, path.join(outputRoot, 'assets', 'guide.css'));
+  await mkdir(ownedPath(outputRoot, 'assets', { missing: true }), {
+    recursive: true,
+  });
+  await copyFile(
+    stylesheet,
+    ownedPath(outputRoot, 'assets/guide.css', { missing: true }),
+  );
   await writeFile(
-    path.join(outputRoot, 'index.html'),
+    ownedPath(outputRoot, 'index.html', { missing: true }),
     htmlDocument(
       'Home',
       'Verified production-shell and synthetic development-sample journeys for FleetIQ.',

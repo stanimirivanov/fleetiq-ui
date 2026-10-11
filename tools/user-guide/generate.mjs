@@ -1,75 +1,107 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, rmSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { qualifyTools } from '../verification/execution.mjs';
+import { sourceState, unchangedSource } from '../verification/source-state.mjs';
+import { assembleBook } from './assemble-book.mjs';
+import { discardGuideOutput, resetGuideOutput } from './owned-output.mjs';
+import { requireQualification } from './qualification.mjs';
+import {
+  inspectGuideArtifacts,
+  outputInventory,
+  writeReady,
+} from './release.mjs';
 
-const repoRoot = fileURLToPath(new URL('../../', import.meta.url));
-const outputRoot = path.resolve(repoRoot, 'dist/user-guide');
-
-// This command deletes generated output. Keep that target fixed inside this repo.
-if (outputRoot !== path.join(path.resolve(repoRoot), 'dist', 'user-guide')) {
-  throw new Error(
-    'Guide output must remain inside the repository dist directory.',
-  );
+/** Fixed argument arrays use the version-qualified launcher; no shell or test bypass. */
+export function executeGuideStage(root, launcher, args, environment) {
+  const result = spawnSync(launcher.command, [...launcher.args, ...args], {
+    cwd: root,
+    env: environment,
+    stdio: 'inherit',
+    shell: false,
+  });
+  if (result.error || result.status !== 0 || result.signal)
+    throw new Error('Guide command did not complete successfully.');
 }
 
-const run = (label, command, args, environment = process.env) => {
-  console.log(`\n${label}`);
-  // Windows needs cmd.exe to launch pnpm.cmd; pass fixed command tokens
-  // directly without shell:true's deprecated argument concatenation.
-  const windowsPnpm = process.platform === 'win32' && command === 'pnpm';
-  const result = spawnSync(
-    windowsPnpm ? (process.env.ComSpec ?? 'cmd.exe') : command,
-    windowsPnpm ? ['/d', '/s', '/c', command, ...args] : args,
-    { cwd: repoRoot, env: environment, stdio: 'inherit' },
+/** Recording requires completed gates; a failed stage never leaves publishable partial output. */
+export async function generateGuide(
+  root,
+  {
+    qualify = qualifyTools,
+    snapshot = sourceState,
+    execute = executeGuideStage,
+    assemble = assembleBook,
+    inspect = inspectGuideArtifacts,
+  } = {},
+) {
+  const manifest = JSON.parse(
+    readFileSync(path.join(root, 'package.json'), 'utf8'),
   );
-  if (result.error !== undefined || result.status !== 0) {
+  const source = snapshot(root);
+  const qualified = qualify(root, manifest);
+  if (qualified.blocker || !qualified.launcher)
+    throw new Error('Guide tool qualification is incomplete.');
+  const qualification = requireQualification(root, source, manifest);
+  const outputRoot = resetGuideOutput(root);
+  try {
+    const environment = { ...process.env, FLEETIQ_E2E_MODE: 'user-guide' };
+    await execute(root, qualified.launcher, ['run', 'build'], environment);
+    for (const config of [
+      'playwright.config.ts',
+      'playwright.development.config.ts',
+    ]) {
+      await execute(
+        root,
+        qualified.launcher,
+        [
+          'exec',
+          'playwright',
+          'test',
+          '--config',
+          `apps/web-e2e/${config}`,
+          '--grep',
+          '@user-guide',
+        ],
+        environment,
+      );
+    }
+    await assemble(outputRoot);
+    const inspectedInventory = outputInventory(outputRoot);
+    await inspect(outputRoot, root);
+    if (
+      JSON.stringify(inspectedInventory) !==
+      JSON.stringify(outputInventory(outputRoot))
+    )
+      throw new Error('Guide output changed during inspection.');
+    if (!unchangedSource(source, snapshot(root)))
+      throw new Error('Source changed during guide generation.');
+    const ready = writeReady(root, source, qualification);
+    console.log(
+      '[ok] Complete guide generated and inspected under dist/user-guide.',
+    );
+    return ready;
+  } catch {
+    discardGuideOutput(root);
     throw new Error(
-      `${label} failed: ${result.error?.message ?? `exit ${result.status}`}`,
+      'Guide generation failed; partial owned output was discarded.',
     );
   }
-};
+}
 
-rmSync(outputRoot, { recursive: true, force: true });
-mkdirSync(outputRoot, { recursive: true });
-
-try {
-  run('Building the application for guide verification', 'pnpm', ['build']);
-  run(
-    'Recording the production-shell guide',
-    'pnpm',
-    [
-      'exec',
-      'playwright',
-      'test',
-      '--config',
-      'apps/web-e2e/playwright.config.ts',
-      '--grep',
-      '@user-guide',
-    ],
-    { ...process.env, FLEETIQ_E2E_MODE: 'user-guide' },
-  );
-  run(
-    'Recording development-sample guides',
-    'pnpm',
-    [
-      'exec',
-      'playwright',
-      'test',
-      '--config',
-      'apps/web-e2e/playwright.development.config.ts',
-      '--grep',
-      '@user-guide',
-    ],
-    { ...process.env, FLEETIQ_E2E_MODE: 'user-guide' },
-  );
-  run('Assembling the user-guide book', process.execPath, [
-    fileURLToPath(new URL('./assemble-book.mjs', import.meta.url)),
-  ]);
-  console.log('\n[ok] User guide generated under dist/user-guide');
-} catch (error) {
-  // Never leave a partial book that could be mistaken for verified output.
-  rmSync(outputRoot, { recursive: true, force: true });
-  console.error(error);
-  process.exitCode = 1;
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  try {
+    if (process.argv.length !== 2)
+      throw new Error('Guide generator accepts no options.');
+    await generateGuide(fileURLToPath(new URL('../../', import.meta.url)));
+  } catch {
+    console.error(
+      'User guide generation incomplete; no publication is permitted.',
+    );
+    process.exitCode = 1;
+  }
 }

@@ -51,8 +51,9 @@ remain separate backend-dependent work.
 The accepted [three-PR harness sequence](exec-plans/active/2026-10-harness-hardening.md)
 in **M02** takes priority: context/verification, executable trust boundaries and
 secure delivery, then measured browser quality. The
-[first slice is completed](exec-plans/completed/2026-10-harness-context-verification.md);
-two harness PRs remain.
+[context slice](exec-plans/completed/2026-10-harness-context-verification.md) and
+[trust/delivery slice](exec-plans/completed/2026-10-harness-trust-delivery.md) are
+completed; one harness PR remains.
 
 The next agreed product PR is the **connected operator user guide**, also in M04.
 It will cover sign-in/session/account/sign-out; explicit tenant selection and denied

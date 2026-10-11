@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "registry": "https://registry.npmjs.org",
+  "secretExceptions": [
+    {
+      "rule": "generic-api-key",
+      "path": "apps/web/src/features/identity/ui/OperatorSessionProvider.tsx",
+      "value": "fleetiq.operator-return.v1",
+      "owner": "FleetIQ frontend maintainers",
+      "reason": "Public session-storage entry identifier; never a credential.",
+      "expires": "2027-01-11"
+    }
+  ],
+  "advisoryExceptions": []
+}

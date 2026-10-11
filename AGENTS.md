@@ -62,3 +62,5 @@ Run focused checks during development, then `pnpm check` and `pnpm e2e`
 for browser changes before handoff. A skipped check is not a pass. Document
 the repository, milestone, copy-ready
 issue, and exact pass/fail/not-run status per [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Read [browser trust and secure delivery](docs/development/security-delivery.md) when changing transport, capture, dependencies or CI publication.

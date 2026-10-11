@@ -1,5 +1,7 @@
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
+import { PRODUCTION_OWNERS } from '../boundaries/policy.mjs';
+import { resolveOwnedPath } from '../docs/source.mjs';
 
 const sourceExtensions = new Set([
   '.js',
@@ -12,26 +14,27 @@ const sourceExtensions = new Set([
   '.cts',
 ]);
 
-/** Inventory the current scan owner independently of dependency-cruiser. */
-export function architectureSources(root, owner = 'apps/web/src') {
+/** Independently inventory every explicitly registered, existing production owner. */
+export function architectureSources(root, owners = PRODUCTION_OWNERS) {
   const files = [];
   function visit(directory) {
     for (const entry of readdirSync(directory, { withFileTypes: true })) {
       const target = path.join(directory, entry.name);
       if (entry.isSymbolicLink()) {
         throw new Error(
-          `Architecture source inventory rejects symlinks: ${target}`,
+          'Architecture source inventory rejects source symlinks.',
         );
       }
       if (entry.isDirectory()) visit(target);
-      else if (
-        entry.isFile() &&
-        sourceExtensions.has(path.extname(entry.name))
-      ) {
+      else if (entry.isFile() && sourceExtensions.has(path.extname(entry.name)))
         files.push(path.relative(root, target).replaceAll('\\', '/'));
-      }
     }
   }
-  visit(path.join(root, owner));
-  return files.sort();
+  for (const owner of typeof owners === 'string' ? [owners] : owners) {
+    const target = resolveOwnedPath(root, owner);
+    if (!target.metadata.isDirectory())
+      throw new Error('Architecture owner must be an existing directory.');
+    visit(target.absolute);
+  }
+  return [...new Set(files)].sort();
 }

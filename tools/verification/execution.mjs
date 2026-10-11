@@ -1,15 +1,23 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import path from 'node:path';
-/** Launch JS entry points directly; Windows shell shims cannot run with shell:false. */
-export function qualifyTools(root, manifest, run = spawnSync) {
+import { pnpmLaunchers } from './pnpm-launchers.mjs';
+
+/** Qualify native and JavaScript pnpm launchers against the exact manifest pin. */
+export function qualifyTools(
+  root,
+  manifest,
+  run = spawnSync,
+  { environment = process.env } = {},
+) {
   const tools = { node: process.version, pnpm: null, git: null };
   if (!/^v24\./u.test(tools.node))
     return { tools, blocker: 'node-24-required' };
   const git = run('git', ['--version'], {
     cwd: root,
+    env: environment,
     encoding: 'utf8',
     timeout: 20_000,
+    maxBuffer: 16_384,
+    shell: false,
   });
   if (
     git.error ||
@@ -19,27 +27,16 @@ export function qualifyTools(root, manifest, run = spawnSync) {
     return { tools, blocker: 'git-unavailable' };
   }
   tools.git = git.stdout.trim().replace('git version ', '');
-  const directories = [
-    path.dirname(process.execPath),
-    ...(process.env.PATH ?? '').split(path.delimiter),
-  ];
-  const candidates = [
-    process.env.npm_execpath,
-    ...directories.flatMap((directory) => [
-      path.join(directory, 'node_modules/corepack/dist/pnpm.js'),
-      path.join(directory, 'node_modules/pnpm/bin/pnpm.cjs'),
-    ]),
-  ].filter(
-    (candidate) =>
-      candidate && existsSync(candidate) && /\.(?:c?js)$/u.test(candidate),
-  );
   const expected = /^pnpm@(\d+\.\d+\.\d+)$/u.exec(manifest.packageManager)?.[1];
   if (!expected) return { tools, blocker: 'package-manager-pin-invalid' };
-  for (const launcher of new Set(candidates)) {
-    const result = run(process.execPath, [launcher, '--version'], {
+  for (const launcher of pnpmLaunchers(root, { environment })) {
+    const result = run(launcher.command, [...launcher.args, '--version'], {
       cwd: root,
+      env: environment,
       encoding: 'utf8',
       timeout: 30_000,
+      maxBuffer: 16_384,
+      shell: false,
     });
     if (
       !result.error &&
@@ -52,6 +49,7 @@ export function qualifyTools(root, manifest, run = spawnSync) {
   }
   return { tools, blocker: 'pinned-pnpm-unavailable' };
 }
+
 /** Human output is inherited; evidence stores bounded statuses, never command output. */
 export function executeCheck(root, launcher, script, { signal } = {}) {
   return new Promise((resolve) => {
@@ -59,7 +57,7 @@ export function executeCheck(root, launcher, script, { signal } = {}) {
       resolve({ status: 'not-run', reason: 'interrupted', exitCode: null });
       return;
     }
-    const child = spawn(process.execPath, [launcher, 'run', script], {
+    const child = spawn(launcher.command, [...launcher.args, 'run', script], {
       cwd: root,
       stdio: 'inherit',
       shell: false,

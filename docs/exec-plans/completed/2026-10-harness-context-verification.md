@@ -86,3 +86,40 @@ New raw-transport/model/Effect call-site policies; delivery security/publication
 coverage/latency/browser budgets; connected guide chapters; real-provider OIDC
 qualification; and remote GitHub administration. Later accepted slices retain
 that work.
+
+## CI portability correction (2026-10-11)
+
+Hosted CI exposed two gaps in the initial local qualification: JavaScript-only
+pnpm discovery missed native pnpm 12 and Linux Corepack PATH symlinks; the Git
+extension allowlist left .mjs/.cjs tooling subject to Windows CRLF conversion.
+
+- The [launcher discovery](../../../tools/verification/pnpm-launchers.mjs)
+  resolves actual PATH targets, supports native executables and .js/.cjs/.mjs
+  entries, deduplicates canonical launchers and rejects Windows shell shims.
+  Qualification still requires the exact pnpm 12.5.1 pin, bounded output and
+  shell-free argument arrays.
+- Thirteen new regressions cover launcher/version/launch failures and actual Git
+  checkouts with core.autocrlf=true/core.eol=crlf. The root .gitattributes uses
+  text=auto eol=lf, preserving binary bytes without an extension allowlist.
+- Passed: actual native pnpm 12.5.1 qualification and script execution on Windows.
+  Actual Ubuntu Node 24.18.0/Git 2.53.0 qualified and executed both the Corepack
+  symlink and native pnpm through PATH, plus native npm_execpath. All 13 new
+  regressions passed on Linux without skips. The temporary official Node archive
+  was checksum-verified; owned runtimes, caches and fixtures were removed.
+- Passed: pnpm check, all 13 stages, 239 harness tests and 170 component tests.
+  The first acceptance attempt failed an unchanged AlertQueue test's five-second
+  deadline; its focused control and the complete acceptance repeat passed with
+  existing assertions and time limits.
+- Passed: pnpm e2e, 32 production and 24 development scenarios. The map guide's
+  initial panel wait timed out once and passed on the configured retry; a focused
+  repeat with one worker and retries disabled passed. These intermittent local
+  deadlines are recorded in the [debt tracker](../tech-debt-tracker.md).
+- Both passing groups observed stable source digest
+  22d56b9bcbe4d1604cfed9adcf336eea6eaf94af2f8ef6e278d61e2fc64b2ed2
+  on base revision 0d0a91ec02c3557dc7529b2d6fc9c3eb0ded4e31 with local changes.
+  Evidence: acceptance-49976-d6160c9a-30cd-474b-9472-e8d89f9be43c.json and
+  browser-54188-7b7ce2dd-7e1d-4e22-a0c3-92b730d9ab2f.json in ignored .verification/.
+  This completion/debt documentation was finalized afterward and checked
+  separately; those reports describe the tested source snapshot.
+- Not-run: hosted CI rerun after committing/publishing this correction. No
+  dependency pins, canonical gates, assertions or timeout budgets were weakened.

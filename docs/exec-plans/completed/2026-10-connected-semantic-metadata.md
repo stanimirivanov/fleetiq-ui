@@ -2,7 +2,10 @@
 
 ## TL;DR
 
-Status: completed. Milestone: **M04 - Semantic Twin and Live UI**. Pin the merged
+Status: completed
+Milestone: M04 - Semantic Twin and Live UI
+
+Pin the merged
 browser identity and semantic metadata contract and connect the catalogue,
 inspector, and registry as one complete web slice. Preserve explicit development
 previews; production never falls back to synthetic evidence.

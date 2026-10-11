@@ -1,5 +1,7 @@
 # Completed execution plans
 
+- [Self-validating harness context and verification](2026-10-harness-context-verification.md) — M02.
+
 Verified PR-sized implementation plans live here. Keep their acceptance
 evidence and material limitations for future reviewers.
 

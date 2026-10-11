@@ -1,0 +1,150 @@
+# Verification and harness ownership
+
+## TL;DR
+
+Run focused checks while developing, then pnpm check. Run pnpm e2e for browser
+behavior or verification workflow changes. Each canonical group produces fresh,
+ignored JSON evidence bound to the current revision and source bytes. A failed,
+unavailable or interrupted run, or differing initial/final source snapshots,
+cannot pass the selected group.
+Read scoped guidance before editing an owner. Harness changes need deliberately
+invalid fixtures and code-owner review.
+
+## Discover relevant context
+
+[AGENTS.md](../../AGENTS.md) and the [documentation map](../README.md) route to the
+[architecture](../../ARCHITECTURE.md), [frontend structure](frontend-structure.md),
+[testing](testing.md), [contract ownership](../../contracts/http/README.md) and
+[plans](../PLANS.md). Scoped working agreements sit beside app composition,
+features, shared code, browser scenarios and tools.
+
+The documentation sensor requires visible Markdown routes. Root instructions have
+a 900-word budget; scoped instructions a 400-word budget. Context guidance cannot
+restrict the agent host's tools, network or filesystem permissions.
+
+## Canonical inventory
+
+[The catalogue](../../tools/verification/catalogue.mjs) owns explicit check IDs,
+package scripts and required CI routes. Use pnpm verify --list to inspect groups.
+
+| Command | Checks | Intended use |
+| --- | --- | --- |
+| pnpm check | Harness fixtures/policy, style, architecture, view size, docs, design, contract, types, unit/component tests, guide tests, build | Complete acceptance group |
+| pnpm verify --group structural | Harness fixtures/policy, style, architecture, view size, docs, design, contract | Portable harness qualification |
+| pnpm verify --group product | Types, unit/component tests, build | Focused product feedback |
+| pnpm e2e | Built-production and development browser scenarios | Browser behavior and sample isolation |
+
+pnpm verify defaults to acceptance. Existing individual scripts remain available
+for focused feedback; they do not establish a complete-group verdict. Acceptance
+does not imply browser qualification; CI requires both. No group establishes
+production readiness, real-provider OIDC behavior or the browser performance
+budgets planned for the later harness slice.
+
+Use Node 24, pinned pnpm, Git and a frozen install. The runner launches pnpm's
+JavaScript entry through Node, avoiding Windows shell-shim quoting. It qualifies
+actual tool versions and selected canonical commands before execution. Missing
+prerequisites produce not-run evidence. Install Playwright Chromium and use the
+documented [port overrides](testing.md) if a browser port is occupied.
+
+## Plan, execute, verify
+
+1. Inspect the branch and preserve existing changes. Read scoped guidance and
+   record the goal, milestone, boundaries and acceptance criteria.
+2. Implement the complete slice. Demonstrate a sensor gap with a deliberate
+   invalid fixture, then make that fixture fail for the expected diagnostic
+   while a positive control passes.
+3. Run focused checks, inspect output and correct failures. Run required canonical
+   groups against final sources; inspect the evidence.
+4. Report passed, failed and not-run separately. Complete the slice's plan with
+   results and limitations; preserve an unfinished parent sequence.
+
+Parsed execution plans require status, milestone, goal, scope and acceptance
+evidence (or evidence), matching the historical common format. New plans also
+include design decisions, acceptance criteria and out of scope under the
+contribution guide. Those additional sections remain author/reviewer-owned;
+historical plans are not rewritten to invent missing decisions.
+
+## Evidence and incomplete runs
+
+Ignored .verification/ JSON records the group, timestamps, versions, revision,
+dirty state, aggregate source digest and check statuses, exit codes and durations.
+It stores no stdout/stderr, source content, environment, HTTP payloads or tokens.
+Ordinary commands still print human output.
+
+The source digest covers tracked and new unignored files, hashing raw bytes and
+paths before and after verification. Ignored generated evidence does not affect
+it. A stable dirty checkout can pass; differing final bytes of already-dirty
+content invalidate the verdict. This comparison does not detect transient edits
+that are reverted before the final snapshot. Git redirection variables are cleared for inventory and revision
+reads so another checkout cannot supply a misleading source identity.
+
+A launched nonzero command is failed; missing prerequisites or launch failures
+are not-run. After an incomplete stage, remaining checks are not-run. Interrupted
+children close before the final snapshot. Different final sources reject acceptance even
+when every command returned zero. A selected-group pass never implies an
+unselected group passed.
+
+Temporary roots remain owned. Evidence is created exclusively, and its directory
+cannot be replaced by a link. Source/link sensors inspect exact casing and
+canonical containment, including Windows junctions, before reading targets.
+Quality CI uploads bounded JSON for seven days. Existing browser artifacts retain
+their separate policy; broader artifact security remains a later slice.
+
+Evidence is an observation, not a signed independent attestation against an actor
+who can change the runner and its policy together.
+
+## Sensor qualification and dependencies
+
+pnpm harness:test covers positive/negative docs, tokens, contract/provenance,
+generated bytes, actual architecture/lint tools, policy and runner outcomes.
+Existing view-size and guide tests remain in their named acceptance stages.
+
+- Markdown/GFM parsing covers links, references, heading anchors, encoded paths,
+  exact casing, visible routes, budgets and plan metadata. Git discovery excludes
+  ignored IDE documents, includes new sources and handles intentional tracked
+deletions.
+- Architecture probes execute installed dependency-cruiser and Biome with copied
+  production configs. They check named runtime/type-only violations, valid public
+  entries, cycles, graph completeness and extraction capabilities. Missing tools
+  or omitted sources fail. The JSON reporter exit status alone cannot prove a
+  clean graph.
+- Token fixtures preserve every light/dark contrast threshold. Contract fixtures
+  preserve exact provenance, operations, cookie security and generated bytes;
+  generation check mode cannot write.
+- YAML fixtures reject missing/conditional canonical jobs, command bypasses,
+  unfrozen installs, event filters and unregistered execution overrides.
+
+Native TypeScript 7.0.2 remains the application compiler. Dependency-cruiser
+18.5.0 needs a JavaScript compiler API; a workspace package extension supplies
+TypeScript 6.0.3 specifically to that tool. The wrapper qualifies TS/TSX parsing
+and type-only extraction. Upgrade parser and compiler independently and qualify
+known-invalid imports after a clean frozen install.
+
+New development-only, MIT-licensed pins are unified 11.0.5, remark-parse 11.0.0,
+remark-gfm 4.0.1, github-slugger 2.0.0 and yaml 2.8.3. These replace custom parsing,
+introducing no browser runtime dependency. Review lockfile changes and upstream
+advisories on upgrade. See the maintained
+[remark parser](https://github.com/remarkjs/remark/tree/main/packages/remark-parse),
+[YAML parser](https://github.com/eemeli/yaml) and
+[pnpm package extensions](https://pnpm.io/settings#packageextensions).
+
+Qualified Solid fixtures cover destructured component parameters and incorrect
+JSX array mapping; body destructuring and derived/lifecycle state still need
+review. Broader model allowlists and raw-transport enforcement remain PR2.
+Cohesion and appropriate abstractions remain review responsibilities.
+
+## CI and external administration
+
+Quality CI requires Linux acceptance, Linux browser scenarios and Windows
+structural qualification from frozen installs. Parsed policy verifies canonical
+routes and read-only permissions. CODEOWNERS assigns harness/configuration changes
+to the current maintainer.
+
+A GitHub administrator must separately require successful check, browser and
+harness-windows jobs on main; code-owner review; stale-review dismissal; suitable
+bypass restrictions; least-privilege workflow permissions; and publication
+approvals. These external settings have not been verified locally. CODEOWNERS and
+a passing sensor cannot attest they are enabled.
+
+User-guide publication hardening and immutable action pinning remain PR2. This
+slice does not secure every workflow or qualify a real identity deployment.

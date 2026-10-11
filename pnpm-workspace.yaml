@@ -6,3 +6,8 @@ minimumReleaseAgeExclude:
   - effect@4.0.1
   - '@effect/openapi-generator@4.0.1'
   - '@effect/platform-node@4.0.1'
+# The native TS7 compiler stays at the root; this tool needs the TS compiler API.
+packageExtensions:
+  dependency-cruiser@18.5.0:
+    dependencies:
+      typescript: 6.0.3

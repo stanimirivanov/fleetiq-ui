@@ -7,7 +7,9 @@ Make one PR-sized change with a clear outcome. Update its docs and run
 could not run.
 
 Start with [AGENTS.md](AGENTS.md), then use the [documentation map](docs/README.md).
-Create a plan in `docs/exec-plans/active` for multi-step changes; move it to
+Create a plan in `docs/exec-plans/active` for multi-step changes with Status,
+Milestone, Goal, Scope, Design decisions, Acceptance criteria, Acceptance evidence
+and Out of scope. Move it to
 `completed` when verified. Record durable design decisions in
 `docs/design-docs`.
 
@@ -20,7 +22,12 @@ reviewing component composition, reactivity, Effect lifetimes, and styling. Pref
 libraries when a real requirement appears. Avoid global state for local UI
 interactions and avoid app-wide abstractions for one feature.
 
-`pnpm check` runs formatting/lint, type checking, import architecture,
+The [verification guide](docs/development/verification.md) owns the canonical
+catalogue, scoped routes and source-bound evidence. Harness changes need positive
+and deliberately invalid fixtures, reviewed dependency decisions and owner review.
+A partial group or missing tool is never acceptance.
+
+`pnpm check` runs harness qualification, policy, formatting/lint, type checking, import architecture,
 `pnpm view:check` (page/root-view size policy and its tests), documentation
 and pinned-contract checks, pure and Solid component tests, and a production
 build. The 150-line gate is a review prompt with a documented exception;

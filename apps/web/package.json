@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@solidjs/router": "1.0.0",
-    "effect": "4.0.1",
+    "effect": "4.0.2",
     "solid-js": "1.9.17"
   },
   "devDependencies": {

@@ -10,7 +10,7 @@ import type {
   RegistrySourceInventoryItem,
   RegistrySourceReview,
   RegistrySourceState,
-} from './registry-review';
+} from './registry-review-types';
 
 /** Preserves the complete source tuple in a URL-safe, collision-free key. */
 export function registrySourceKey(source: RegistrySourceIdentity): string {

@@ -10,6 +10,9 @@ handoff. Mobile development is deferred and will use native platforms.
 [documentation map](docs/README.md) routes work to the relevant guide. The
 [frontend structure guide](docs/development/frontend-structure.md) defines
 component, reactivity, and presentation review criteria.
+Read the nearest scoped AGENTS.md before editing app, feature, shared, browser
+scenario or harness code. The [verification guide](docs/development/verification.md)
+owns canonical groups, sensor fixtures and source-bound evidence.
 
 ## Before changing code
 
@@ -22,7 +25,7 @@ component, reactivity, and presentation review criteria.
 ## Architecture rules
 
 - `apps/web/src/app` composes routes and providers. A feature never imports
-  app composition or another feature's private files.
+  app composition or another feature.
 - `features/<name>/model` is pure TypeScript. Transport adapters and Solid
   components depend on it, never the other way around.
 - `shared` contains small, product-neutral web utilities and components. It

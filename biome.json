@@ -9,7 +9,8 @@
       "!**/pnpm-lock.yaml",
       "!**/contracts/http/fleetiq-v1-ui-baseline.openapi.json",
       "!**/apps/web/src/generated/fleetiq-api.ts",
-      "!**/LICENSE"
+      "!**/LICENSE",
+      "!**/.verification"
     ]
   },
   "formatter": {

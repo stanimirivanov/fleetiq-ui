@@ -1,0 +1,23 @@
+# GitHub administrators must separately require code-owner review; this file alone cannot.
+# Current repository maintainer owns changes to policy and its verification machinery.
+/AGENTS.md @stanimirivanov
+/CONTRIBUTING.md @stanimirivanov
+/ARCHITECTURE.md @stanimirivanov
+/apps/**/AGENTS.md @stanimirivanov
+/tools/ @stanimirivanov
+/docs/development/ @stanimirivanov
+/docs/PLANS.md @stanimirivanov
+/docs/exec-plans/ @stanimirivanov
+/.github/ @stanimirivanov
+/.dependency-cruiser.cjs @stanimirivanov
+/biome.json @stanimirivanov
+/package.json @stanimirivanov
+/pnpm-workspace.yaml @stanimirivanov
+/pnpm-lock.yaml @stanimirivanov
+/contracts/http/ @stanimirivanov
+/SECURITY.md @stanimirivanov
+/docs/README.md @stanimirivanov
+**/package.json @stanimirivanov
+/apps/web/vite.config.ts @stanimirivanov
+/.gitattributes @stanimirivanov
+/.editorconfig @stanimirivanov

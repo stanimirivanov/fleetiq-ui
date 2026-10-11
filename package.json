@@ -11,7 +11,7 @@
     "build": "pnpm --filter @fleetiq/web build",
     "typecheck": "pnpm --filter @fleetiq/web typecheck && pnpm exec tsc --noEmit -p apps/web-e2e/tsconfig.json",
     "style:check": "biome ci .",
-    "architecture": "depcruise --config .dependency-cruiser.cjs apps/web/src",
+    "architecture": "node tools/check-architecture.mjs",
     "view:check": "node --test tools/check-view-size.test.mjs && node tools/check-view-size.mjs",
     "docs:check": "node tools/check-docs.mjs",
     "design:check": "node tools/check-design-tokens.mjs",
@@ -20,13 +20,16 @@
     "test:unit": "pnpm --filter @fleetiq/web test:unit",
     "test:component": "pnpm --filter @fleetiq/web test:component",
     "test": "pnpm test:unit && pnpm test:component",
-    "e2e": "pnpm e2e:production && pnpm e2e:development",
+    "e2e": "node tools/verification/cli.mjs --group browser",
     "e2e:production": "pnpm build && pnpm exec playwright test --config apps/web-e2e/playwright.config.ts",
     "e2e:development": "pnpm exec playwright test --config apps/web-e2e/playwright.development.config.ts",
     "guide:generate": "node tools/user-guide/generate.mjs",
     "guide:preview": "node tools/user-guide/preview.mjs",
-    "check": "pnpm style:check && pnpm typecheck && pnpm architecture && pnpm view:check && pnpm docs:check && pnpm design:check && pnpm contract:check && pnpm test && pnpm guide:test && pnpm build",
-    "guide:test": "node --test tools/user-guide/*.test.mjs"
+    "check": "node tools/verification/cli.mjs --group acceptance",
+    "guide:test": "node --test tools/user-guide/*.test.mjs",
+    "verify": "node tools/verification/cli.mjs",
+    "harness:check": "node tools/verification/check-policy.mjs",
+    "harness:test": "node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/verification/*.test.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
@@ -35,6 +38,11 @@
     "@playwright/test": "1.63.0",
     "@types/node": "24.19.1",
     "dependency-cruiser": "18.5.0",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "github-slugger": "2.0.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5",
+    "yaml": "2.8.3"
   }
 }

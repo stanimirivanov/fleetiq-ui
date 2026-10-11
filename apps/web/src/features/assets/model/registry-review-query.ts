@@ -1,7 +1,7 @@
 import type {
   RegistryCutoffRead,
   RegistryReviewCutoffs,
-} from './registry-review';
+} from './registry-review-types';
 
 const DECIMAL_MILLISECONDS = /^(?:0|-[1-9]\d*|[1-9]\d*)$/u;
 

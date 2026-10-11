@@ -104,6 +104,8 @@ module.exports = {
     },
   ],
   options: {
+    // Preserve type-only edges so architectural rules cover interface dependencies.
+    tsPreCompilationDeps: true,
     doNotFollow: { path: 'node_modules' },
     exclude: { path: '(^|/)(node_modules|dist)/' },
   },

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseDocument } from 'yaml';
+import { ACTIONS } from './actions.mjs';
 import {
   CHECKS,
   GROUPS,
@@ -8,9 +9,15 @@ import {
   REQUIRED_SCRIPTS,
   selectedChecks,
 } from './catalogue.mjs';
+import { inspectDelivery } from './delivery-policy.mjs';
 
 /** Parse workflow structure rather than trusting text that merely mentions a gate. */
-export function inspectPolicy(manifest, workflowSource, workspaceSource) {
+export function inspectPolicy(
+  manifest,
+  workflowSource,
+  workspaceSource,
+  guideSource,
+) {
   const diagnostics = [];
   const fail = (message) => diagnostics.push(message);
   const parse = (source, label) => {
@@ -23,6 +30,14 @@ export function inspectPolicy(manifest, workflowSource, workspaceSource) {
   };
   const workflow = parse(workflowSource, 'quality workflow');
   const workspace = parse(workspaceSource, 'workspace');
+  const guide = parse(guideSource, 'guide workflow');
+  inspectDelivery(workflow, guide, fail);
+  if (
+    manifest.devDependencies?.['typescript-parser'] !==
+      'npm:typescript@6.0.3' ||
+    manifest.devDependencies?.yauzl !== '3.4.0'
+  )
+    fail('Keep explicit reviewed AST and archive parser pins.');
   if (manifest.packageManager !== 'pnpm@12.5.1') fail('Pin pnpm@12.5.1.');
   if (
     manifest.devDependencies?.typescript !== '7.0.2' ||
@@ -97,12 +112,10 @@ export function inspectPolicy(manifest, workflowSource, workspaceSource) {
     );
     const node = steps.filter(
       (step) =>
-        step.uses === 'actions/setup-node@v6' &&
+        step.uses === ACTIONS.node &&
         String(step.with?.['node-version']) === '24',
     );
-    const checkout = steps.filter(
-      (step) => step.uses === 'actions/checkout@v6',
-    );
+    const checkout = steps.filter((step) => step.uses === ACTIONS.checkout);
     if (
       gate.length !== 1 ||
       install.length !== 1 ||
@@ -124,9 +137,24 @@ export function inspectPolicy(manifest, workflowSource, workspaceSource) {
         fail(`Required step can be skipped or weakened: ${name}`);
       }
     }
-    const positions = [checkout[0], node[0], install[0], gate[0]].map((step) =>
-      steps.indexOf(step),
+    const scannerInstall = steps.filter(
+      (step) => step.run === 'pnpm security:install' && step.if === undefined,
     );
+    const corepack = steps.filter(
+      (step) => step.run === 'corepack enable' && step.if === undefined,
+    );
+    if (scannerInstall.length !== 1 || corepack.length !== 1) {
+      fail('Required scanner/package-manager setup missing.');
+      continue;
+    }
+    const positions = [
+      checkout[0],
+      node[0],
+      corepack[0],
+      install[0],
+      scannerInstall[0],
+      gate[0],
+    ].map((step) => steps.indexOf(step));
     if (
       positions.some(
         (position, index) => index > 0 && position <= positions[index - 1],
@@ -142,5 +170,6 @@ export function checkPolicy(root) {
     JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')),
     readFileSync(path.join(root, '.github/workflows/quality.yml'), 'utf8'),
     readFileSync(path.join(root, 'pnpm-workspace.yaml'), 'utf8'),
+    readFileSync(path.join(root, '.github/workflows/user-guide.yml'), 'utf8'),
   );
 }

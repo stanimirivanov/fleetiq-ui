@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PRODUCTION_OWNERS } from '../boundaries/policy.mjs';
 
 // Resolve installed tools through their public package entry, never ambient PATH.
 const dependencyCli = fileURLToPath(
@@ -34,7 +35,7 @@ function runTool(tool, args, root) {
 }
 
 /** Execute the real pinned CLI against a repository or an isolated fixture. */
-export function runDependencyCruiser(root, entries = ['apps/web/src']) {
+export function runDependencyCruiser(root, entries = PRODUCTION_OWNERS) {
   const result = runTool(
     dependencyCli,
     [

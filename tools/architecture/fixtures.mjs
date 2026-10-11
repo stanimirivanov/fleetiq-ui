@@ -3,6 +3,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -78,6 +79,16 @@ export function architectureFixture(context, options = {}) {
   write(
     'apps/web/package.json',
     readFileSync(path.join(repositoryRoot, 'apps/web/package.json'), 'utf8'),
+  );
+  symlinkSync(
+    path.join(repositoryRoot, 'node_modules'),
+    path.join(root, 'node_modules'),
+    process.platform === 'win32' ? 'junction' : 'dir',
+  );
+  symlinkSync(
+    path.join(repositoryRoot, 'apps/web/node_modules'),
+    path.join(root, 'apps/web/node_modules'),
+    process.platform === 'win32' ? 'junction' : 'dir',
   );
   for (const [file, contents] of Object.entries(sourceFiles))
     write(file, contents);

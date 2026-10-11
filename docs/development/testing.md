@@ -51,7 +51,7 @@ screenshots, and a Playwright video only in guide mode. An untagged scenario
 is only an E2E test. Guide prose is maintained with the scenario and page
 object actions.
 
-Run `pnpm guide:generate` to build the app, execute only tagged scenarios,
+Install the checksummed detector with `pnpm security:install`, run `pnpm check` and `pnpm e2e` against unchanged sources, then run `pnpm guide:generate` to build the app, execute only tagged scenarios,
 and assemble `dist/user-guide` as Markdown and a static HTML book. Run
 `pnpm guide:preview` to inspect it locally. The generator rejects missing
 or failed guide scenarios and discards partial output. Generated media is
@@ -99,3 +99,5 @@ configuration. Do not record provider tokens, credentials, or one-time callback 
 Component tests retain per-file isolation and use at most two workers. This bounds
 concurrent jsdom/Effect environments on local machines and CI without extending
 interaction deadlines or relaxing assertions.
+
+Guide release also requires exact source/evidence/output hashes and inspection. Both publication triggers rerun all gates at the selected SHA and use `pnpm guide:release --require-clean` for release. Follow [trust and delivery](security-delivery.md) for synthetic capture, inspected retention and recovery.

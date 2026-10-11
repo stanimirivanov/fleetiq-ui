@@ -29,7 +29,13 @@
     "guide:test": "node --test tools/user-guide/*.test.mjs",
     "verify": "node tools/verification/cli.mjs",
     "harness:check": "node tools/verification/check-policy.mjs",
-    "harness:test": "node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/verification/*.test.mjs"
+    "harness:test": "node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/architecture/*.test.mjs tools/boundaries/*.test.mjs tools/security/*.test.mjs tools/verification/*.test.mjs",
+    "boundaries:check": "node tools/check-boundaries.mjs",
+    "security:install": "node tools/security/install.mjs",
+    "security:secrets": "node tools/security/secrets.mjs",
+    "security:dependencies": "node tools/security/advisories.mjs",
+    "security:artifacts": "node tools/security/artifacts.mjs",
+    "guide:release": "node tools/user-guide/release.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
@@ -43,6 +49,8 @@
     "remark-gfm": "4.0.1",
     "remark-parse": "11.0.0",
     "unified": "11.0.5",
-    "yaml": "2.8.3"
+    "yaml": "2.8.3",
+    "typescript-parser": "npm:typescript@6.0.3",
+    "yauzl": "3.4.0"
   }
 }

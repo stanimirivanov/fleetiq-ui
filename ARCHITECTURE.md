@@ -104,3 +104,5 @@ refresh that discovers a different account disposes the previous account's reads
 and metadata before mounting the new account's views; same-actor expiry refresh
 preserves ordinary interaction. Native sign-in anchors opt out of Solid Router
 with `rel="external noreferrer"` so the server receives the login request.
+
+See [executable trust controls](docs/development/security-delivery.md) for graph/AST coverage, exact adapter privileges and remaining review obligations.

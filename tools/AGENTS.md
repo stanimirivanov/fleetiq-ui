@@ -15,3 +15,5 @@ files in verified owned roots and inspect symlink/junction containment.
 Evidence records bounded statuses and source identity, never raw command output,
 environment or response payloads. A sensor cannot attest its own independence:
 policy changes require owner review and external GitHub ruleset configuration.
+
+Follow [trust and delivery](../docs/development/security-delivery.md) for current/trusted-base policies, checked detector pins, redacted findings and recovery. Keep compiler and AST parser pins independent. Static syntax sensors have documented limits.

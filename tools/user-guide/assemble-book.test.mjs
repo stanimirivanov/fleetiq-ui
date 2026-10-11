@@ -1,62 +1,11 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { assembleBook } from './assemble-book.mjs';
+import { fixture } from './fixtures.mjs';
 
-const chapters = [
-  ['console-orientation', 'production-shell', 10],
-  ['fleet-overview', 'development-sample', 20],
-  ['map-workbench', 'development-sample', 30],
-  ['asset-inspector', 'development-sample', 40],
-  ['registry-review', 'development-sample', 50],
-  ['alert-triage', 'development-sample', 60],
-];
-
-const createFixture = async (context) => {
-  const root = await mkdtemp(path.join(tmpdir(), 'fleetiq-guide-'));
-  context.after(async () => {
-    const resolved = path.resolve(root);
-    if (!resolved.startsWith(`${path.resolve(tmpdir())}${path.sep}`)) {
-      throw new Error(
-        'Refusing to remove a guide fixture outside the temp directory.',
-      );
-    }
-    await rm(root, { recursive: true, force: true });
-  });
-
-  for (const [slug, dataMode, order] of chapters) {
-    const directory = path.join(root, slug);
-    const assets = path.join(directory, 'assets');
-    await mkdir(assets, { recursive: true });
-    await writeFile(path.join(assets, `${slug}.webm`), '');
-    const steps = [];
-    for (let index = 1; index <= 5; index += 1) {
-      const image = `assets/step-${String(index).padStart(2, '0')}.png`;
-      await writeFile(path.join(directory, image), '');
-      steps.push({
-        title: `Step ${index}`,
-        body: `Verified action ${index}.`,
-        image,
-      });
-    }
-    await writeFile(
-      path.join(directory, 'guide.json'),
-      JSON.stringify({
-        schemaVersion: 2,
-        dataMode,
-        order,
-        slug,
-        title: slug,
-        summary: 'A verified browser journey.',
-        video: `assets/${slug}.webm`,
-        steps,
-      }),
-    );
-  }
-  return root;
-};
+const createFixture = async (context) => (await fixture(context)).output;
 
 test('assembles distinct production and synthetic guide sections', async (context) => {
   const root = await createFixture(context);

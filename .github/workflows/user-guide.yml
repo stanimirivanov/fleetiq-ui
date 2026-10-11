@@ -1,25 +1,18 @@
 name: User guide
-
 on:
   workflow_run:
-    workflows:
-      - Web quality gate
-    types:
-      - completed
+    workflows: [Web quality gate]
+    types: [completed]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
   group: fleetiq-user-guide-pages
   cancel-in-progress: true
-
 jobs:
   build:
-    name: Build complete executable user guide
-    # workflow_run can run with higher privilege. Accept only this repository's
-    # successfully verified push to main, never a pull-request run or fork.
+    name: Qualify and build complete executable user guide
+    # Both triggers rerun every gate at the exact source revision. Never publish a fork/PR run.
     if: >-
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'workflow_run' &&
@@ -28,56 +21,64 @@ jobs:
        github.event.workflow_run.head_branch == 'main' &&
        github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     permissions:
       contents: read
       pages: read
     steps:
-      - name: Check out the verified revision
-        uses: actions/checkout@v6
+      - name: Check out publication revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '24'
-
-      - name: Enable pinned package manager
-        run: corepack enable
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Chromium and system dependencies
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Verify and generate production and sample journeys
-        run: pnpm guide:generate
-
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm security:install
+      - run: pnpm exec playwright install --with-deps chromium
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
-
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - name: Qualify publication revision
+        run: pnpm check
+      - name: Qualify browser behavior at publication revision
+        run: pnpm e2e
+      - name: Generate only synthetic and contract-mocked journeys
+        run: pnpm guide:generate
+      - name: Validate exact-source release evidence
+        run: pnpm guide:release --require-clean
+      - name: Inspect artifacts before retention
+        id: artifacts
+        if: always()
+        run: pnpm security:artifacts
+      - name: Upload qualified GitHub Pages artifact
+        if: success() && steps.artifacts.outcome == 'success'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: dist/user-guide
-
-      - name: Upload guide failure artifacts
-        if: failure()
-        uses: actions/upload-artifact@v6
+      - name: Upload bounded verification evidence
+        if: always() && steps.artifacts.outcome == 'success'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: verification-guide
+          path: .verification/*.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload inspected synthetic guide failure evidence
+        if: failure() && steps.artifacts.outcome == 'success'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: playwright-user-guide-${{ github.run_attempt }}
           path: |
             test-results/
             playwright-report/
-            dist/user-guide
           if-no-files-found: ignore
           retention-days: 7
-
   deploy:
-    name: Publish executable user guide
+    name: Publish qualified executable user guide
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -87,6 +88,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy GitHub Pages artifact
+      - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
         id: deployment
-        uses: actions/deploy-pages@v5

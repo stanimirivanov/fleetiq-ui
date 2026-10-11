@@ -1,6 +1,41 @@
 /** Structural import rules for the Solid web application. */
+const testOnly =
+  '(^|/)(?:tests?|__tests__|fixtures|web-e2e)/|[.](?:test|spec)[.][cm]?[jt]sx?$';
+const models = '^apps/web/src/(?:features/[^/]+/model/|shared/model/)';
 module.exports = {
   forbidden: [
+    {
+      name: 'product-cannot-import-harness-code',
+      severity: 'error',
+      from: { path: '^apps/web/src/', pathNot: testOnly },
+      to: { path: '^tools/' },
+    },
+    {
+      name: 'product-cannot-import-testing-libraries',
+      severity: 'error',
+      from: { path: '^apps/web/src/', pathNot: testOnly },
+      to: {
+        path: '(?:^|/)(?:node_modules/)?(?:vitest|@playwright/test|@solidjs/testing-library|@testing-library/[^/]+)(?:/|$)',
+      },
+    },
+    {
+      name: 'product-cannot-import-test-only-code',
+      severity: 'error',
+      from: { path: '^apps/web/src/', pathNot: testOnly },
+      to: { path: testOnly },
+    },
+    {
+      name: 'pure-models-cannot-import-external-dependencies',
+      severity: 'error',
+      from: { path: models, pathNot: testOnly },
+      to: { pathNot: '^apps/web/src/' },
+    },
+    {
+      name: 'pure-models-cannot-import-non-model-code',
+      severity: 'error',
+      from: { path: models, pathNot: testOnly },
+      to: { path: '^apps/web/src/', pathNot: models },
+    },
     {
       name: 'no-circular-imports',
       severity: 'error',
@@ -31,9 +66,9 @@ module.exports = {
     {
       name: 'feature-model-cannot-import-ui-or-transport',
       severity: 'error',
-      from: { path: '^apps/web/src/features/[^/]+/model/' },
+      from: { path: '^apps/web/src/features/[^/]+/model/', pathNot: testOnly },
       to: {
-        path: '^apps/web/src/(features/[^/]+/(ui|api)/|shared/api/|generated/)',
+        path: '^apps/web/src/(features/[^/]+/(ui|api|demo)/|shared/(api|ui)/|generated/)',
       },
     },
     {
@@ -57,7 +92,7 @@ module.exports = {
     {
       name: 'shared-model-cannot-import-ui-or-transport',
       severity: 'error',
-      from: { path: '^apps/web/src/shared/model/' },
+      from: { path: '^apps/web/src/shared/model/', pathNot: testOnly },
       to: { path: '^apps/web/src/(shared/(api|ui)/|generated/)' },
     },
     {
@@ -106,7 +141,11 @@ module.exports = {
   options: {
     // Preserve type-only edges so architectural rules cover interface dependencies.
     tsPreCompilationDeps: true,
+    // Modern packages (including Effect v4) publish their entries through exports.
+    enhancedResolveOptions: {
+      exportsFields: ['exports'],
+      conditionNames: ['browser', 'import', 'default'],
+    },
     doNotFollow: { path: 'node_modules' },
-    exclude: { path: '(^|/)(node_modules|dist)/' },
   },
 };

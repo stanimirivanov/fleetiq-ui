@@ -54,13 +54,13 @@ preference when browser storage is available.
 
 ## Verify
 
-Run `pnpm check` for types, architecture, contracts, Solid tests, and the production
+Install the pinned scanner with `pnpm security:install`, then run `pnpm check` for types, architecture, contracts, Solid tests, and the production
 build. Install Chromium once with `pnpm exec playwright install chromium`, then
 run `pnpm e2e` for production and development browser suites. Connected browser
 scenarios intercept HTTP with contract-valid test-only responses; deployment
 qualification against an actual OIDC provider remains separate.
 
-`pnpm guide:generate` still records six existing chapters: production shell
+After current `pnpm check` and `pnpm e2e` pass, `pnpm guide:generate` records six existing chapters: production shell
 orientation and five labelled development walkthroughs. It creates an ignored
 static guide under `dist/user-guide`. The next guide slice will add connected
 operator procedures. See the [testing guide](docs/development/testing.md).

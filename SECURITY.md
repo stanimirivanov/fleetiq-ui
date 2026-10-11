@@ -1,5 +1,9 @@
 # Security
 
+## TL;DR
+
+Keep credentials out of browser code and recordings. Run the pinned source/history, advisory and artifact gates. See [security and delivery](docs/development/security-delivery.md) for capture, exception review and publication policy.
+
 Do not publish suspected vulnerabilities or credentials in a public issue.
 Use GitHub private vulnerability reporting for this repository when available;
 otherwise contact a maintainer privately through GitHub before disclosure.

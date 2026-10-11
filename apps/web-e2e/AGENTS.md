@@ -13,3 +13,5 @@ Use the documented port overrides when a default is occupied.
 Run both browser groups and the guide assembler tests. Do not claim stubbed OIDC
 responses qualify a real identity provider or deployment. Never capture provider
 tokens or credentials in screenshots, guide copy or test evidence.
+
+Follow [capture and retention policy](../../docs/development/security-delivery.md): loopback synthetic/contract mocks only, no live identity recordings or shared browser profiles. Validate artifact inspection before retention.

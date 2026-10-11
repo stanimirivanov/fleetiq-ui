@@ -18,16 +18,28 @@ const workflow = parse(
   readFileSync(path.join(root, '.github/workflows/quality.yml'), 'utf8'),
 );
 const workspace = readFileSync(path.join(root, 'pnpm-workspace.yaml'), 'utf8');
+const guide = readFileSync(
+  path.join(root, '.github/workflows/user-guide.yml'),
+  'utf8',
+);
 function mutated(modify) {
   const inputs = {
     manifest: structuredClone(manifest),
     workflow: structuredClone(workflow),
   };
   modify(inputs);
-  return inspectPolicy(inputs.manifest, stringify(inputs.workflow), workspace);
+  return inspectPolicy(
+    inputs.manifest,
+    stringify(inputs.workflow),
+    workspace,
+    guide,
+  );
 }
 test('current policy and every catalogue group have valid explicit commands', () => {
-  assert.deepEqual(inspectPolicy(manifest, stringify(workflow), workspace), []);
+  assert.deepEqual(
+    inspectPolicy(manifest, stringify(workflow), workspace, guide),
+    [],
+  );
   for (const group of Object.keys(GROUPS)) {
     assert.ok(selectedChecks(group).length > 0);
     assert.ok(
@@ -100,10 +112,12 @@ test('setup ordering, frozen installs and skip permissions are enforced', () => 
     assert.ok(mutated(({ workflow: config }) => edit(config)).length);
 });
 test('invalid and duplicate-key YAML and absent parser declaration fail', () => {
-  assert.ok(inspectPolicy(manifest, 'jobs: [invalid', workspace).length);
-  assert.ok(inspectPolicy(manifest, 'jobs: {}\njobs: {}\n', workspace).length);
+  assert.ok(inspectPolicy(manifest, 'jobs: [invalid', workspace, guide).length);
   assert.ok(
-    inspectPolicy(manifest, stringify(workflow), 'packages: []').length,
+    inspectPolicy(manifest, 'jobs: {}\njobs: {}\n', workspace, guide).length,
+  );
+  assert.ok(
+    inspectPolicy(manifest, stringify(workflow), 'packages: []', guide).length,
   );
 });
 

@@ -18,7 +18,7 @@ const state = {
 };
 const ready = () => ({
   tools: { node: process.version, pnpm: '12.5.1', git: 'test' },
-  launcher: 'fixture',
+  launcher: { command: 'fixture', args: [] },
   blocker: null,
 });
 const pass = async () => ({ status: 'passed', reason: null, exitCode: 0 });
@@ -107,7 +107,7 @@ test('aborted check is explicitly not run', async () => {
   controller.abort();
   assert.equal(
     (
-      await executeCheck('fixture', 'fixture', 'check', {
+      await executeCheck('fixture', { command: 'fixture', args: [] }, 'check', {
         signal: controller.signal,
       })
     ).status,
@@ -226,9 +226,14 @@ test('a running interrupted child closes before execution returns', async () => 
       launcher,
       "require('node:fs').writeFileSync('pid', String(process.pid)); setInterval(() => {}, 1000);\n",
     );
-    const running = executeCheck(root, launcher, 'fixture', {
-      signal: controller.signal,
-    });
+    const running = executeCheck(
+      root,
+      { command: process.execPath, args: [launcher] },
+      'fixture',
+      {
+        signal: controller.signal,
+      },
+    );
     const deadline = Date.now() + 10_000;
     let pid;
     while (Date.now() < deadline) {

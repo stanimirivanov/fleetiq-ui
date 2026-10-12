@@ -48,7 +48,7 @@ Its reads cover identity, pinned definitions, directed relationships, and exact
 source/target bindings. Live operational values, locations, and alert lifecycle
 remain separate backend-dependent work.
 
-The accepted [three-PR harness sequence](exec-plans/active/2026-10-harness-hardening.md)
+The accepted [three-PR harness sequence](exec-plans/completed/2026-10-harness-hardening.md)
 in **M02** takes priority: context/verification, executable trust boundaries and
 secure delivery, then measured browser quality. The
 [context slice](exec-plans/completed/2026-10-harness-context-verification.md) and

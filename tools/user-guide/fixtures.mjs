@@ -90,7 +90,7 @@ export async function fixture(context) {
     path.join(root, 'dist', 'unrelated.txt'),
     'preserve this output',
   );
-  for (const group of ['acceptance', 'browser']) {
+  for (const group of ['acceptance', 'browser', 'browser-quality']) {
     await writeFile(
       path.join(root, '.verification', `${group}-123-fixture.json`),
       JSON.stringify(report(group)),

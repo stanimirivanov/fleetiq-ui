@@ -10,7 +10,8 @@
       "!**/contracts/http/fleetiq-v1-ui-baseline.openapi.json",
       "!**/apps/web/src/generated/fleetiq-api.ts",
       "!**/LICENSE",
-      "!**/.verification"
+      "!**/.verification",
+      "!**/coverage"
     ]
   },
   "formatter": {
@@ -65,6 +66,27 @@
                     "message": "View components must not import Effect runtime subpaths."
                   }
                 ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "apps/web-e2e/e2e/**/*.spec.ts",
+        "apps/web-e2e/e2e-dev/**/*.spec.ts",
+        "apps/web-e2e/quality/**/*.spec.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@playwright/test": "Browser scenarios must import the owned error-observing test fixture."
+                }
               }
             }
           }

@@ -22,6 +22,7 @@ const allowedRuns = new Set([
   'pnpm exec playwright install --with-deps chromium',
   'pnpm check',
   'pnpm e2e',
+  'pnpm verify --group browser-quality',
   'pnpm verify --group structural',
   'pnpm guide:generate',
   'pnpm guide:release --require-clean',
@@ -130,6 +131,7 @@ export function inspectDelivery(quality, guide, fail) {
   if (
     !equal(Object.keys(quality.jobs ?? {}).sort(), [
       'browser',
+      'browser-quality',
       'check',
       'harness-windows',
     ])
@@ -182,6 +184,7 @@ export function inspectDelivery(quality, guide, fail) {
         'pnpm exec playwright install --with-deps chromium',
         'pnpm check',
         'pnpm e2e',
+        'pnpm verify --group browser-quality',
         'pnpm guide:generate',
         'pnpm guide:release --require-clean',
       ].map((command) => (step) => step.run === command),

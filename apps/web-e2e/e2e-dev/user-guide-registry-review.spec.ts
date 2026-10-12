@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures/browser-quality-test';
 import { RegistryReviewPage } from '../pages/registry-review.page';
 import { UserGuideSession } from '../user-guide/user-guide-session';
 

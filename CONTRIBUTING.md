@@ -47,3 +47,5 @@ copy-ready issue body with Goal, Scope, Design decisions, Acceptance criteria,
 and Out of scope. State exactly which checks passed, failed, or were not run.
 
 Security and delivery changes follow [the trust guide](docs/development/security-delivery.md). Install the pinned scanner before full acceptance. Exceptions require explicit review; incomplete scans cannot be called clean.
+
+Browser/harness changes also run pnpm verify --group browser-quality. Follow [measured quality](docs/development/measured-browser-quality.md) for per-file coverage ratchets, assertion qualification, accessibility/performance controls and recovery.

@@ -20,6 +20,7 @@ export interface ApiRequestEvidence {
 }
 
 export interface MetadataMockOptions {
+  readonly catalogueSize?: number;
   readonly sessionStatus?: 200 | 401 | 404 | 500;
   readonly actorId?: string;
   readonly identityDestination?: string;
@@ -36,6 +37,27 @@ export async function installMetadataApi(
   page: Page,
   options: MetadataMockOptions = {},
 ) {
+  if (
+    options.catalogueSize !== undefined &&
+    (!Number.isInteger(options.catalogueSize) ||
+      options.catalogueSize < 50 ||
+      options.catalogueSize > 200)
+  )
+    throw new Error('Quality catalogue requires 50..200 bounded records');
+  const inventory =
+    options.catalogueSize === undefined
+      ? catalogueRecords
+      : [
+          ...catalogueRecords,
+          ...Array.from(
+            { length: options.catalogueSize - catalogueRecords.length },
+            (_, index) => ({
+              ...catalogueRecords[0],
+              id: `zz-fixture-${String(index).padStart(4, '0')}`,
+              name: `Fixture machine ${index}`,
+            }),
+          ),
+        ];
   const requests: ApiRequestEvidence[] = [];
   let sessionStatus = options.sessionStatus ?? 200;
   let actorId = options.actorId ?? 'operator-a';
@@ -143,17 +165,35 @@ export async function installMetadataApi(
         );
       const after = url.searchParams.get('after');
       const first = after === null;
+      const offset =
+        after === null
+          ? 0
+          : inventory.findIndex((entry) => entry.id === after) + 1;
+      const bounded = inventory.slice(
+        offset,
+        offset + Number(url.searchParams.get('limit') ?? 50),
+      );
       const records = options.emptyCatalogue
         ? []
-        : first
-          ? catalogueRecords.slice(0, 2)
-          : catalogueRecords.slice(2);
+        : options.catalogueSize !== undefined
+          ? bounded
+          : first
+            ? catalogueRecords.slice(0, 2)
+            : catalogueRecords.slice(2);
       return reply(200, 'catalogue', {
         assets: records.map(({ external_identifiers: _, ...asset }) => ({
           ...asset,
           tenant_id: options.wrongTenantCatalogue ? 'tenant-b' : 'tenant-a',
         })),
-        next_after: !options.emptyCatalogue && first ? 'assembly-a' : null,
+        next_after: options.emptyCatalogue
+          ? null
+          : options.catalogueSize !== undefined
+            ? offset + bounded.length < inventory.length
+              ? bounded.at(-1)?.id
+              : null
+            : first
+              ? 'assembly-a'
+              : null,
       });
     }
     if (parts[0] === 'assets' && parts[1]) {

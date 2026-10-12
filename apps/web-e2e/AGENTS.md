@@ -15,3 +15,5 @@ responses qualify a real identity provider or deployment. Never capture provider
 tokens or credentials in screenshots, guide copy or test evidence.
 
 Follow [capture and retention policy](../../docs/development/security-delivery.md): loopback synthetic/contract mocks only, no live identity recordings or shared browser profiles. Validate artifact inspection before retention.
+
+Scenarios import the owned test fixture; direct Playwright imports bypassing observation are forbidden. Run pnpm verify --group browser-quality too. Read [measured quality](../../docs/development/measured-browser-quality.md) for seeded workloads, no-retry qualification and redacted observations.

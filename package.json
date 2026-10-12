@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "pnpm --filter @fleetiq/web dev",
-    "build": "pnpm --filter @fleetiq/web build",
+    "build": "pnpm --filter @fleetiq/web build && node tools/quality/bundle.mjs",
     "typecheck": "pnpm --filter @fleetiq/web typecheck && pnpm exec tsc --noEmit -p apps/web-e2e/tsconfig.json",
     "style:check": "biome ci .",
     "architecture": "node tools/check-architecture.mjs",
@@ -29,28 +29,34 @@
     "guide:test": "node --test tools/user-guide/*.test.mjs",
     "verify": "node tools/verification/cli.mjs",
     "harness:check": "node tools/verification/check-policy.mjs",
-    "harness:test": "node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/architecture/*.test.mjs tools/boundaries/*.test.mjs tools/security/*.test.mjs tools/verification/*.test.mjs",
+    "harness:test": "node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/architecture/*.test.mjs tools/boundaries/*.test.mjs tools/security/*.test.mjs tools/verification/*.test.mjs tools/quality/*.test.mjs",
     "boundaries:check": "node tools/check-boundaries.mjs",
     "security:install": "node tools/security/install.mjs",
     "security:secrets": "node tools/security/secrets.mjs",
     "security:dependencies": "node tools/security/advisories.mjs",
     "security:artifacts": "node tools/security/artifacts.mjs",
-    "guide:release": "node tools/user-guide/release.mjs"
+    "guide:release": "node tools/user-guide/release.mjs",
+    "quality:mutations": "node tools/quality/mutations.mjs",
+    "e2e:quality": "pnpm build && pnpm exec playwright test --config apps/web-e2e/playwright.quality.config.ts",
+    "quality:configuration": "node tools/quality/configuration.mjs",
+    "quality:page-errors": "node tools/quality/browser-error-fixture.mjs"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@biomejs/biome": "2.5.15",
     "@effect/openapi-generator": "4.0.1",
     "@effect/platform-node": "4.0.1",
     "@playwright/test": "1.63.0",
     "@types/node": "24.19.1",
     "dependency-cruiser": "18.5.0",
-    "typescript": "7.0.2",
     "github-slugger": "2.0.0",
     "remark-gfm": "4.0.1",
     "remark-parse": "11.0.0",
-    "unified": "11.0.5",
-    "yaml": "2.8.3",
+    "typescript": "7.0.2",
     "typescript-parser": "npm:typescript@6.0.3",
+    "unified": "11.0.5",
+    "vite": "8.3.2",
+    "yaml": "2.8.3",
     "yauzl": "3.4.0"
   }
 }

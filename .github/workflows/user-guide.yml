@@ -45,6 +45,8 @@ jobs:
         run: pnpm check
       - name: Qualify browser behavior at publication revision
         run: pnpm e2e
+      - name: Qualify measured browser quality at publication revision
+        run: pnpm verify --group browser-quality
       - name: Generate only synthetic and contract-mocked journeys
         run: pnpm guide:generate
       - name: Validate exact-source release evidence

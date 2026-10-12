@@ -3,7 +3,7 @@
 ## TL;DR
 
 Run pnpm security:install once to install the checksummed scanner, then pnpm check
-and pnpm e2e. Publication additionally requires pnpm guide:generate and
+and pnpm e2e, then pnpm verify --group browser-quality. Publication additionally requires pnpm guide:generate and
 pnpm guide:release --require-clean against the same source revision.
 Source, history and textual artifacts are scanned; scans never certify pixels.
 Keep policy changes reviewable and require external Code Owner protection.
@@ -117,3 +117,5 @@ outside repository Markdown.
 Measured performance, rendered accessibility and critical behavior coverage
 belong to the remaining harness PR. No scan, mock journey or source hash proves
 production readiness, visual privacy or deployment capacity.
+
+Measured quality adds the third exact-source qualification group. Raw component coverage/test reports stay ignored and are not uploaded. Only validated category/count/timing quality receipts and inspected synthetic browser artifacts are retained. See [measured browser quality](measured-browser-quality.md).

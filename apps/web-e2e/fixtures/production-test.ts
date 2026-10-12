@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base } from './browser-quality-test';
 import { startIdentityDestination } from './identity-destination';
 import { mockUnavailableSignIn } from './metadata-api';
 
@@ -27,3 +27,5 @@ export const test = base.extend<{
     }
   },
 });
+
+export type { Page } from '@playwright/test';

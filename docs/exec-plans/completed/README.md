@@ -25,3 +25,6 @@ evidence and material limitations for future reviewers.
 - [Complete FleetIQ web user guide](2026-10-complete-user-guide.md)
 
 - [Connected browser-safe semantic metadata](2026-10-connected-semantic-metadata.md) — M04.
+
+- [Harness audit and completed hardening sequence](2026-10-harness-hardening.md) — M02.
+- [Measured browser quality and recovery](2026-10-measured-browser-quality.md) — M02.

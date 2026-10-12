@@ -41,7 +41,7 @@ export function BindingRecords(props: {
             <p class="break-all">
               Target:{' '}
               <A
-                class="text-accent hover:underline"
+                class="text-accent underline underline-offset-2"
                 href={props.workspace.href(
                   `/assets/${encodeURIComponent(binding.target.assetId)}`,
                   { ...clearSnapshotSelection(), binding: null },

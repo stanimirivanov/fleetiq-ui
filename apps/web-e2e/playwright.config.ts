@@ -15,6 +15,7 @@ export default defineConfig({
   outputDir: fileURLToPath(new URL('../../test-results/', import.meta.url)),
   fullyParallel: !userGuideMode,
   forbidOnly: Boolean(process.env.CI),
+  failOnFlakyTests: true,
   retries: process.env.CI && !userGuideMode ? 1 : 0,
   workers: userGuideMode ? 1 : process.env.CI ? 2 : undefined,
   timeout: userGuideMode ? 120_000 : 30_000,

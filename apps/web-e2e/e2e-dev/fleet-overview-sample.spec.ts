@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures/browser-quality-test';
 import { AssetsPage } from '../pages/assets.page';
 import { OverviewPage } from '../pages/overview.page';
 import { ShellPage } from '../pages/shell.page';

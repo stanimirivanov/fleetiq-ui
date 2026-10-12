@@ -64,3 +64,5 @@ the repository, milestone, copy-ready
 issue, and exact pass/fail/not-run status per [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Read [browser trust and secure delivery](docs/development/security-delivery.md) when changing transport, capture, dependencies or CI publication.
+
+Browser/harness handoff also requires pnpm verify --group browser-quality. Read [measured browser quality](docs/development/measured-browser-quality.md) for critical obligations, calibrated workloads and recovery.

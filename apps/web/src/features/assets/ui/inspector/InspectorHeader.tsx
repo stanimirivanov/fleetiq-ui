@@ -41,7 +41,7 @@ export function InspectorHeader(props: { readonly inspector: DemoInspector }) {
       <nav aria-label="Breadcrumb" class="text-xs text-muted">
         <A
           href="/assets?preview=sample"
-          class="font-medium text-accent hover:underline"
+          class="font-medium text-accent underline underline-offset-2"
         >
           Assets
         </A>

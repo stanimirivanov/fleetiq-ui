@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    "src/shared/api/browser-api.ts",
+    "src/features/identity/api/browser-session-service.ts",
+    "src/features/identity/model/operator-session.ts",
+    "src/features/identity/ui/OperatorSessionProvider.tsx",
+    "src/features/identity/ui/OperatorAccessBoundary.tsx",
+    "src/features/assets/api/parse-asset-page.ts",
+    "src/features/assets/api/parse-metadata.ts",
+    "src/features/assets/api/live-metadata-reader.ts",
+    "src/features/assets/model/metadata-query.ts",
+    "src/features/assets/ui/connected/useMetadataRead.ts"
+  ]
+}

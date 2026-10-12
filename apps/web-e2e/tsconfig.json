@@ -18,6 +18,9 @@
     "pages/**/*.ts",
     "e2e/**/*.ts",
     "e2e-dev/**/*.ts",
-    "user-guide/**/*.ts"
+    "user-guide/**/*.ts",
+    "playwright.quality.config.ts",
+    "quality/**/*.ts",
+    "fixtures/**/*.ts"
   ]
 }

@@ -220,6 +220,11 @@ for (const [label, change] of [
       rm(path.join(root, '.verification', 'acceptance-123-fixture.json')),
   ],
   [
+    'missing measured browser quality',
+    (root) =>
+      rm(path.join(root, '.verification', 'browser-quality-123-fixture.json')),
+  ],
+  [
     'missing browser',
     async (root) =>
       rm(path.join(root, '.verification', 'browser-123-fixture.json')),
@@ -331,7 +336,7 @@ for (const [label, mutate] of [
 test('clean publication rejects dirty source while local exact-source validation remains permitted', async (context) => {
   const dirty = { ...source, dirty: true };
   const { root, output } = await fixture(context);
-  for (const group of ['acceptance', 'browser'])
+  for (const group of ['acceptance', 'browser', 'browser-quality'])
     await writeFile(
       path.join(root, '.verification', `${group}-123-fixture.json`),
       JSON.stringify(report(group, dirty)),

@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "bundle": {
+    "javascriptBytes": 350000,
+    "javascriptGzipBytes": 100000,
+    "cssBytes": 60000,
+    "cssGzipBytes": 16000,
+    "forbiddenModules": [
+      "apps/web/src/features/assets/demo/",
+      "apps/web/src/features/alerts/demo/",
+      "apps/web/src/features/assets/api/fixture-asset-reader.ts",
+      "apps/web/src/features/assets/api/sample-live-signal-service.ts"
+    ]
+  },
+  "performance": {
+    "warmups": 2,
+    "samples": 5,
+    "catalogueRecords": 100,
+    "pageSize": 50,
+    "navigationMs": 2000,
+    "filterMs": 1000,
+    "heapGrowthBytes": 16777216,
+    "nodeGrowth": 400
+  },
+  "coverage": {
+    "src/features/assets/api/live-metadata-reader.ts": {
+      "lines": {
+        "percent": 97,
+        "minimumTotal": 46
+      },
+      "statements": {
+        "percent": 97,
+        "minimumTotal": 46
+      },
+      "branches": {
+        "percent": 90,
+        "minimumTotal": 10
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 31
+      }
+    },
+    "src/features/assets/api/parse-asset-page.ts": {
+      "lines": {
+        "percent": 96,
+        "minimumTotal": 28
+      },
+      "statements": {
+        "percent": 96,
+        "minimumTotal": 28
+      },
+      "branches": {
+        "percent": 84,
+        "minimumTotal": 32
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 4
+      }
+    },
+    "src/features/assets/api/parse-metadata.ts": {
+      "lines": {
+        "percent": 100,
+        "minimumTotal": 69
+      },
+      "statements": {
+        "percent": 95,
+        "minimumTotal": 81
+      },
+      "branches": {
+        "percent": 92,
+        "minimumTotal": 65
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 27
+      }
+    },
+    "src/features/assets/model/metadata-query.ts": {
+      "lines": {
+        "percent": 97,
+        "minimumTotal": 42
+      },
+      "statements": {
+        "percent": 97,
+        "minimumTotal": 48
+      },
+      "branches": {
+        "percent": 95,
+        "minimumTotal": 46
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 15
+      }
+    },
+    "src/features/assets/ui/connected/useMetadataRead.ts": {
+      "lines": {
+        "percent": 91,
+        "minimumTotal": 34
+      },
+      "statements": {
+        "percent": 82,
+        "minimumTotal": 41
+      },
+      "branches": {
+        "percent": 77,
+        "minimumTotal": 18
+      },
+      "functions": {
+        "percent": 80,
+        "minimumTotal": 10
+      }
+    },
+    "src/features/identity/api/browser-session-service.ts": {
+      "lines": {
+        "percent": 100,
+        "minimumTotal": 10
+      },
+      "statements": {
+        "percent": 100,
+        "minimumTotal": 10
+      },
+      "branches": {
+        "percent": 100,
+        "minimumTotal": 9
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 5
+      }
+    },
+    "src/features/identity/model/operator-session.ts": {
+      "lines": {
+        "percent": 88,
+        "minimumTotal": 9
+      },
+      "statements": {
+        "percent": 83,
+        "minimumTotal": 12
+      },
+      "branches": {
+        "percent": 90,
+        "minimumTotal": 11
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 1
+      }
+    },
+    "src/features/identity/ui/OperatorAccessBoundary.tsx": {
+      "lines": {
+        "percent": 100,
+        "minimumTotal": 17
+      },
+      "statements": {
+        "percent": 100,
+        "minimumTotal": 25
+      },
+      "branches": {
+        "percent": 50,
+        "minimumTotal": 2
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 15
+      }
+    },
+    "src/features/identity/ui/OperatorSessionProvider.tsx": {
+      "lines": {
+        "percent": 97,
+        "minimumTotal": 70
+      },
+      "statements": {
+        "percent": 92,
+        "minimumTotal": 82
+      },
+      "branches": {
+        "percent": 76,
+        "minimumTotal": 42
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 19
+      }
+    },
+    "src/shared/api/browser-api.ts": {
+      "lines": {
+        "percent": 91,
+        "minimumTotal": 90
+      },
+      "statements": {
+        "percent": 87,
+        "minimumTotal": 102
+      },
+      "branches": {
+        "percent": 86,
+        "minimumTotal": 88
+      },
+      "functions": {
+        "percent": 73,
+        "minimumTotal": 15
+      }
+    }
+  },
+  "obligations": [
+    {
+      "file": "src/features/identity/ui/OperatorSessionProvider.test.tsx",
+      "titles": [
+        "invalidates on metadata authorization loss and preserves a safe login return",
+        "failed logout immediately hides evidence and exposes an explicit retry",
+        "focus refresh cancels superseded inspection and unmount cancels the current read",
+        "expiry removes protected evidence without a new metadata request",
+        "an account change remounts protected ownership and cancels prior operator evidence"
+      ]
+    },
+    {
+      "file": "src/features/assets/ui/connected/MetadataWorkspace.test.tsx",
+      "titles": [
+        "aborts tenant changes and unmount, discarding a stale response from a non-cooperative reader",
+        "metadata unauthorized response invalidates the app-owned session",
+        "source review preserves sibling cursors and fetches an exact pinned property without inventing observed values",
+        "scoped tenant change aborts old work and retains the latest completion",
+        "scoped effective cutoff change aborts old work and retains the latest completion",
+        "scoped known cutoff change aborts old work and retains the latest completion",
+        "scoped source change aborts old work and retains the latest completion",
+        "scoped cursor change aborts old work and retains the latest completion"
+      ]
+    },
+    {
+      "file": "src/shared/api/browser-api.test.ts",
+      "titles": [
+        "caller cancellation interrupts the owned HTTP request",
+        "disposal interrupts active work and rejects subsequent execution"
+      ]
+    },
+    {
+      "file": "src/features/assets/api/live-metadata-reader.test.ts",
+      "titles": [
+        "rejects tenant substitution and mismatched exact definition versions",
+        "rejects rows outside the requested temporal and membership scope",
+        "rejects changed target and exact source tuples even when schemas match",
+        "rejects duplicate or non-advancing page identities without imposing JS collation"
+      ]
+    },
+    {
+      "file": "src/features/assets/api/parse-asset-page.test.ts",
+      "titles": [
+        "rejects a different tenant even when the wire shape is valid",
+        "rejects a non-advancing cursor or cursor on an empty page"
+      ]
+    }
+  ]
+}

@@ -48,7 +48,7 @@ test('current policy and every catalogue group have valid explicit commands', ()
   }
   assert.throws(() => selectedChecks('unknown'), /Unknown/);
 });
-for (const name of ['check', 'browser', 'harness-windows']) {
+for (const name of ['check', 'browser', 'browser-quality', 'harness-windows']) {
   test(`missing required ${name} job is rejected`, () => {
     assert.ok(
       mutated(({ workflow: config }) => {

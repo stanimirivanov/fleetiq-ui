@@ -38,6 +38,11 @@ export function inspectPolicy(
     manifest.devDependencies?.yauzl !== '3.4.0'
   )
     fail('Keep explicit reviewed AST and archive parser pins.');
+  if (
+    manifest.devDependencies?.['@axe-core/playwright'] !== '4.13.0' ||
+    manifest.devDependencies?.vite !== '8.3.2'
+  )
+    fail('Keep the reviewed browser-quality tool pins.');
   if (manifest.packageManager !== 'pnpm@12.5.1') fail('Pin pnpm@12.5.1.');
   if (
     manifest.devDependencies?.typescript !== '7.0.2' ||

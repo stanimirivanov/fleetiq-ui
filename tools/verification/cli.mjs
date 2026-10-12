@@ -29,7 +29,7 @@ try {
       (arguments_.length !== 2 || arguments_[0] !== '--group')
     ) {
       throw new Error(
-        'Usage: pnpm verify [--group acceptance|structural|product|browser] or --list',
+        'Usage: pnpm verify [--group acceptance|structural|product|browser|browser-quality|security] or --list',
       );
     }
     const group = arguments_[1] ?? 'acceptance';

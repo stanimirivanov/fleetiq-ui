@@ -90,7 +90,7 @@ The product contract and existing screen behavior remain unchanged.
   deployment and remote required-check/Code Owner/environment protection.
   Those external settings remain explicit administration obligations.
 
-Parent sequence: [Harness hardening](../active/2026-10-harness-hardening.md).
+Parent sequence: [Harness hardening](../completed/2026-10-harness-hardening.md).
 
 ## Out of scope
 

@@ -1,0 +1,126 @@
+# Measured browser quality
+
+## TL;DR
+
+Run pnpm check, pnpm e2e and pnpm verify --group browser-quality before handing off
+browser or harness changes. The first covers scoped critical coverage, assertion
+qualification and production output. The second covers operator behavior; the
+third uses one Chromium worker, no retries, representative rendered accessibility
+and a bounded production-fixture rendering workload. All three groups must qualify
+unchanged sources before guide publication. Measurements are rendering regression
+controls, not live fleet capacity or backend latency promises.
+
+## Critical behavior and coverage
+
+[The scope](../../tools/quality/coverage-scope.json) names ten owned modules:
+managed HTTP, session parsing/ownership/access, asset and semantic parsing, the live
+metadata reader, URL context and cancellable reads. Generated code is excluded.
+[The policy](../../tools/quality/policy.json) records measured per-file line,
+statement, function and branch floors, rounded down to whole percentages.
+Minimum instrumentation counts prevent deleting an uncovered owned branch from
+silently improving its percentage. Legitimate simplification requires reviewed
+baseline changes; coverage is not a proof of useful assertions.
+
+The component runner checks owned output parents, removes only three stale report
+files, runs the real pinned V8 provider, validates complete source registration,
+and requires every named critical assertion to pass. Full raw component reports
+stay in ignored apps/web/coverage; retained receipts contain counts and registered
+relative module names only. Missing or skipped obligations fail qualification.
+
+Obligations cover authorization invalidation, immediate hiding on failed logout,
+account remount, expiry, cancellation/disposal, parser scope/precision, cursor
+advancement, and tenant/effective/known/source/cursor transitions. A late old
+completion must leave the new result visible. The mutation gate uses isolated Vite
+load hooks against real component assertions: deleting immediate logout hiding,
+read cancellation or stale-completion suppression must fail its named assertion.
+Positive controls pass first. Changed anchors, setup failures and surviving
+mutants require investigation; application files are never edited by qualification.
+
+## Production output
+
+The Vite plugin records resolved application module ownership and hashes final
+emitted JS/CSS bytes after asset processing. The build gate checks actual inventory,
+hashes and gzip sizes. Demo owners, the fixture reader and synthetic playback
+service cannot be shipped in production. Legitimate generated wire examples are
+not blanket-searched for words such as sample or locomotive.
+
+The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
+gzip. Reviewed caps are 350,000 / 100,000 JS bytes and 60,000 / 16,000 CSS bytes.
+A new map SDK or substantial feature requires a workload and budget review, not
+an automatic increase. Real Vite fixtures qualify allowed examples, forbidden
+sample ownership, changed output bytes and a deliberately exceeded budget.
+
+## Rendered accessibility and browser errors
+
+Axe 4.13.0 audits selected WCAG 2.0/2.1 A/AA rules on the connected catalogue,
+inspector and registry in Light/Dark and desktop/narrow layouts. Signed-out and
+denied-access surfaces are checked too. Evidence keeps rule IDs and counts, never
+DOM snippets. Keyboard and responsive functional journeys remain required.
+Passing these checks does not certify full WCAG compliance or replace screen-reader
+and human visual review. Incomplete/unsupported Axe execution fails the test.
+
+Scenarios import the owned production or browser-quality test fixture. A real
+Biome rule rejects direct Playwright imports in all three scenario directories.
+The automatic fixture fails unexpected page errors and attaches only completed,
+cancelled and rejected fetch/XHR counters plus page-error counts. Typed HTTP
+failures remain explicit UI states; they are not uncaught JavaScript errors.
+A separate real browser qualification proves an error-free page passes and an
+uncaught error is rejected by the actual fixture. Its private temporary reports
+are removed; module context is explicitly ESM.
+
+## Rendering envelope and calibration
+
+The separate quality config owns its built preview on loopback port 4175; use
+FLEETIQ_E2E_QUALITY_PORT when occupied. It refuses server reuse. Tool pins are
+Playwright 1.63.0 / Chromium 153.0.8010.12, Vite 8.3.2 and Node 24; receipts record
+the actual versions and source identity. CI runs a separate browser-quality job.
+
+The test-owned backend fixture seeds 100 identities, serves bounded 50-row pages,
+and returns one relationship, target binding and exact-source candidate per
+registry snapshot. Viewports are 1365×900 and 390×844. Two warm-up rounds precede
+five recorded rounds of catalogue filtering and client-side registry/catalogue
+navigation. Each observation waits for visible readiness and two animation frames.
+Browser-clock durations include automation and local mocked transport/decoding;
+they are not isolated INP or real backend request measurements.
+
+Post-GC Chromium heap/node counts compare the same catalogue state after warm-up
+and five complete round trips. Both boundaries use exactly three render/GC rounds
+to finish Chromium's asynchronous DOM sweeping, then record the final snapshot.
+The sensor never retries until a threshold passes or chooses the lowest count.
+Run this lane without concurrent local build/coverage work; the dedicated CI job
+also owns one worker. Missing metrics, malformed samples and incomplete
+runs fail. Raw numeric timings/resources and workload limits are retained in
+ignored .verification/quality-performance-*.json and inspected browser attachments.
+
+Initial 12 October 2026 qualification used Windows and Ubuntu WSL, frozen installs,
+Node 24.18.0 and the same Chromium build:
+
+| Workload | Observed maximum navigation | Observed maximum filter | Retained nodes |
+| --- | ---: | ---: | ---: |
+| Windows desktop/narrow development calibration | <390 ms | <211 ms | 0 |
+| Linux desktop/narrow development calibration | <418 ms | <205 ms | 0 |
+
+Heap growth was below 0.4 MiB across these runs. Conservative blocking limits are
+2,000 ms maximum navigation, 1,000 ms filtering, 16 MiB post-GC heap growth and
+400 retained nodes. These tolerate local/CI variation while rejecting a controlled
+slowdown and retained DOM. Review the first hosted Linux results, upgrades and
+changed workloads before tightening or changing caps. Linux calibration receipts
+are retained separately under .verification/linux-calibration and do not
+substitute for final-source handoff evidence.
+
+## Failure and recovery
+
+1. Read the incomplete group receipt and failing stage. Missing prerequisites are
+   not a clean scan; setup failures cannot qualify a deliberate regression.
+2. Inspect synthetic traces privately. Preserve rule categories and raw numeric
+   samples; do not copy DOM, headers, tokens or error payloads into receipts.
+3. Check source identity, frozen installation, selected viewport/workload, owned
+   port and tool versions. Diagnose workload or product causes before changing caps.
+4. Repair the component, lifecycle or sensor. Add a violation fixture if the gate
+   escaped. Do not disable a rule, remove a source or turn a missing metric into zero.
+5. Rerun complete groups at unchanged final sources. Guide release requires all
+   three complete receipts, inspection and clean publication sources.
+
+[The control register](harness-controls.md) records owners, triggers and remaining
+review/deferred obligations. External required statuses and Code Owner protection
+must include browser-quality; repository text cannot configure those settings.

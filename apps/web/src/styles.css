@@ -141,7 +141,8 @@ textarea {
   .fi-nav-link--planned {
     position: relative;
     cursor: not-allowed;
-    opacity: 0.58;
+    /* Planned destinations remain readable; non-interactivity is conveyed by the label. */
+    opacity: 1;
   }
 
   .fi-header-icon {

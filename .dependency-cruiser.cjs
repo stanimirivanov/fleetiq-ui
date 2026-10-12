@@ -15,7 +15,7 @@ module.exports = {
       severity: 'error',
       from: { path: '^apps/web/src/', pathNot: testOnly },
       to: {
-        path: '(?:^|/)(?:node_modules/)?(?:vitest|@playwright/test|@solidjs/testing-library|@testing-library/[^/]+)(?:/|$)',
+        path: '(?:^|/)(?:node_modules/)?(?:vitest|@vitest/[^/]+|@axe-core/playwright|axe-core|@playwright/test|@solidjs/testing-library|@testing-library/[^/]+)(?:/|$)',
       },
     },
     {

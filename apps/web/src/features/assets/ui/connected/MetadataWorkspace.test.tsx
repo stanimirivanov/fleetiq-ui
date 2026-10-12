@@ -287,9 +287,6 @@ test('aborts tenant changes and unmount, discarding a stale response from a non-
   setTenant('tenant-b');
   await waitFor(() => expect(signals).toHaveLength(2));
   expect(signals[0]?.aborted).toBe(true);
-  first.resolve(assets);
-  await first.promise;
-  expect(screen.queryByText('Primary machine')).toBeNull();
   second.resolve({
     assets: [
       {
@@ -302,6 +299,10 @@ test('aborts tenant changes and unmount, discarding a stale response from a non-
     nextAfter: null,
   });
   expect(await screen.findByText('Another tenant machine')).toBeTruthy();
+  first.resolve(assets);
+  await first.promise;
+  expect(screen.queryByText('Primary machine')).toBeNull();
+  expect(screen.getByText('Another tenant machine')).toBeTruthy();
   view.unmount();
   expect(signals[1]?.aborted).toBe(true);
 });
@@ -410,3 +411,99 @@ test('an empty exact-source page never claims an unassigned or unregistered devi
     screen.queryByRole('list', { name: 'Source binding candidate records' }),
   ).toBeNull();
 });
+
+interface ScopedSnapshot {
+  readonly tenantId: string;
+  readonly effectiveAtMs: number;
+  readonly knownAtMs: number;
+  readonly limit: number;
+  readonly after?: string;
+  readonly source: {
+    readonly deviceAssetId: string;
+    readonly endpointId: string;
+    readonly signalId: string;
+  };
+}
+function ScopedSnapshotProbe(props: { readonly request: ScopedSnapshot }) {
+  const read = useMetadataRead(
+    () => props.request,
+    (reader, request, options) => reader.listSourceBindings(request, options),
+  );
+  return <output aria-label="Scoped read state">{read.state().kind}</output>;
+}
+const snapshotRequest: ScopedSnapshot = {
+  tenantId: 'tenant-a',
+  effectiveAtMs: 1500,
+  knownAtMs: 2500,
+  limit: 50,
+  source: {
+    deviceAssetId: 'gateway-1',
+    endpointId: 'can-primary',
+    signalId: 'bus.voltage',
+  },
+};
+test.each([
+  ['tenant', { ...snapshotRequest, tenantId: 'tenant-b' }],
+  ['effective cutoff', { ...snapshotRequest, effectiveAtMs: 1600 }],
+  ['known cutoff', { ...snapshotRequest, knownAtMs: 2600 }],
+  [
+    'source',
+    {
+      ...snapshotRequest,
+      source: { ...snapshotRequest.source, signalId: 'bus.current' },
+    },
+  ],
+  ['cursor', { ...snapshotRequest, after: 'binding-1' }],
+] as const)(
+  'scoped %s change aborts old work and retains the latest completion',
+  async (_name, nextRequest) => {
+    let firstResolve!: (
+      value: Awaited<ReturnType<MetadataReader['listSourceBindings']>>,
+    ) => void;
+    let secondResolve!: (
+      value: Awaited<ReturnType<MetadataReader['listSourceBindings']>>,
+    ) => void;
+    const first = new Promise<
+      Awaited<ReturnType<MetadataReader['listSourceBindings']>>
+    >((resolve) => {
+      firstResolve = resolve;
+    });
+    const second = new Promise<
+      Awaited<ReturnType<MetadataReader['listSourceBindings']>>
+    >((resolve) => {
+      secondResolve = resolve;
+    });
+    const signals: AbortSignal[] = [];
+    const reader = readerWith({
+      listSourceBindings: (_request, options) => {
+        if (!options?.signal) throw new Error('Cancellation signal missing');
+        signals.push(options.signal);
+        return signals.length === 1 ? first : second;
+      },
+    });
+    const [request, setRequest] = createSignal<ScopedSnapshot>(snapshotRequest);
+    const view = render(() => (
+      <MetadataReaderProvider reader={reader}>
+        <ScopedSnapshotProbe request={request()} />
+      </MetadataReaderProvider>
+    ));
+    setRequest(nextRequest);
+    await waitFor(() => expect(signals).toHaveLength(2));
+    expect(signals[0]?.aborted).toBe(true);
+    const result = (request: ScopedSnapshot) => ({
+      source: request.source,
+      effectiveAtMs: request.effectiveAtMs,
+      knownAtMs: request.knownAtMs,
+      bindings: [],
+      nextAfter: null,
+    });
+    secondResolve(result(nextRequest));
+    await second;
+    expect(await screen.findByText('ready')).toBeTruthy();
+    firstResolve(result(snapshotRequest));
+    await first;
+    expect(screen.getByText('ready')).toBeTruthy();
+    view.unmount();
+    expect(signals[1]?.aborted).toBe(true);
+  },
+);

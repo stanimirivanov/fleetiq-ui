@@ -25,3 +25,6 @@ homes rather than growing the root README.
   trigger for action.
 
 - [Browser trust and delivery](development/security-delivery.md): model/transport sensors, scans, capture and exact-source publication.
+
+- [Measured browser quality](development/measured-browser-quality.md): critical obligations, output budgets, rendered checks and calibrated workloads.
+- [Harness control register](development/harness-controls.md): owners, review triggers and unqualified areas.

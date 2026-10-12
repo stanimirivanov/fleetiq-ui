@@ -73,6 +73,45 @@ jobs:
             playwright-report/
           if-no-files-found: ignore
           retention-days: 7
+  browser-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '24'
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm security:install
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm verify --group browser-quality
+      - name: Inspect artifacts before retention
+        id: artifacts
+        if: always()
+        run: pnpm security:artifacts
+      - name: Upload bounded verification evidence
+        if: always() && steps.artifacts.outcome == 'success'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: verification-browser-quality
+          path: .verification/*.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload inspected synthetic browser failure evidence
+        if: failure() && steps.artifacts.outcome == 'success'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: playwright-quality-failure-${{ github.run_attempt }}
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
   harness-windows:
     runs-on: windows-latest
     timeout-minutes: 25

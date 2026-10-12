@@ -34,7 +34,7 @@ export function qualifiedReport(report, group, source, pin) {
   );
 }
 
-/** Both complete groups must qualify the exact source bytes used for the book. */
+/** All three complete groups must qualify the exact source bytes used for the book. */
 export function requireQualification(root, source, manifest) {
   const directory = ownedPath(root, '.verification');
   if (!lstatSync(directory).isDirectory())
@@ -42,7 +42,7 @@ export function requireQualification(root, source, manifest) {
   const pin = /^pnpm@(\d+\.\d+\.\d+)$/u.exec(manifest.packageManager)?.[1];
   if (!pin) throw new Error('Guide package-manager pin is invalid.');
   const reports = readdirSync(directory).filter((name) =>
-    /^(?:acceptance|browser)-[a-z0-9-]+\.json$/u.test(name),
+    /^(?:acceptance|browser|browser-quality)-[a-z0-9-]+\.json$/u.test(name),
   );
   const found = {};
   for (const name of reports.sort()) {
@@ -55,14 +55,14 @@ export function requireQualification(root, source, manifest) {
     } catch {
       continue;
     }
-    for (const group of ['acceptance', 'browser']) {
+    for (const group of ['acceptance', 'browser', 'browser-quality']) {
       if (qualifiedReport(report, group, source, pin))
         found[group] = `.verification/${name}`;
     }
   }
-  if (!found.acceptance || !found.browser)
+  if (!found.acceptance || !found.browser || !found['browser-quality'])
     throw new Error(
-      'Guide generation requires complete acceptance and browser evidence at the current source revision and digest.',
+      'Guide generation requires complete acceptance, browser and measured-quality evidence at the current source revision and digest.',
     );
   return found;
 }

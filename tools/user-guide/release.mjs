@@ -100,7 +100,7 @@ export async function validateReady(
   }
   const manifest = manifestFor(root);
   requireQualification(root, source, manifest);
-  for (const group of ['acceptance', 'browser']) {
+  for (const group of ['acceptance', 'browser', 'browser-quality']) {
     const entry = ready.qualification?.[group];
     if (
       !entry ||
@@ -129,7 +129,7 @@ export async function validateReady(
     JSON.stringify(ready.files) !== JSON.stringify(outputInventory(outputRoot))
   )
     throw new Error('Guide output changed during release inspection.');
-  for (const group of ['acceptance', 'browser']) {
+  for (const group of ['acceptance', 'browser', 'browser-quality']) {
     const entry = ready.qualification[group];
     if (sha256(readFileSync(ownedPath(root, entry.path))) !== entry.sha256)
       throw new Error('Guide evidence changed during release inspection.');

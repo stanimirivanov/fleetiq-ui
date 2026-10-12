@@ -21,3 +21,10 @@ API, map and product slices remain in [PLANS.md](../PLANS.md).
   [portability correction evidence](completed/2026-10-harness-context-verification.md#ci-portability-correction-2026-10-11).
   Product assertions, timeouts and worker policy remain unchanged; root cause
   and hosted-CI recurrence have not been established.
+
+## Measured workload and remaining capacity
+
+- **Owner:** browser harness and platform maintainers.
+- **Disposition:** separate rendering lane uses two warm-ups, five samples, fixed viewports, post-GC metrics and no retries; functional retries remain diagnostic and flaky outcomes now fail. The previous transient deadlines were not extended.
+- **Trigger:** first hosted Linux lane, recurring deadlines, tool upgrades or workload changes. Review raw measurements before modifying thresholds.
+- **Remaining:** live telemetry/maps, long sessions and provider/deployment qualification. See [control register](../development/harness-controls.md) and [measured quality](../development/measured-browser-quality.md).

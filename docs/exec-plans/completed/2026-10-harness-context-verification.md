@@ -78,7 +78,7 @@ from creating misleading harness failures or acceptance passes.
   ruleset/required-code-owner qualification. CI lanes and administration
   requirements are authored; those external settings are not attested here.
 
-Parent sequence: [Harness hardening](../active/2026-10-harness-hardening.md).
+Parent sequence: [Harness hardening](../completed/2026-10-harness-hardening.md).
 
 ## Out of scope
 

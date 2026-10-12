@@ -4,7 +4,7 @@
 
 `pnpm check` verifies types, architecture, view size, styling, documentation,
 pure rules, Solid component behavior, and a production build. `pnpm e2e`
-runs production-preview and development-server Playwright suites. Both gates
+runs production-preview and development-server Playwright suites. All three gates
 are required in CI. Selected production journeys can generate a user guide;
 ordinary e2e scenarios do not.
 
@@ -101,3 +101,7 @@ concurrent jsdom/Effect environments on local machines and CI without extending
 interaction deadlines or relaxing assertions.
 
 Guide release also requires exact source/evidence/output hashes and inspection. Both publication triggers rerun all gates at the selected SHA and use `pnpm guide:release --require-clean` for release. Follow [trust and delivery](security-delivery.md) for synthetic capture, inspected retention and recovery.
+
+## Measured quality and mandatory browser fixture
+
+Run pnpm verify --group browser-quality after the functional browser group. The separate built-preview lane records bounded workloads, repeated samples, rendered accessibility and resource growth; it does not qualify backend/network capacity. Scenarios import fixtures/production-test or fixtures/browser-quality-test so unexpected page errors cannot be silently discarded. Direct SDK test imports are lint violations. Follow [measured quality](measured-browser-quality.md) and the [control register](harness-controls.md). Guide release requires acceptance, browser and browser-quality evidence at unchanged sources.

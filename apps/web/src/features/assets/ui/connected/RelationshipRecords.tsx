@@ -26,7 +26,7 @@ export function RelationshipRecords(props: {
             </p>
             <p class="break-all">
               <A
-                class="text-accent hover:underline"
+                class="text-accent underline underline-offset-2"
                 href={assetHref(relationship.sourceAssetId)}
               >
                 {relationship.sourceAssetId}
@@ -36,7 +36,7 @@ export function RelationshipRecords(props: {
                 <span aria-hidden="true"> → </span>
               </span>
               <A
-                class="text-accent hover:underline"
+                class="text-accent underline underline-offset-2"
                 href={assetHref(relationship.targetAssetId)}
               >
                 {relationship.targetAssetId}

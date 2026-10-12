@@ -20,6 +20,7 @@ export default defineConfig({
   ),
   fullyParallel: !userGuideMode,
   forbidOnly: Boolean(process.env.CI),
+  failOnFlakyTests: true,
   retries: process.env.CI && !userGuideMode ? 1 : 0,
   workers: userGuideMode ? 1 : process.env.CI ? 2 : undefined,
   reporter: [

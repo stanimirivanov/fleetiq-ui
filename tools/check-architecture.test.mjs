@@ -229,3 +229,29 @@ test('unsupported TS or TSX extensions cannot qualify extraction', () => {
     );
   }
 });
+
+for (const file of [
+  'apps/web-e2e/e2e/Probe.spec.ts',
+  'apps/web-e2e/e2e-dev/Probe.spec.ts',
+  'apps/web-e2e/quality/Probe.spec.ts',
+]) {
+  test(`browser scenario cannot bypass the owned error fixture: ${file}`, (context) =>
+    assertLintViolation(
+      architectureFixture(context),
+      {
+        source:
+          "import { test as unchecked } from '@playwright/test';\nunchecked('probe', async () => {});\n",
+        diagnostic: 'noRestrictedImports',
+      },
+      file,
+    ));
+}
+test('owned browser fixture imports pass the actual lint rule', (context) => {
+  const fixture = architectureFixture(context);
+  const file = 'apps/web-e2e/quality/Probe.spec.ts';
+  fixture.write(
+    file,
+    "import { test } from '../fixtures/production-test';\ntest('probe', async () => {});\n",
+  );
+  assert.equal(runBiome(fixture.root, file).status, 0);
+});

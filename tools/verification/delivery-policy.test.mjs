@@ -151,6 +151,17 @@ const cases = {
       with: { 'persist-credentials': false, 'fetch-depth': 0 },
     });
   },
+  'measured-quality job removed': ({ quality }) => {
+    delete quality.jobs['browser-quality'];
+  },
+  'measured-quality publication removed': ({ guide }) => {
+    guide.jobs.build.steps = guide.jobs.build.steps.filter(
+      (step) => step.run !== 'pnpm verify --group browser-quality',
+    );
+  },
+  'accessibility pin removed': ({ manifest }) => {
+    delete manifest.devDependencies['@axe-core/playwright'];
+  },
   'AST alias missing': ({ manifest }) => {
     delete manifest.devDependencies['typescript-parser'];
   },

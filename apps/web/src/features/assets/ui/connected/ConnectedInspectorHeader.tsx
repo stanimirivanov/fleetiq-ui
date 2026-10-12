@@ -12,7 +12,7 @@ export function ConnectedInspectorHeader(props: {
     <header class="grid gap-3">
       <nav aria-label="Breadcrumb" class="text-xs text-muted">
         <A
-          class="text-accent hover:underline"
+          class="text-accent underline underline-offset-2"
           href={props.workspace.href('/assets')}
         >
           Assets
@@ -38,7 +38,7 @@ export function ConnectedInspectorHeader(props: {
           </p>
         </div>
         <A
-          class="text-xs font-semibold text-accent hover:underline"
+          class="text-xs font-semibold text-accent underline underline-offset-2"
           href={props.workspace.href(
             '/assets/registry/review',
             assetSelectionChanges(props.assetId),

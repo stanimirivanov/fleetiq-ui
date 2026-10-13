@@ -28,4 +28,8 @@ export function assessPerformance(
   resources: ResourceSamples,
   limits?: PerformanceLimits,
 ): { passed: boolean; maxNavigationMs: number; maxFilterMs: number };
+export function requireUnrecordedMeasurement(
+  trace: unknown,
+  video: unknown,
+): void;
 export function requireNoPageErrors(count: number): void;

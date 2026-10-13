@@ -33,7 +33,8 @@ and pinned-contract checks, pure and Solid component tests, and a production
 build. The 150-line gate is a review prompt with a documented exception;
 shorter pages still need structural review.
 
-For browser behavior, also run `pnpm e2e`; CI requires both jobs. Add focused
+For browser behavior, also run `pnpm e2e` and
+`pnpm verify --group browser-quality`; CI requires all three groups. Add focused
 behavioral tests when implementing behavior, without repeating static markup
 or configuration. Keep page-object locators/actions separate from scenario
 assertions, and tag only coherent, verified journeys for guide generation.

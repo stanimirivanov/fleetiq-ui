@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import browserConfiguration from '../../apps/web-e2e/playwright.quality.config.ts';
 import { runEntrypoint } from '../sensors/entrypoint.mjs';
 import { qualityPolicy, repositoryRoot } from './policy.mjs';
 import { coverageScope } from './scope.mjs';
@@ -7,6 +8,7 @@ export function inspectQualityConfiguration(
   app,
   policy = qualityPolicy,
   scope = coverageScope,
+  browser = browserConfiguration,
 ) {
   if (
     app.scripts?.['test:component'] !==
@@ -33,6 +35,34 @@ export function inspectQualityConfiguration(
     policy.performance.pageSize !== 50
   )
     throw new Error('Keep the calibrated bounded rendering workload.');
+  const projects = browser.projects ?? [];
+  const accessibility = projects.find(
+    (project) => project.name === 'rendered-accessibility',
+  );
+  const performance = projects.find(
+    (project) => project.name === 'rendering-performance',
+  );
+  if (
+    browser.workers !== 1 ||
+    browser.retries !== 0 ||
+    projects.length !== 2 ||
+    !accessibility ||
+    !performance ||
+    JSON.stringify(accessibility.testMatch) !==
+      JSON.stringify(['**/measured-browser.spec.ts']) ||
+    JSON.stringify(performance.testMatch) !==
+      JSON.stringify([
+        '**/rendering-performance.spec.ts',
+        '**/resource-sensors.spec.ts',
+      ]) ||
+    performance.use?.trace !== 'off' ||
+    performance.use?.video !== 'off' ||
+    JSON.stringify(performance.use?.launchOptions?.args) !==
+      JSON.stringify(['--js-flags=--expose-gc'])
+  )
+    throw new Error(
+      'Keep both owned quality projects, unrecorded precise-GC measurements, one worker and zero retries.',
+    );
   return { passed: true };
 }
 await runEntrypoint(import.meta.url, () => {

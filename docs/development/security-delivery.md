@@ -78,7 +78,9 @@ Never reuse an authenticated browser profile or point recordings at live identit
 The artifact inspector rejects links/junctions, unknown formats, empty content,
 unsafe archive entry paths and excessive decompression. Maintained yauzl inspects
 ZIP entries; bounded textual content, including Playwright trace archives, goes
-through the pinned secret detector before retention. Failure uploads require the
+through the pinned secret detector before retention. The trace viewer's
+.webmanifest is accepted only as a UTF-8 JSON object and its original bytes remain
+fully scanned. Malformed manifests and other unknown formats still fail. Failure uploads require the
 inspection step's success; no inspection means no upload.
 
 PNG/WebM signatures and regular-file ownership validate expected media, not the

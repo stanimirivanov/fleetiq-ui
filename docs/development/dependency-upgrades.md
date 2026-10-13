@@ -64,6 +64,12 @@ copied identity before substituting only eligible exact npm-tool pins into that
 snapshot's private registry. The original reviewed registry and checkout remain
 unchanged.
 
+Git's displayed top-level path may use a Windows DOS 8.3 alias, including the
+runner temporary directory. Repository identity requires native canonical paths
+and matching directory device/file IDs after rejecting linked ancestors. Display
+spelling, slash style or letter case alone never establishes ownership. Shallow,
+borrowed, promisor, hidden-index and altered-source controls remain enforced.
+
 The [qualification runner](../../tools/verification/candidate.mjs) performs a fresh
 frozen install, checksummed scanner installation, harness policy verification, the
 selected unchanged group, and artifact inspection. Installed package metadata,

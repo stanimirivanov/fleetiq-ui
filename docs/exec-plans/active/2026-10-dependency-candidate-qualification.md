@@ -131,6 +131,20 @@ identity. Their ignored .verification receipts are authoritative; preliminary
 runs interrupted or invalidated by source edits are not acceptance evidence.
 Earlier receipts from the merged harness PR do not qualify this changed source.
 
+## Windows checkout identity regression
+
+The Windows structural job exposed a Git/Node path-spelling mismatch when the
+runner TEMP directory uses a DOS 8.3 alias. The original display-string comparison
+rejected the same physical repository before isolation. Compare native canonical
+directory names and exact device/file IDs after rejecting links; leave checkout,
+index, history, source-drift and cleanup checks intact.
+
+Regression qualification must exercise a real owned Windows short-path fixture
+without changing filesystem settings or global Git configuration. Positive snapshot
+assertions and unrelated-root, linked-ancestor and invalid-checkout controls remain
+mandatory. Fresh source-bound group receipts, rather than earlier run results,
+establish acceptance for this repair.
+
 ## Out of scope
 
 Automatic approval/merge, new publishers, Node/pnpm major upgrades, remote GitHub

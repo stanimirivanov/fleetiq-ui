@@ -99,6 +99,30 @@ function indexEntries(root, identity) {
   return names;
 }
 
+/**
+ * Git may retain a Windows DOS 8.3 spelling while Node reports the long path.
+ * Resolve native directory names only after rejecting linked ancestors. Compare
+ * directory identity too: case-insensitive path comparison alone is insufficient
+ * on Windows volumes with case-sensitive directories.
+ */
+function samePlainDirectory(root, reported) {
+  if (!path.isAbsolute(reported) || reported.length > 4096) throw failure();
+  plainAncestors(root);
+  plainAncestors(reported);
+  const original = lstatSync(root, { bigint: true });
+  const actual = lstatSync(reported, { bigint: true });
+  return (
+    original.isDirectory() &&
+    !original.isSymbolicLink() &&
+    actual.isDirectory() &&
+    !actual.isSymbolicLink() &&
+    path.relative(realpathSync.native(root), realpathSync.native(reported)) ===
+      '' &&
+    actual.dev === original.dev &&
+    actual.ino === original.ino
+  );
+}
+
 function inspectCheckout(root) {
   plainAncestors(root);
   if (!lstatSync(root).isDirectory()) throw failure();
@@ -114,9 +138,10 @@ function inspectCheckout(root) {
   if (plainFiles(gitDirectory).some((name) => name.endsWith('.promisor')))
     throw failure();
   if (
-    runGit(root, ['rev-parse', '--show-toplevel'])
-      .trim()
-      .replaceAll('\\', '/') !== realpathSync(root).replaceAll('\\', '/') ||
+    !samePlainDirectory(
+      root,
+      runGit(root, ['rev-parse', '--show-toplevel']).trim(),
+    ) ||
     runGit(root, ['rev-parse', '--is-shallow-repository']).trim() !== 'false' ||
     runGit(root, ['rev-parse', '--is-bare-repository']).trim() !== 'false' ||
     existsSync(path.join(gitDirectory, 'objects/info/alternates'))

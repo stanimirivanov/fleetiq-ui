@@ -146,6 +146,77 @@ test('real Vite graph and final bytes distinguish sample owners from legitimate 
   await compile();
   assert.throws(() => inspectBundle(output), /sample modules/u);
 });
+
+test('real Vite graph canonicalizes directory aliases without hiding sample owners', async (context) => {
+  const root = fixture(context);
+  const aliasParent = fixture(context);
+  const alias = path.join(aliasParent, 'checkout');
+  symlinkSync(root, alias, process.platform === 'win32' ? 'junction' : 'dir');
+  const source = path.join(root, 'apps/web/src');
+  mkdirSync(path.join(source, 'features/assets/demo'), { recursive: true });
+  writeFileSync(
+    path.join(root, 'index.html'),
+    '<script type="module" src="/apps/web/src/main.js"></script>',
+  );
+  writeFileSync(
+    path.join(source, 'main.js'),
+    'document.body.dataset.ready="yes";',
+  );
+  const compile = () =>
+    build({
+      root,
+      configFile: false,
+      logLevel: 'silent',
+      plugins: [qualityManifest(alias)],
+      build: { outDir: 'dist', minify: false },
+    });
+  await compile();
+  const output = path.join(root, 'dist');
+  assert.equal(inspectBundle(output).passed, true);
+  const manifest = JSON.parse(
+    readFileSync(path.join(output, 'quality-manifest.json'), 'utf8'),
+  );
+  assert.deepEqual(manifest.modules, ['apps/web/src/main.js']);
+  writeFileSync(
+    path.join(source, 'features/assets/demo/sample.js'),
+    'export const sample="synthetic";',
+  );
+  writeFileSync(
+    path.join(source, 'main.js'),
+    'import {sample} from "./features/assets/demo/sample.js";document.body.dataset.example=sample;',
+  );
+  await compile();
+  assert.throws(() => inspectBundle(output), /sample modules/u);
+});
+
+test('unavailable source paths and an empty owned graph cannot emit a valid manifest', (context) => {
+  const root = fixture(context);
+  const plugin = qualityManifest(root);
+  assert.throws(
+    () =>
+      plugin.generateBundle(
+        {},
+        {
+          missing: {
+            type: 'chunk',
+            modules: { [path.join(root, 'apps/web/src/missing.js')]: {} },
+          },
+        },
+      ),
+    /ENOENT/u,
+  );
+  plugin.generateBundle(
+    {},
+    {
+      virtual: { type: 'chunk', modules: { '\0virtual-entry': {} } },
+    },
+  );
+  assert.throws(
+    () => plugin.writeBundle({ dir: path.join(root, 'dist') }, {}),
+    /module graph is unavailable/u,
+  );
+});
+
 test('linked output and fabricated inventory never qualify as production bytes', (context) => {
   const root = fixture(context);
   const external = fixture(context);

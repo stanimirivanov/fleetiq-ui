@@ -78,10 +78,12 @@ export function inspectDelivery(quality, guide, fail) {
         if (
           step.uses === ACTIONS.checkout &&
           (step.with?.['persist-credentials'] !== false ||
-            step.with?.['fetch-depth'] !== 0)
+            step.with?.['fetch-depth'] !== 0 ||
+            (step.with?.['allow-unsafe-pr-checkout'] !== undefined &&
+              step.with['allow-unsafe-pr-checkout'] !== false))
         )
           fail(
-            `${label}/${name}: require non-persistent credentials and complete history.`,
+            `${label}/${name}: require non-persistent credentials, complete history and safe fork checkout.`,
           );
         if ([ACTIONS.upload, ACTIONS.uploadPages].includes(step.uses)) {
           const scan = steps.find(

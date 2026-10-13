@@ -67,6 +67,22 @@ Dependabot proposes package and GitHub Action updates; upgrades must requalify
 the sensors. The compatible Solid 1.9.17 patch removes the locked Seroval
 advisories without a vulnerability exception.
 
+## Reviewing GitHub Action updates
+
+Dependabot updates workflow pins; it does not authorize a new executable in
+[the reviewed action registry](../../tools/verification/actions.mjs). Review the
+official release tag, commit and action.yml, then update that exact registry entry
+alongside the workflows. Never accept any arbitrary SHA or mutable version tag.
+Run delivery-policy fixtures and the canonical groups before handoff.
+
+On 13 October 2026, Checkout 7.0.1 was verified against its official release tag
+at [commit 3d3c42e](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1).
+Its [action definition](https://github.com/actions/checkout/blob/3d3c42e5aac5ba805825da76410c181273ba90b1/action.yml)
+retains Node 24 and introduces allow-unsafe-pr-checkout, defaulting to false.
+Our workflow_run publication already requires a successful same-repository main
+push and its exact SHA. No unsafe checkout opt-in is needed. The sensor rejects
+that opt-in, stale/unreviewed pins, persistent credentials and shallow history.
+
 ## Capture and artifact retention
 
 Guide recording is opt-in and limited to the loopback test server.

@@ -1,6 +1,6 @@
-/** Official upstream release commits, verified with git ls-remote on 2026-10-11. */
+/** Official upstream release commits; upgrade review lives in security-delivery.md. */
 export const ACTIONS = {
-  checkout: 'actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803', // v6.1.0
+  checkout: 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1', // v7.0.1
   node: 'actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38', // v6.5.0
   upload: 'actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f', // v6.0.0
   pages: 'actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d', // v6.0.0

@@ -128,6 +128,17 @@ changed workloads before tightening or changing caps. Linux calibration receipts
 are retained separately under .verification/linux-calibration and do not
 substitute for final-source handoff evidence.
 
+## Portable module ownership
+
+The production manifest canonicalizes the configured repository root and real
+absolute module paths with native filesystem resolution before checking owned
+source prefixes. This expands Windows 8.3 temporary-directory aliases and avoids
+comparing equivalent filesystem locations as unrelated strings. Virtual module
+IDs remain excluded; missing real paths or an empty owned graph still fail.
+Actual Vite builds exercise an aliased root and confirm that development sample
+imports remain forbidden. Final output inventory, hashes and size budgets are
+still checked separately; output links remain forbidden.
+
 ## Failure and recovery
 
 1. Read the incomplete group receipt and failing stage. Missing prerequisites are

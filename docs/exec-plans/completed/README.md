@@ -29,3 +29,5 @@ evidence and material limitations for future reviewers.
 - [Harness audit and completed hardening sequence](2026-10-harness-hardening.md) — M02.
 - [Measured browser quality and recovery](2026-10-measured-browser-quality.md) — M02.
 - [Browser resource stability and inspected diagnostics](2026-10-browser-resource-stability.md) — M02.
+
+- [Checkout upgrade and portable graph ownership](2026-10-checkout-portable-graph.md) — M02.

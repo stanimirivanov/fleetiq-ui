@@ -30,7 +30,31 @@ test('secure quality and both guide triggers pass the actual YAML policy', () =>
     inspect(() => {}),
     [],
   ));
+test('explicit safe fork checkout preserves the required delivery controls', () =>
+  assert.deepEqual(
+    inspect(({ quality, guide }) => {
+      for (const workflow of [quality, guide])
+        for (const job of Object.values(workflow.jobs))
+          for (const step of job.steps)
+            if (step.uses === ACTIONS.checkout)
+              step.with['allow-unsafe-pr-checkout'] = false;
+    }),
+    [],
+  ));
 const cases = {
+  'retired checkout commit': ({ quality }) => {
+    quality.jobs.check.steps[0].uses =
+      'actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803';
+  },
+  'unsafe quality fork checkout': ({ quality }) => {
+    quality.jobs.check.steps[0].with['allow-unsafe-pr-checkout'] = true;
+  },
+  'unsafe guide fork checkout': ({ guide }) => {
+    guide.jobs.build.steps[0].with['allow-unsafe-pr-checkout'] = true;
+  },
+  'ambiguous fork checkout option': ({ quality }) => {
+    quality.jobs.check.steps[0].with['allow-unsafe-pr-checkout'] = 'false';
+  },
   'mutable action tag': ({ quality }) => {
     quality.jobs.check.steps[0].uses = 'actions/checkout@v6';
   },

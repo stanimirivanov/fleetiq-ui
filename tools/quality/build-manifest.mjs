@@ -1,9 +1,11 @@
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 /** Resolve sample ownership from Vite's graph, then hash final bytes after CSS emission. */
 export function qualityManifest(repositoryRoot) {
-  const prefix = `${path.resolve(repositoryRoot).replaceAll('\\', '/')}/`;
+  // Native realpath expands Windows 8.3 names and canonicalizes drive casing.
+  // Vite/Rolldown may resolve imports differently from the configured temp root.
+  const prefix = `${realpathSync.native(repositoryRoot).replaceAll('\\', '/')}/`;
   let modules;
   return {
     name: 'fleetiq-quality-manifest',
@@ -15,7 +17,9 @@ export function qualityManifest(repositoryRoot) {
             .flatMap((chunk) => Object.keys(chunk.modules)),
         ),
       ]
-        .map((id) => id.replaceAll('\\', '/').split('?')[0])
+        .map((id) => id.split('?')[0])
+        .filter((id) => path.isAbsolute(id))
+        .map((id) => realpathSync.native(id).replaceAll('\\', '/'))
         .filter((id) => id.startsWith(`${prefix}apps/web/src/`))
         .map((id) => id.slice(prefix.length))
         .sort();

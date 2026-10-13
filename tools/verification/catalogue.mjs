@@ -54,6 +54,7 @@ export const GROUPS = {
 };
 /** Changes must be reviewed with the sensor; changing a script cannot bypass it. */
 export const REQUIRED_SCRIPTS = {
+  'dependencies:review': 'node tools/verification/upgrades-cli.mjs',
   verify: 'node tools/verification/cli.mjs',
   check: 'node tools/verification/cli.mjs --group acceptance',
   e2e: 'node tools/verification/cli.mjs --group browser',

@@ -1,6 +1,7 @@
 import { isDeepStrictEqual } from 'node:util';
 import { ACTIONS, GUIDE_REF, GUIDE_TRIGGER } from './actions.mjs';
 import { REQUIRED_JOBS } from './catalogue.mjs';
+import { REVIEWED } from './reviewed-dependencies.mjs';
 
 const equal = (actual, expected) => isDeepStrictEqual(actual, expected);
 const normal = (value) =>
@@ -178,7 +179,7 @@ export function inspectDelivery(quality, guide, fail) {
       (step) => step.uses === ACTIONS.checkout && step.with?.ref === GUIDE_REF,
       (step) =>
         step.uses === ACTIONS.node &&
-        String(step.with?.['node-version']) === '24',
+        String(step.with?.['node-version']) === String(REVIEWED.nodeMajor),
       ...[
         'corepack enable',
         'pnpm install --frozen-lockfile',

@@ -1,5 +1,6 @@
 import { lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { selectedChecks } from '../verification/catalogue.mjs';
+import { REVIEWED } from '../verification/reviewed-dependencies.mjs';
 import { unchangedSource } from '../verification/source-state.mjs';
 import { ownedPath } from './owned-output.mjs';
 
@@ -10,10 +11,16 @@ export function qualifiedReport(report, group, source, pin) {
     report.completePass !== true ||
     report.sourceStable !== true ||
     report.blocker !== null ||
+    report.dependencyReview?.status !== 'current' ||
+    report.dependencyReview.changes !== 0 ||
+    report.dependencyReview.issues !== 0 ||
+    report.installedTools?.status !== 'current' ||
+    report.installedTools.issues !== 0 ||
     !report.source ||
     !unchangedSource(report.source, source) ||
     report.tools?.pnpm !== pin ||
-    !/^v24\./u.test(report.tools?.node ?? '') ||
+    typeof report.tools?.node !== 'string' ||
+    !report.tools.node.startsWith(`v${REVIEWED.nodeMajor}.`) ||
     typeof report.tools?.git !== 'string' ||
     !Array.isArray(report.checks)
   )

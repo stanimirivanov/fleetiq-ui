@@ -42,13 +42,27 @@ does not imply browser qualification; CI requires all three groups. No group est
 production readiness, real-provider OIDC behavior or live-fleet performance.
 The browser-quality group qualifies only the calibrated rendering envelope.
 
-Use Node 24, pinned pnpm, Git and a frozen install. The runner launches pnpm's
+Use the reviewed Node major, pinned pnpm, Git and a frozen install. The runner launches pnpm's
 native executable directly or its resolved JavaScript entry through Node, avoiding
 Windows shell-shim quoting. PATH symlinks and .mjs entries are supported; cmd, bat
 and PowerShell shims are never executed through a shell. It qualifies
 actual tool versions and selected canonical commands before execution. Missing
 prerequisites produce not-run evidence. Install Playwright Chromium and use the
 documented [port overrides](testing.md) if a browser port is occupied.
+
+## Dependency upgrade preflight
+
+All groups first compare registered declarations with the strict
+[reviewed registry](../../tools/verification/reviewed-dependencies.json).
+Run pnpm dependencies:review for coordinated candidate pins and review instructions.
+Unreviewed or inconsistent inputs stop before any selected tool/test commands.
+After approval, exact installed tool metadata is checked in each owner, including
+dependency-cruiser's private parser, and resampled after execution. Read
+[upgrade review](dependency-upgrades.md) for recovery and bounded diagnostic limits.
+
+Receipts include dependencyReview and installedTools status/counts. Guide
+qualification requires both to be current with zero issues and no proposed changes;
+legacy or incomplete receipts cannot qualify publication.
 
 ## Plan, execute, verify
 

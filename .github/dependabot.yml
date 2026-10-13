@@ -5,9 +5,32 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # Couple compatible maintenance updates; major upgrades stay individually reviewable.
     groups:
+      analysis-tools:
+        patterns:
+          - typescript
+          - typescript-parser
+          - dependency-cruiser
+        update-types: [minor, patch]
+      component-testing:
+        patterns:
+          - vitest
+          - '@vitest/coverage-v8'
+        update-types: [minor, patch]
+      browser-testing:
+        patterns:
+          - '@playwright/test'
+          - '@axe-core/playwright'
+        update-types: [minor, patch]
+      effect:
+        patterns:
+          - effect
+          - '@effect/*'
+        update-types: [minor, patch]
       development-tools:
         dependency-type: development
+        update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
     schedule:

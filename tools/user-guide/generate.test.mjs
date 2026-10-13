@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
+import { REVIEWED } from '../verification/reviewed-dependencies.mjs';
 import { assembleBook } from './assemble-book.mjs';
 import { chapters, fixture, manifest, report, source } from './fixtures.mjs';
 import { executeGuideStage, generateGuide } from './generate.mjs';
@@ -11,7 +12,11 @@ import { requireQualification } from './qualification.mjs';
 import { validateReady } from './release.mjs';
 
 const launcher = { command: process.execPath, args: [] };
-const qualify = () => ({ tools: { pnpm: '12.5.1' }, launcher, blocker: null });
+const qualify = () => ({
+  tools: { pnpm: REVIEWED.pnpm },
+  launcher,
+  blocker: null,
+});
 const inspect = async () => {};
 const snapshot = () => source;
 async function generated(context, overrides = {}) {

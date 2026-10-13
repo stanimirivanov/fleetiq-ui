@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  ARCHITECTURE_TYPESCRIPT,
   assertExtractionEnvironment,
   assertGraphEvidence,
 } from './architecture/evidence.mjs';
@@ -187,14 +188,18 @@ test('missing, unsupported or wrong parser metadata fails explicitly', () => {
   for (const parser of [
     undefined,
     { name: 'typescript', available: false, currentVersion: '-' },
-    { name: 'typescript', available: true, currentVersion: 'typescript@7.0.2' },
+    {
+      name: 'typescript',
+      available: true,
+      currentVersion: 'typescript@unqualified',
+    },
   ]) {
     assert.throws(
       () =>
         assertExtractionEnvironment({
           transpilersFound: parser ? [parser] : [],
         }),
-      /requires typescript@6\.0\.3/u,
+      (error) => error.message.includes(`requires ${ARCHITECTURE_TYPESCRIPT}`),
     );
   }
 });
@@ -217,7 +222,7 @@ test('unsupported TS or TSX extensions cannot qualify extraction', () => {
             {
               name: 'typescript',
               available: true,
-              currentVersion: 'typescript@6.0.3',
+              currentVersion: ARCHITECTURE_TYPESCRIPT,
             },
           ],
           extensionsFound: ['.ts', '.tsx'].map((extension) => ({

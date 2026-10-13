@@ -70,10 +70,12 @@ advisories without a vulnerability exception.
 ## Reviewing GitHub Action updates
 
 Dependabot updates workflow pins; it does not authorize a new executable in
-[the reviewed action registry](../../tools/verification/actions.mjs). Review the
+[the reviewed action registry](../../tools/verification/reviewed-dependencies.json). Review the
 official release tag, commit and action.yml, then update that exact registry entry
 alongside the workflows. Never accept any arbitrary SHA or mutable version tag.
-Run delivery-policy fixtures and the canonical groups before handoff.
+Use [dependency upgrade review](dependency-upgrades.md) for the read-only preflight,
+coordinated manifests and installed-tool qualification. Run delivery-policy fixtures
+and the canonical groups before handoff.
 
 On 13 October 2026, Checkout 7.0.1 was verified against its official release tag
 at [commit 3d3c42e](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1).

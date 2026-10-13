@@ -6,6 +6,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { REQUIRED_SCRIPTS } from './catalogue.mjs';
 import { executeCheck, qualifyTools } from './execution.mjs';
+import { REVIEWED } from './reviewed-dependencies.mjs';
 import { verify } from './runner.mjs';
 import { sourceState, unchangedSource } from './source-state.mjs';
 
@@ -17,12 +18,14 @@ const state = {
   files: 2,
 };
 const ready = () => ({
-  tools: { node: process.version, pnpm: '12.5.1', git: 'test' },
+  tools: { node: process.version, pnpm: REVIEWED.pnpm, git: 'test' },
   launcher: { command: 'fixture', args: [] },
   blocker: null,
 });
 const pass = async () => ({ status: 'passed', reason: null, exitCode: 0 });
 const options = {
+  installed: () => [],
+  review: () => ({ status: 'current', changes: [], issues: [] }),
   snapshot: () => state,
   qualify: ready,
   execute: pass,
@@ -160,6 +163,8 @@ test('actual temporary Git sources bind content, ignore generated evidence, and 
     writeFileSync(path.join(root, 'new.txt'), 'new source\n');
     assert.notEqual(sourceState(root).digest, secondDirty.digest);
     const { report, evidencePath } = await verify(root, manifest, 'product', {
+      review: options.review,
+      installed: options.installed,
       qualify: ready,
       execute: pass,
     });

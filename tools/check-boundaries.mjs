@@ -10,6 +10,7 @@ import {
   isTestSource,
 } from './boundaries/policy.mjs';
 import { resolveOwnedPath } from './docs/source.mjs';
+import { REVIEWED } from './verification/reviewed-dependencies.mjs';
 
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
 
@@ -18,9 +19,9 @@ export function checkBoundaries(
   root = repositoryRoot,
   policy = BOUNDARY_POLICY,
 ) {
-  if (ts.version !== '6.0.3')
+  if (ts.version !== REVIEWED.tools.astParser)
     throw new Error(
-      'Browser boundary extraction requires the declared typescript-parser@6.0.3.',
+      `Browser boundary extraction requires the reviewed typescript-parser@${REVIEWED.tools.astParser}.`,
     );
   assertBoundaryPolicy(policy);
   const sources = architectureSources(root, policy.owners).filter(

@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { selectedChecks } from '../verification/catalogue.mjs';
+import { REVIEWED } from '../verification/reviewed-dependencies.mjs';
 import { requiredChapters } from './assemble-book.mjs';
 
 export const png = Buffer.from(
@@ -21,7 +22,7 @@ export const source = {
   digest: 'b'.repeat(64),
   files: 10,
 };
-export const manifest = { packageManager: 'pnpm@12.5.1' };
+export const manifest = { packageManager: `pnpm@${REVIEWED.pnpm}` };
 
 export async function chapters(output) {
   await Promise.all(
@@ -62,9 +63,15 @@ export function report(group, current = source) {
     group,
     source: current,
     sourceStable: true,
+    dependencyReview: { status: 'current', changes: 0, issues: 0 },
+    installedTools: { status: 'current', issues: 0 },
     blocker: null,
     completePass: true,
-    tools: { node: 'v24.18.0', pnpm: '12.5.1', git: '2.55.0' },
+    tools: {
+      node: `v${REVIEWED.nodeMajor}.0.0`,
+      pnpm: REVIEWED.pnpm,
+      git: '2.55.0',
+    },
     checks: selectedChecks(group).map(({ id, script }) => ({
       id,
       command: `pnpm run ${script}`,

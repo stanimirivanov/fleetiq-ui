@@ -5,6 +5,7 @@ import test from 'node:test';
 import { build } from 'vite';
 import browserConfiguration from '../../apps/web-e2e/playwright.quality.config.ts';
 import { temporary } from '../security/owned.mjs';
+import { REVIEWED } from '../verification/reviewed-dependencies.mjs';
 import { qualityManifest } from './build-manifest.mjs';
 import { inspectBundle } from './bundle.mjs';
 import { prepareCoverage } from './component-tests.mjs';
@@ -348,7 +349,10 @@ test('provider and source scope cannot bypass the measured component gate', () =
     scripts: {
       'test:component': 'node ../../tools/quality/component-tests.mjs',
     },
-    devDependencies: { vitest: '5.0.3', '@vitest/coverage-v8': '5.0.3' },
+    devDependencies: {
+      vitest: REVIEWED.tools.vitest,
+      '@vitest/coverage-v8': REVIEWED.tools.vitest,
+    },
   };
   inspectQualityConfiguration(app);
   assert.throws(() =>
@@ -363,7 +367,16 @@ test('provider and source scope cannot bypass the measured component gate', () =
   assert.throws(() =>
     inspectQualityConfiguration({
       ...app,
-      devDependencies: { vitest: '5.0.3' },
+      devDependencies: { vitest: REVIEWED.tools.vitest },
+    }),
+  );
+  assert.throws(() =>
+    inspectQualityConfiguration({
+      ...app,
+      devDependencies: {
+        vitest: REVIEWED.tools.vitest,
+        '@vitest/coverage-v8': '0.0.0',
+      },
     }),
   );
 });
@@ -391,7 +404,10 @@ for (const defect of [
       scripts: {
         'test:component': 'node ../../tools/quality/component-tests.mjs',
       },
-      devDependencies: { vitest: '5.0.3', '@vitest/coverage-v8': '5.0.3' },
+      devDependencies: {
+        vitest: REVIEWED.tools.vitest,
+        '@vitest/coverage-v8': REVIEWED.tools.vitest,
+      },
     };
     assert.throws(
       () =>

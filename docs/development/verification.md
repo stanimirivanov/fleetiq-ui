@@ -55,14 +55,31 @@ documented [port overrides](testing.md) if a browser port is occupied.
 All groups first compare registered declarations with the strict
 [reviewed registry](../../tools/verification/reviewed-dependencies.json).
 Run pnpm dependencies:review for coordinated candidate pins and review instructions.
-Unreviewed or inconsistent inputs stop before any selected tool/test commands.
-After approval, exact installed tool metadata is checked in each owner, including
-dependency-cruiser's private parser, and resampled after execution. Read
-[upgrade review](dependency-upgrades.md) for recovery and bounded diagnostic limits.
+Malformed or inconsistent inventory is blocked. Root/E2E Node declaration versions
+must match each other and the declared runtime major.
 
-Receipts include dependencyReview and installedTools status/counts. Guide
-qualification requires both to be current with zero issues and no proposed changes;
-legacy or incomplete receipts cannot qualify publication.
+Eligible pending npm-tool proposals can run the unchanged group in an owned
+disposable workspace through pnpm dependencies:qualify --group followed by
+product, structural, browser or browser-quality. The snapshot preserves complete
+Git history/refs, staged index and raw current source files; only its private
+registry receives coordinated exact candidate tool pins. It performs a fresh frozen
+install, scanner setup, policy check, selected group and artifact inspection.
+Action, Node-major and pnpm proposals require review first.
+
+pnpm check gathers candidate acceptance results for eligible pending review and
+still exits nonzero. The required check job remains the merge barrier; the other
+three CI jobs can report candidate qualification results. No actor-name exemption,
+automatic original-registry update or weakened catalogue is involved. When the
+registry is current, the explicit qualification route runs normal original-source
+verification. Read [upgrade review](dependency-upgrades.md) for eligibility,
+review decisions and recovery.
+
+Ordinary receipts include dependencyReview and installedTools status/counts.
+Exact installed metadata is checked in each owner, including dependency-cruiser's
+private parser, and resampled after execution. Guide qualification requires current
+review/install status with zero issues and no proposed changes. Candidate receipts
+are explicitly marked kind: dependency-candidate, retain completePass: false and
+cannot establish publication acceptance; legacy or incomplete receipts also fail.
 
 ## Plan, execute, verify
 
@@ -88,6 +105,13 @@ Ignored .verification/ JSON records the group, timestamps, versions, revision,
 dirty state, aggregate source digest and check statuses, exit codes and durations.
 It stores no stdout/stderr, source content, environment, HTTP payloads or tokens.
 Ordinary commands still print human output.
+
+Candidate-prefixed receipts retain bounded qualification stages, proposed exact
+tool roles, original source identity and isolated candidate identity. A successful
+qualificationPass is diagnostic test evidence with completePass: false. Original
+checkout/index/ref/policy drift and failed temporary cleanup invalidate it.
+Candidate output is never an original-source acceptance receipt, including after
+renaming the file.
 
 The source digest covers tracked and new unignored files, hashing raw bytes and
 paths before and after verification. Ignored generated evidence does not affect
@@ -148,7 +172,7 @@ and type-only extraction. Upgrade parser and compiler independently and qualify
 known-invalid imports after a clean frozen install.
 
 New development-only, MIT-licensed pins are unified 11.0.5, remark-parse 11.0.0,
-remark-gfm 4.0.1, github-slugger 2.0.0 and yaml 2.8.3. These replace custom parsing,
+remark-gfm 4.0.1, github-slugger 2.0.0 and yaml 2.9.1. These replace custom parsing,
 introducing no browser runtime dependency. Review lockfile changes and upstream
 advisories on upgrade. See the maintained
 [remark parser](https://github.com/remarkjs/remark/tree/main/packages/remark-parse),
@@ -162,10 +186,13 @@ Cohesion and appropriate abstractions remain review responsibilities.
 
 ## CI and external administration
 
-Quality CI requires Linux acceptance, functional and measured browser scenarios, and Windows
-structural qualification from frozen installs. Parsed policy verifies canonical
-routes and read-only permissions. CODEOWNERS assigns harness/configuration changes
-to the current maintainer.
+Quality CI requires Linux acceptance, functional and measured browser scenarios,
+and Windows structural qualification from frozen installs. The check job retains
+original-source acceptance and pending-review failure. Browser, browser-quality
+and harness-windows use explicit candidate qualification routes so eligible
+dependency proposals expose behavioral results before review. Parsed policy
+verifies these exact routes, the required check barrier and read-only permissions.
+CODEOWNERS assigns harness/configuration changes to the current maintainer.
 
 A GitHub administrator must separately require successful check, browser, browser-quality and
 harness-windows jobs on main; code-owner review; stale-review dismissal; suitable

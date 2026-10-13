@@ -7,6 +7,8 @@ import { ownedPath } from './owned-output.mjs';
 export function qualifiedReport(report, group, source, pin) {
   if (
     report?.schemaVersion !== 1 ||
+    report.kind !== undefined ||
+    report.qualificationPass !== undefined ||
     report.group !== group ||
     report.completePass !== true ||
     report.sourceStable !== true ||

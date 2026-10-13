@@ -49,7 +49,16 @@ export function inspectUpgradeInventory(inputs) {
         proposed,
         locations,
         owner: 'Repository maintainers',
-        qualification: [...QUALIFICATION],
+        qualification: [
+          ...(Object.hasOwn(inputs.registry.tools, role)
+            ? [
+                'pnpm dependencies:qualify --group structural',
+                'pnpm dependencies:qualify --group browser',
+                'pnpm dependencies:qualify --group browser-quality',
+              ]
+            : []),
+          ...QUALIFICATION,
+        ],
       });
   };
   let registry;
@@ -166,6 +175,23 @@ export function inspectUpgradeInventory(inputs) {
   const nodeMajor = nodeMatch ? Number(nodeMatch[1]) : null;
   if (!Number.isSafeInteger(nodeMajor) || nodeMajor < 1)
     block('non-exact-runtime-major', 'node', ['package.json#engines/node']);
+
+  // Node declarations describe runtime APIs; future-major types would admit APIs
+  // that the reviewed execution runtime cannot provide. Maintenance releases
+  // within the coordinated runtime major remain ordinary dependency proposals.
+  const nodeTypes = ['rootManifest', 'e2eManifest'].map((owner) =>
+    declared(owner, '@types/node'),
+  );
+  const typeLocations = nodeTypes.map(({ location }) => location);
+  if (!nodeTypes.every(({ value }) => exactVersion(value)))
+    block('missing-or-non-exact-pin', 'nodeTypes', typeLocations);
+  else if (new Set(nodeTypes.map(({ value }) => value)).size !== 1)
+    block('inconsistent-shared-pin', 'nodeTypes', typeLocations);
+  else if (Number(nodeTypes[0].value.split('.')[0]) !== nodeMajor)
+    block('runtime-types-major-mismatch', 'nodeTypes', [
+      ...typeLocations,
+      'package.json#engines/node',
+    ]);
 
   const actionCandidates = new Map();
   const repositories = new Map(

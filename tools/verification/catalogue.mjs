@@ -55,6 +55,7 @@ export const GROUPS = {
 /** Changes must be reviewed with the sensor; changing a script cannot bypass it. */
 export const REQUIRED_SCRIPTS = {
   'dependencies:review': 'node tools/verification/upgrades-cli.mjs',
+  'dependencies:qualify': 'node tools/verification/cli.mjs --candidate',
   verify: 'node tools/verification/cli.mjs',
   check: 'node tools/verification/cli.mjs --group acceptance',
   e2e: 'node tools/verification/cli.mjs --group browser',
@@ -94,14 +95,17 @@ export const REQUIRED_SCRIPTS = {
 };
 export const REQUIRED_JOBS = {
   check: { platform: 'ubuntu-latest', command: 'pnpm check' },
-  browser: { platform: 'ubuntu-latest', command: 'pnpm e2e' },
+  browser: {
+    platform: 'ubuntu-latest',
+    command: 'pnpm dependencies:qualify --group browser',
+  },
   'browser-quality': {
     platform: 'ubuntu-latest',
-    command: 'pnpm verify --group browser-quality',
+    command: 'pnpm dependencies:qualify --group browser-quality',
   },
   'harness-windows': {
     platform: 'windows-latest',
-    command: 'pnpm verify --group structural',
+    command: 'pnpm dependencies:qualify --group structural',
   },
 };
 export function selectedChecks(group) {

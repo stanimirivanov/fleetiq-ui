@@ -2,17 +2,24 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GROUPS, selectedChecks } from './catalogue.mjs';
+import { verificationExitCode } from './cli-decision.mjs';
 
 const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../..',
 );
-const arguments_ = process.argv.slice(2);
+const flags = process.argv.slice(2);
+const candidateRequested = flags[0] === '--candidate';
+const arguments_ = candidateRequested ? flags.slice(1) : flags;
 const controller = new AbortController();
 process.once('SIGINT', () => controller.abort());
 process.once('SIGTERM', () => controller.abort());
 try {
-  if (arguments_.length === 1 && arguments_[0] === '--list') {
+  if (
+    !candidateRequested &&
+    arguments_.length === 1 &&
+    arguments_[0] === '--list'
+  ) {
     for (const group of Object.keys(GROUPS)) {
       console.log(
         group +
@@ -28,7 +35,7 @@ try {
       (arguments_.length !== 2 || arguments_[0] !== '--group')
     ) {
       throw new Error(
-        'Usage: pnpm verify [--group acceptance|structural|product|browser|browser-quality|security] or --list',
+        'Usage: pnpm verify [--candidate] [--group acceptance|structural|product|browser|browser-quality|security] or --list',
       );
     }
     const group = arguments_[1] ?? 'acceptance';
@@ -44,6 +51,21 @@ try {
     const { report, evidencePath } = await verify(root, manifest, group, {
       signal: controller.signal,
     });
+    let candidate;
+    if (
+      report.blocker === 'dependency-review-required' &&
+      (group === 'acceptance' || candidateRequested)
+    ) {
+      const { qualifyCandidate } = await import('./candidate.mjs');
+      candidate = await qualifyCandidate(root, manifest, group, {
+        signal: controller.signal,
+      });
+      for (const stage of candidate.report.stages)
+        console.log(`candidate/${stage.id}: ${stage.status}`);
+      console.log(
+        `candidate evidence: ${path.relative(root, candidate.evidencePath)}`,
+      );
+    }
     if (
       report.dependencyReview?.status !== 'current' &&
       report.dependencyReview
@@ -63,13 +85,22 @@ try {
       console.log(`${entry.id}: ${entry.status}`);
     console.log(`verification evidence: ${path.relative(root, evidencePath)}`);
     console.log(
-      report.completePass
-        ? `Verification group ${group} passed.`
-        : 'Verification incomplete (' +
+      candidate
+        ? 'Candidate qualification ' +
+            (candidate.report.qualificationPass ? 'passed' : 'failed') +
+            '; dependency review remains pending; no group acceptance pass.'
+        : report.completePass
+          ? `Verification group ${group} passed.`
+          : 'Verification incomplete (' +
             (report.blocker ?? 'check-failed') +
             '); no group acceptance pass.',
     );
-    if (!report.completePass) process.exitCode = 1;
+    process.exitCode = verificationExitCode(
+      group,
+      candidateRequested,
+      report,
+      candidate?.report,
+    );
   }
 } catch {
   console.error(

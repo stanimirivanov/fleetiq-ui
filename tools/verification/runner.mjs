@@ -22,7 +22,7 @@ function installedState(root, inspect) {
   return { status: 'blocked', issues: 1 };
 }
 
-function writeEvidence(root, report) {
+export function writeEvidence(root, report) {
   const directory = path.join(root, '.verification');
   try {
     if (!lstatSync(directory).isDirectory())
@@ -34,7 +34,7 @@ function writeEvidence(root, report) {
   resolveOwnedPath(root, '.verification');
   const file = path.join(
     directory,
-    `${report.group}-${process.pid}-${randomUUID()}.json`,
+    `${report.kind === 'dependency-candidate' ? 'candidate-' : ''}${report.group}-${process.pid}-${randomUUID()}.json`,
   );
   writeFileSync(file, `${JSON.stringify(report, null, 2)}\n`, {
     flag: 'wx',

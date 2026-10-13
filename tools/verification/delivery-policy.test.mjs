@@ -42,6 +42,19 @@ test('explicit safe fork checkout preserves the required delivery controls', () 
     [],
   ));
 const cases = {
+  'candidate route replaces required check review barrier': ({ quality }) => {
+    quality.jobs.check.steps.find((step) => step.run === 'pnpm check').run =
+      'pnpm dependencies:qualify --group acceptance';
+  },
+  'candidate evidence authorizes guide publication': ({ guide }) => {
+    guide.jobs.build.steps.find((step) => step.run === 'pnpm check').run =
+      'pnpm dependencies:qualify --group acceptance';
+  },
+  'canonical browser bypasses qualification route': ({ quality }) => {
+    quality.jobs.browser.steps.find(
+      (step) => step.run === 'pnpm dependencies:qualify --group browser',
+    ).run = 'pnpm e2e';
+  },
   'retired checkout commit': ({ quality }) => {
     quality.jobs.check.steps[0].uses =
       'actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803';

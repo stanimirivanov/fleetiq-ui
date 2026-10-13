@@ -49,7 +49,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm security:install
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm e2e
+      - run: pnpm dependencies:qualify --group browser
       - name: Inspect artifacts before retention
         id: artifacts
         if: always()
@@ -88,7 +88,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm security:install
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm verify --group browser-quality
+      - run: pnpm dependencies:qualify --group browser-quality
       - name: Inspect artifacts before retention
         id: artifacts
         if: always()
@@ -126,7 +126,7 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm security:install
-      - run: pnpm verify --group structural
+      - run: pnpm dependencies:qualify --group structural
       - name: Inspect artifacts before retention
         id: artifacts
         if: always()

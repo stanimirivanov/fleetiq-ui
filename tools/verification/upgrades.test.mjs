@@ -189,10 +189,13 @@ for (const [label, mutate, role] of [
   [
     'Node major and all runner declarations',
     (data) => {
-      data.rootManifest.engines.node = '>=25.0.0';
+      const major = nextNodeMajor(data);
+      data.rootManifest.engines.node = `>=${major}.0.0`;
+      for (const owner of ['rootManifest', 'e2eManifest'])
+        data[owner].devDependencies['@types/node'] = `${major}.0.0`;
       for (const step of allSteps(data))
         if (step.uses?.startsWith('actions/setup-node@'))
-          step.with['node-version'] = String(nextNodeMajor(data));
+          step.with['node-version'] = String(major);
     },
     'nodeMajor',
   ],
@@ -224,6 +227,21 @@ for (const [label, mutate, role] of [
 }
 
 const invalid = {
+  'missing Node declaration': (data) => {
+    delete data.e2eManifest.devDependencies['@types/node'];
+  },
+  'mutable Node declaration': (data) => {
+    data.rootManifest.devDependencies['@types/node'] = '^24.19.1';
+  },
+  'inconsistent Node declaration': (data) => {
+    data.e2eManifest.devDependencies['@types/node'] = nextVersion(
+      data.rootManifest.devDependencies['@types/node'],
+    );
+  },
+  'future-major Node declarations on the current runtime': (data) => {
+    for (const owner of ['rootManifest', 'e2eManifest'])
+      data[owner].devDependencies['@types/node'] = `${nextNodeMajor(data)}.0.0`;
+  },
   'runtime major with a leading zero': (data) => {
     data.rootManifest.engines.node = '>=01.0.0';
     for (const step of allSteps(data))
@@ -519,4 +537,37 @@ test('actual entrypoint handles a malformed real registry without raw setup erro
   );
   assert.equal(result.stderr.includes('at '), false);
   assert.equal(result.stderr.includes('no clean result'), true);
+});
+
+test('coordinated Node declaration maintenance matches runtime without registry approval', () => {
+  const result = candidate((data) => {
+    const version = nextVersion(
+      data.rootManifest.devDependencies['@types/node'],
+    );
+    for (const owner of ['rootManifest', 'e2eManifest'])
+      data[owner].devDependencies['@types/node'] = version;
+  });
+  assert.deepEqual(result, { status: 'current', changes: [], issues: [] });
+});
+
+test('actual CLI rejects future-major Node declarations and preserves source bytes', (t) => {
+  const owned = fixture();
+  t.after(() => owned.dispose());
+  for (const name of [names.rootManifest, names.e2eManifest]) {
+    const manifest = JSON.parse(
+      readFileSync(path.join(owned.root, name), 'utf8'),
+    );
+    manifest.devDependencies['@types/node'] = `${nextNodeMajor(inputs)}.0.0`;
+    write(owned.root, name, JSON.stringify(manifest));
+  }
+  const before = digest(owned.root);
+  const result = execute(owned.root);
+  assert.equal(result.status, 1, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.status, 'blocked');
+  assert.deepEqual(
+    report.issues.map(({ code, role }) => ({ code, role })),
+    [{ code: 'runtime-types-major-mismatch', role: 'nodeTypes' }],
+  );
+  assert.deepEqual(digest(owned.root), before);
 });

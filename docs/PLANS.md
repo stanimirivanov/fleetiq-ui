@@ -53,7 +53,8 @@ in **M02** takes priority: context/verification, executable trust boundaries and
 secure delivery, then measured browser quality. The
 [context slice](exec-plans/completed/2026-10-harness-context-verification.md) and
 [trust/delivery slice](exec-plans/completed/2026-10-harness-trust-delivery.md) are
-completed; one harness PR remains.
+completed; the [measured-quality slice](exec-plans/completed/2026-10-measured-browser-quality.md)
+completes that sequence.
 
 The next agreed product PR is the **connected operator user guide**, also in M04.
 It will cover sign-in/session/account/sign-out; explicit tenant selection and denied
@@ -63,3 +64,7 @@ directed relationships, effective/known review times and scoped pages; exact-sou
 binding candidates and pinned property definitions; empty/missing/error/retry states;
 and keyboard, narrow-layout, and theme use. Retain clear sample chapters only for
 capabilities without connected backend counterparts. Connected browser assertions are implemented; the new guide chapters remain pending.
+
+The active [dependency candidate qualification slice](exec-plans/active/2026-10-dependency-candidate-qualification.md)
+in **M02** gathers unchanged test results before dependency approval while keeping
+original-source acceptance and guide publication blocked until review is current.

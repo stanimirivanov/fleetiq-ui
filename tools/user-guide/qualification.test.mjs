@@ -13,6 +13,12 @@ test('reviewed declared and installed tool evidence is required for guide public
   );
 });
 const defects = {
+  'candidate receipt renamed as acceptance': (value) => {
+    value.kind = 'dependency-candidate';
+  },
+  'candidate qualification relabelled as acceptance': (value) => {
+    value.qualificationPass = true;
+  },
   'legacy receipt without review': (value) => {
     delete value.dependencyReview;
   },

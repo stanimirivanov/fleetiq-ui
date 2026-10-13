@@ -6,11 +6,11 @@
     "compiler": "7.0.2",
     "astParser": "6.0.3",
     "dependencyCruiser": "18.5.0",
-    "vite": "8.3.2",
+    "vite": "8.3.4",
     "axe": "4.13.0",
     "archive": "3.4.0",
     "vitest": "5.0.3",
-    "playwright": "1.63.0"
+    "playwright": "1.64.0"
   },
   "actions": {
     "checkout": {
@@ -20,13 +20,13 @@
     },
     "node": {
       "repository": "actions/setup-node",
-      "version": "6.5.0",
-      "commit": "249970729cb0ef3589644e2896645e5dc5ba9c38"
+      "version": "7.1.0",
+      "commit": "949feb2413d6458794dcd2491c4babbbce0c15c1"
     },
     "upload": {
       "repository": "actions/upload-artifact",
-      "version": "6.0.0",
-      "commit": "b7c566a772e6b6bfb58ed0dc250532a479d7789f"
+      "version": "7.0.2",
+      "commit": "cf430e030ddbb5b0abf93d22962f4752f3646cd9"
     },
     "pages": {
       "repository": "actions/configure-pages",

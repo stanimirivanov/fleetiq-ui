@@ -40,14 +40,15 @@
     "e2e:quality": "pnpm build && pnpm exec playwright test --config apps/web-e2e/playwright.quality.config.ts",
     "quality:configuration": "node tools/quality/configuration.mjs",
     "quality:page-errors": "node tools/quality/browser-error-fixture.mjs",
-    "dependencies:review": "node tools/verification/upgrades-cli.mjs"
+    "dependencies:review": "node tools/verification/upgrades-cli.mjs",
+    "dependencies:qualify": "node tools/verification/cli.mjs --candidate"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@biomejs/biome": "2.5.15",
-    "@effect/openapi-generator": "4.0.1",
-    "@effect/platform-node": "4.0.1",
-    "@playwright/test": "1.63.0",
+    "@effect/openapi-generator": "4.0.2",
+    "@effect/platform-node": "4.0.2",
+    "@playwright/test": "1.64.0",
     "@types/node": "24.19.1",
     "dependency-cruiser": "18.5.0",
     "github-slugger": "2.0.0",
@@ -56,8 +57,8 @@
     "typescript": "7.0.2",
     "typescript-parser": "npm:typescript@6.0.3",
     "unified": "11.0.5",
-    "vite": "8.3.2",
-    "yaml": "2.8.3",
+    "vite": "8.3.4",
+    "yaml": "2.9.1",
     "yauzl": "3.4.0"
   }
 }

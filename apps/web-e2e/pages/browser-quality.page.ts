@@ -65,11 +65,31 @@ export class BrowserQualityPage {
   async resources(
     session: CDPSession,
   ): Promise<{ heap: number; nodes: number }> {
-    // Chromium sweeps detached DOM after renderer tasks. Use identical fixed
-    // render/collection rounds at both boundaries; never retry until a cap passes.
+    // This profile measures the main renderer; worker heaps need their own lane.
+    const targets = await session.send('Target.getTargets');
+    if (
+      targets.targetInfos.some((target: { type: string }) =>
+        ['worker', 'shared_worker', 'service_worker'].includes(target.type),
+      )
+    )
+      throw new Error('Resource measurement requires a worker-free browser.');
+    // Async last-resort V8 GC uses an empty native stack and releases incidental
+    // engine caches. Fixed rounds allow finalizers; no threshold-driven retries.
     for (let round = 0; round < 3; round++) {
       await this.settled();
-      await session.send('HeapProfiler.collectGarbage');
+      const collected = await session.send('Runtime.evaluate', {
+        expression: `(async () => {
+          if (typeof gc !== 'function') return false;
+          const pending = gc({ type: 'major', execution: 'async', flavor: 'last-resort' });
+          if (!(pending instanceof Promise)) return false;
+          await pending;
+          return true;
+        })()`,
+        awaitPromise: true,
+        returnByValue: true,
+      });
+      if (collected.exceptionDetails || collected.result?.value !== true)
+        throw new Error('Required asynchronous browser GC unavailable.');
     }
     const result = await session.send('Performance.getMetrics');
     const metrics = new Map<string, number>(
@@ -78,9 +98,17 @@ export class BrowserQualityPage {
         entry.value,
       ]),
     );
-    const heap = metrics.get('JSHeapUsedSize'),
-      nodes = metrics.get('Nodes');
-    if (!heap || !nodes)
+    const heap = metrics.get('JSHeapUsedSize');
+    const dom = await session.send('Memory.getDOMCounters');
+    const nodes = dom.nodes;
+
+    if (
+      !Number.isFinite(heap) ||
+      !heap ||
+      heap <= 0 ||
+      !Number.isSafeInteger(nodes) ||
+      nodes <= 0
+    )
       throw new Error('Required Chromium resource metrics unavailable');
     return { heap, nodes };
   }

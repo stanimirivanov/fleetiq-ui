@@ -79,14 +79,34 @@ The test-owned backend fixture seeds 100 identities, serves bounded 50-row pages
 and returns one relationship, target binding and exact-source candidate per
 registry snapshot. Viewports are 1365×900 and 390×844. Two warm-up rounds precede
 five recorded rounds of catalogue filtering and client-side registry/catalogue
-navigation. Each observation waits for visible readiness and two animation frames.
+navigation. Latency samples run before cache-conditioning GC so the warm-up
+remains meaningful. A separate set of five equivalent, unrecorded rounds compares
+conditioned memory snapshots. Each observation waits for visible readiness and
+two animation frames.
 Browser-clock durations include automation and local mocked transport/decoding;
 they are not isolated INP or real backend request measurements.
 
 Post-GC Chromium heap/node counts compare the same catalogue state after warm-up
-and five complete round trips. Both boundaries use exactly three render/GC rounds
-to finish Chromium's asynchronous DOM sweeping, then record the final snapshot.
-The sensor never retries until a threshold passes or chooses the lowest count.
+and five complete round trips. The rendered-accessibility project retains traces;
+the rendering-performance project disables trace/video recording and its owned
+fixture rejects an accidental recorder. Snapshotter caches retain real child-node
+references, so recordings must not contribute to the memory benchmark.
+
+The measurement project alone launches Chromium with --js-flags=--expose-gc.
+Both resource boundaries await exactly three asynchronous major collections with
+last-resort cache cleanup, then read heap usage and native DOM counters. This
+clears incidental engine caches without removing reachable application state.
+[V8's implementation](https://github.com/v8/v8/blob/main/src/extensions/gc-extension.cc)
+defines the asynchronous empty-stack mode and last-resort collector. Missing
+instrumentation or metrics fail; there is no fallback, lowest-count selection or
+threshold-driven retry. The main-renderer profile rejects workers before sampling,
+because worker heaps need a separate workload. These flags belong to the test
+browser and are not a production browser requirement.
+
+Real controls prove attached/detached retained nodes and reachable heap allocations
+still breach the unchanged caps, released references are reclaimed, an active
+worker is rejected without termination, and an unconfigured browser cannot pass.
+Failure messages contain only numeric growth and limits; receipts remain bounded.
 Run this lane without concurrent local build/coverage work; the dedicated CI job
 also owns one worker. Missing metrics, malformed samples and incomplete
 runs fail. Raw numeric timings/resources and workload limits are retained in

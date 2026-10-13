@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { build } from 'vite';
+import browserConfiguration from '../../apps/web-e2e/playwright.quality.config.ts';
 import { temporary } from '../security/owned.mjs';
 import { qualityManifest } from './build-manifest.mjs';
 import { inspectBundle } from './bundle.mjs';
@@ -15,6 +16,7 @@ import {
   assessPerformance,
   qualityPolicy,
   requireNoPageErrors,
+  requireUnrecordedMeasurement,
 } from './policy.mjs';
 
 function fixture(context) {
@@ -202,23 +204,27 @@ test('performance budgets reject absent, malformed, slow and retained-resource o
     ),
   );
   assert.throws(() => assessPerformance(samples, null));
-  assert.throws(() =>
-    assessPerformance(
-      [
-        {
-          navigationMs: qualityPolicy.performance.navigationMs + 1,
-          filterMs: 1,
-        },
-        ...samples.slice(1),
-      ],
-      resources,
-    ),
+  assert.throws(
+    () =>
+      assessPerformance(
+        [
+          {
+            navigationMs: qualityPolicy.performance.navigationMs + 1,
+            filterMs: 1,
+          },
+          ...samples.slice(1),
+        ],
+        resources,
+      ),
+    /maxNavigationMs=2001, limit=2000/u,
   );
-  assert.throws(() =>
-    assessPerformance(samples, {
-      ...resources,
-      nodesAfter: 100 + qualityPolicy.performance.nodeGrowth + 1,
-    }),
+  assert.throws(
+    () =>
+      assessPerformance(samples, {
+        ...resources,
+        nodesAfter: 100 + qualityPolicy.performance.nodeGrowth + 1,
+      }),
+    /nodeGrowth=401, limit=400/u,
   );
   assert.throws(() =>
     assessPerformance(samples, {
@@ -226,6 +232,19 @@ test('performance budgets reject absent, malformed, slow and retained-resource o
       heapAfter: 100 + qualityPolicy.performance.heapGrowthBytes + 1,
     }),
   );
+});
+test('measured fixture rejects recording and cannot silently accept missing options', () => {
+  requireUnrecordedMeasurement('off', 'off');
+  for (const trace of ['on', 'retain-on-failure', { mode: 'off' }, undefined])
+    assert.throws(
+      () => requireUnrecordedMeasurement(trace, 'off'),
+      /recording/u,
+    );
+  for (const video of ['on', 'retain-on-failure', undefined])
+    assert.throws(
+      () => requireUnrecordedMeasurement('off', video),
+      /recording/u,
+    );
 });
 test('page errors and payload-bearing observation extensions cannot be discarded', () => {
   requireNoPageErrors(0);
@@ -278,6 +297,38 @@ test('provider and source scope cannot bypass the measured component gate', () =
   );
 });
 
+for (const defect of [
+  'missing-project',
+  'missing-sensor',
+  'trace',
+  'video',
+  'gc',
+  'workers',
+  'retries',
+]) {
+  test(`quality project registration rejects ${defect}`, () => {
+    const browser = structuredClone(browserConfiguration);
+    const profile = browser.projects[1];
+    if (defect === 'missing-project') browser.projects.pop();
+    if (defect === 'missing-sensor') profile.testMatch.pop();
+    if (defect === 'trace') profile.use.trace = 'retain-on-failure';
+    if (defect === 'video') profile.use.video = 'on';
+    if (defect === 'gc') profile.use.launchOptions.args = [];
+    if (defect === 'workers') browser.workers = 2;
+    if (defect === 'retries') browser.retries = 1;
+    const app = {
+      scripts: {
+        'test:component': 'node ../../tools/quality/component-tests.mjs',
+      },
+      devDependencies: { vitest: '5.0.3', '@vitest/coverage-v8': '5.0.3' },
+    };
+    assert.throws(
+      () =>
+        inspectQualityConfiguration(app, qualityPolicy, coverageScope, browser),
+      /owned quality projects/u,
+    );
+  });
+}
 test('missing budget fields and sparse samples cannot qualify', () => {
   const limits = { ...qualityPolicy.performance };
   delete limits.navigationMs;

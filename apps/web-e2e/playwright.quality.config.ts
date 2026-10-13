@@ -31,6 +31,25 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
+  projects: [
+    {
+      name: 'rendered-accessibility',
+      testMatch: ['**/measured-browser.spec.ts'],
+    },
+    {
+      name: 'rendering-performance',
+      testMatch: [
+        '**/rendering-performance.spec.ts',
+        '**/resource-sensors.spec.ts',
+      ],
+      use: {
+        trace: 'off',
+        video: 'off',
+        // Test-only V8 GC entry point; no production browser requirement.
+        launchOptions: { args: ['--js-flags=--expose-gc'] },
+      },
+    },
+  ],
   webServer: {
     command:
       'pnpm --filter @fleetiq/web preview --host 127.0.0.1 --port ' +

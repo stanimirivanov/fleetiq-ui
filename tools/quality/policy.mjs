@@ -47,20 +47,31 @@ export function assessPerformance(
     )
   )
     throw new Error(
-      'Measured browser interaction exceeds the calibrated limit.',
+      'Measured browser interaction exceeds the calibrated limit. ' +
+        `maxNavigationMs=${Math.max(...samples.map((sample) => sample.navigationMs))}, limit=${limits.navigationMs}; ` +
+        `maxFilterMs=${Math.max(...samples.map((sample) => sample.filterMs))}, limit=${limits.filterMs}.`,
     );
   if (
     resources.heapAfter - resources.heapBefore > limits.heapGrowthBytes ||
     resources.nodesAfter - resources.nodesBefore > limits.nodeGrowth
   )
     throw new Error(
-      'Post-GC browser resource growth exceeds the calibrated limit.',
+      'Post-GC browser resource growth exceeds the calibrated limit. ' +
+        `heapGrowthBytes=${resources.heapAfter - resources.heapBefore}, limit=${limits.heapGrowthBytes}; ` +
+        `nodeGrowth=${resources.nodesAfter - resources.nodesBefore}, limit=${limits.nodeGrowth}.`,
     );
   return {
     passed: true,
     maxNavigationMs: Math.max(...samples.map((s) => s.navigationMs)),
     maxFilterMs: Math.max(...samples.map((s) => s.filterMs)),
   };
+}
+/** Recording retains DOM and changes the workload; measured cases must remain unrecorded. */
+export function requireUnrecordedMeasurement(trace, video) {
+  if (trace !== 'off' || video !== 'off')
+    throw new Error(
+      'Measured resource cases require trace and video recording to be off.',
+    );
 }
 export function requireNoPageErrors(count) {
   if (!Number.isSafeInteger(count) || count !== 0)

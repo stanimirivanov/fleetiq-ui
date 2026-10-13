@@ -38,6 +38,7 @@ const extensions = new Set([
   '.ico',
   '.mp4',
   '.har',
+  '.webmanifest',
 ]);
 function zipOpen(file) {
   return new Promise((resolve, reject) => {
@@ -177,6 +178,24 @@ export async function inspectArtifact(
       if (state.bytes > LIMITS.expandedBytes)
         throw new Error('Artifact content exceeds the reviewed size bound.');
       const bytes = await readFile(source);
+      if (path.extname(name).toLowerCase() === '.webmanifest') {
+        // Playwright's trace viewer includes a standard JSON web manifest.
+        // Validate its format, then scan the original bytes like every artifact.
+        let manifest;
+        try {
+          manifest = JSON.parse(
+            new TextDecoder('utf-8', { fatal: true }).decode(bytes),
+          );
+        } catch {
+          throw new Error('Artifact web manifest must be a UTF-8 JSON object.');
+        }
+        if (
+          !manifest ||
+          typeof manifest !== 'object' ||
+          Array.isArray(manifest)
+        )
+          throw new Error('Artifact web manifest must be a UTF-8 JSON object.');
+      }
       digest.update(name).update('\0').update(bytes).update('\0');
       if (path.extname(name).toLowerCase() === '.zip')
         await extractArchive(source, selected.root, state);

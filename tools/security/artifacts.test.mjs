@@ -120,6 +120,45 @@ test('empty file/output and unsupported extension never qualify release', async 
     }),
   );
 });
+test('JSON web manifests remain fully scanned and cannot conceal a secret', async (context) => {
+  const root = await ownedFixture(context);
+  const detector = qualifyDetector(repository);
+  context.after(() => detector.dispose());
+  const file = path.join(root, 'manifest.webmanifest');
+  writeFileSync(
+    file,
+    JSON.stringify({ name: 'Synthetic trace viewer', start_url: 'index.html' }),
+  );
+  assert.equal((await inspectArtifact(root, { detector })).passed, true);
+  writeFileSync(
+    file,
+    JSON.stringify({ name: 'Synthetic trace viewer', access_token: secret() }),
+  );
+  await assert.rejects(
+    () => inspectArtifact(root, { detector }),
+    (error) =>
+      /secret-findings/u.test(error.message) &&
+      !error.message.includes(secret()),
+  );
+});
+for (const content of [
+  Buffer.from('{'),
+  Buffer.from('[]'),
+  Buffer.from('null'),
+  Buffer.from('"manifest"'),
+  Buffer.from([0xff, 0xfe]),
+]) {
+  test('invalid web manifest content fails before scanning', async (context) => {
+    const root = await ownedFixture(context);
+    writeFileSync(path.join(root, 'manifest.webmanifest'), content);
+    await assert.rejects(() =>
+      inspectArtifact(root, {
+        scan: () => assert.fail('invalid manifest scanned'),
+      }),
+    );
+  });
+}
+
 test('linked artifacts are not followed to content outside owner', async (context) => {
   const root = await ownedFixture(context);
   const external = await ownedFixture(context);

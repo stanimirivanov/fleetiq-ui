@@ -176,10 +176,10 @@ importers:
         version: 2.5.15
       '@effect/openapi-generator':
         specifier: 4.0.1
-        version: 4.0.1(@effect/platform-node@4.0.1(effect@4.0.1)(redis@6.3.0))(effect@4.0.1)
+        version: 4.0.1(@effect/platform-node@4.0.1(effect@4.0.2)(redis@6.3.0))(effect@4.0.2)
       '@effect/platform-node':
         specifier: 4.0.1
-        version: 4.0.1(effect@4.0.1)(redis@6.3.0)
+        version: 4.0.1(effect@4.0.2)(redis@6.3.0)
       '@playwright/test':
         specifier: 1.63.0
         version: 1.63.0
@@ -223,8 +223,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0(solid-js@1.9.17)
       effect:
-        specifier: 4.0.1
-        version: 4.0.1
+        specifier: 4.0.2
+        version: 4.0.2
       solid-js:
         specifier: 1.9.17
         version: 1.9.17
@@ -272,8 +272,8 @@ importers:
         specifier: 24.19.1
         version: 24.19.1
       effect:
-        specifier: 4.0.1
-        version: 4.0.1
+        specifier: 4.0.2
+        version: 4.0.2
       typescript:
         specifier: 7.0.2
         version: 7.0.2
@@ -1159,8 +1159,8 @@ packages:
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
 
-  effect@4.0.1:
-    resolution: {integrity: sha512-b1VlQG9g8fwxE5QnIZuPoOP/0MsqHJSRKxUijjoM80E5q95FXrX5yWtY5XI8G+GJsBQAVSDbLS458z9a++uVvw==}
+  effect@4.0.2:
+    resolution: {integrity: sha512-YeYnLqSFrL4+tCOXRrfNP03w8FILoF/wDl+ukraJAGzXrjcS383W7LAAvGBbLatEyktmLxRq+9xJinx7QzXW5A==}
 
   electron-to-chromium@1.5.444:
     resolution: {integrity: sha512-5ss/uJfoDYDHT0lfJzT6FbcskIzROIOPf0BbbFkGcvDzoJU7i//9GDrwwIHQVmIsrAGiF3ihpADBRIsrEFt1rQ==}
@@ -2366,27 +2366,27 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@effect/openapi-generator@4.0.1(@effect/platform-node@4.0.1(effect@4.0.1)(redis@6.3.0))(effect@4.0.1)':
+  '@effect/openapi-generator@4.0.1(@effect/platform-node@4.0.1(effect@4.0.2)(redis@6.3.0))(effect@4.0.2)':
     dependencies:
-      '@effect/platform-node': 4.0.1(effect@4.0.1)(redis@6.3.0)
-      effect: 4.0.1
+      '@effect/platform-node': 4.0.1(effect@4.0.2)(redis@6.3.0)
+      effect: 4.0.2
       swagger2openapi: 7.0.8
     transitivePeerDependencies:
       - encoding
 
-  '@effect/platform-node-shared@4.0.1(effect@4.0.1)':
+  '@effect/platform-node-shared@4.0.1(effect@4.0.2)':
     dependencies:
       '@types/ws': 8.18.2
-      effect: 4.0.1
+      effect: 4.0.2
       ws: 8.22.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform-node@4.0.1(effect@4.0.1)(redis@6.3.0)':
+  '@effect/platform-node@4.0.1(effect@4.0.2)(redis@6.3.0)':
     dependencies:
-      '@effect/platform-node-shared': 4.0.1(effect@4.0.1)
-      effect: 4.0.1
+      '@effect/platform-node-shared': 4.0.1(effect@4.0.2)
+      effect: 4.0.2
       redis: 6.3.0
       undici: 8.11.2
     transitivePeerDependencies:
@@ -2896,7 +2896,7 @@ snapshots:
 
   dom-accessibility-api@0.6.3: {}
 
-  effect@4.0.1: {}
+  effect@4.0.2: {}
 
   electron-to-chromium@1.5.444: {}
 

@@ -10,6 +10,7 @@ import {
   selectedChecks,
 } from './catalogue.mjs';
 import { inspectDelivery } from './delivery-policy.mjs';
+import { REVIEWED } from './reviewed-dependencies.mjs';
 
 /** Parse workflow structure rather than trusting text that merely mentions a gate. */
 export function inspectPolicy(
@@ -34,25 +35,28 @@ export function inspectPolicy(
   inspectDelivery(workflow, guide, fail);
   if (
     manifest.devDependencies?.['typescript-parser'] !==
-      'npm:typescript@6.0.3' ||
-    manifest.devDependencies?.yauzl !== '3.4.0'
+      `npm:typescript@${REVIEWED.tools.astParser}` ||
+    manifest.devDependencies?.yauzl !== REVIEWED.tools.archive
   )
     fail('Keep explicit reviewed AST and archive parser pins.');
   if (
-    manifest.devDependencies?.['@axe-core/playwright'] !== '4.13.0' ||
-    manifest.devDependencies?.vite !== '8.3.2'
+    manifest.devDependencies?.['@axe-core/playwright'] !== REVIEWED.tools.axe ||
+    manifest.devDependencies?.vite !== REVIEWED.tools.vite
   )
     fail('Keep the reviewed browser-quality tool pins.');
-  if (manifest.packageManager !== 'pnpm@12.5.1') fail('Pin pnpm@12.5.1.');
+  if (manifest.packageManager !== `pnpm@${REVIEWED.pnpm}`)
+    fail(`Pin the reviewed package manager pnpm@${REVIEWED.pnpm}.`);
   if (
-    manifest.devDependencies?.typescript !== '7.0.2' ||
-    manifest.devDependencies?.['dependency-cruiser'] !== '18.5.0'
+    manifest.devDependencies?.typescript !== REVIEWED.tools.compiler ||
+    manifest.devDependencies?.['dependency-cruiser'] !==
+      REVIEWED.tools.dependencyCruiser
   ) {
     fail('Keep the reviewed compiler and architecture tool pins.');
   }
   if (
-    workspace.packageExtensions?.['dependency-cruiser@18.5.0']?.dependencies
-      ?.typescript !== '6.0.3'
+    workspace.packageExtensions?.[
+      `dependency-cruiser@${REVIEWED.tools.dependencyCruiser}`
+    ]?.dependencies?.typescript !== REVIEWED.tools.astParser
   ) {
     fail('Declare the architecture parser package extension explicitly.');
   }
@@ -118,7 +122,7 @@ export function inspectPolicy(
     const node = steps.filter(
       (step) =>
         step.uses === ACTIONS.node &&
-        String(step.with?.['node-version']) === '24',
+        String(step.with?.['node-version']) === String(REVIEWED.nodeMajor),
     );
     const checkout = steps.filter((step) => step.uses === ACTIONS.checkout);
     if (

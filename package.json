@@ -39,7 +39,8 @@
     "quality:mutations": "node tools/quality/mutations.mjs",
     "e2e:quality": "pnpm build && pnpm exec playwright test --config apps/web-e2e/playwright.quality.config.ts",
     "quality:configuration": "node tools/quality/configuration.mjs",
-    "quality:page-errors": "node tools/quality/browser-error-fixture.mjs"
+    "quality:page-errors": "node tools/quality/browser-error-fixture.mjs",
+    "dependencies:review": "node tools/verification/upgrades-cli.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

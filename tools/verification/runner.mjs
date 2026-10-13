@@ -4,7 +4,23 @@ import path from 'node:path';
 import { resolveOwnedPath } from '../docs/source.mjs';
 import { REQUIRED_SCRIPTS, selectedChecks } from './catalogue.mjs';
 import { executeCheck, qualifyTools } from './execution.mjs';
+import { inspectInstalledTools } from './installed-tools.mjs';
 import { sourceState, unchangedSource } from './source-state.mjs';
+import { reviewUpgrades } from './upgrades.mjs';
+
+function installedState(root, inspect) {
+  try {
+    const findings = inspect(root);
+    if (Array.isArray(findings) && findings.length <= 64)
+      return {
+        status: findings.length === 0 ? 'current' : 'blocked',
+        issues: findings.length,
+      };
+  } catch {
+    // Discovery failures contain no candidate metadata in retained evidence.
+  }
+  return { status: 'blocked', issues: 1 };
+}
 
 function writeEvidence(root, report) {
   const directory = path.join(root, '.verification');
@@ -33,6 +49,8 @@ export async function verify(
   group,
   {
     qualify = qualifyTools,
+    review = reviewUpgrades,
+    installed = inspectInstalledTools,
     snapshot = sourceState,
     execute = executeCheck,
     persist = writeEvidence,
@@ -46,6 +64,8 @@ export async function verify(
     startedAt: new Date().toISOString(),
     finishedAt: null,
     tools: {},
+    dependencyReview: null,
+    installedTools: null,
     source: null,
     sourceStable: false,
     blocker: null,
@@ -61,9 +81,48 @@ export async function verify(
   let context;
   try {
     report.source = snapshot(root);
-    context = qualify(root, manifest);
-    report.tools = context.tools;
-    report.blocker = context.blocker;
+    const inventory = review(root);
+    const validShape =
+      inventory &&
+      Array.isArray(inventory.changes) &&
+      Array.isArray(inventory.issues) &&
+      inventory.changes.length <= 64 &&
+      inventory.issues.length <= 64;
+    if (
+      !validShape ||
+      !(
+        (inventory.status === 'current' &&
+          inventory.changes.length === 0 &&
+          inventory.issues.length === 0) ||
+        (inventory.status === 'review-required' &&
+          inventory.changes.length > 0 &&
+          inventory.issues.length === 0) ||
+        (inventory.status === 'blocked' && inventory.issues.length > 0)
+      )
+    ) {
+      report.blocker = 'dependency-inventory-invalid';
+    } else {
+      report.dependencyReview = {
+        status: inventory.status,
+        changes: inventory.changes.length,
+        issues: inventory.issues.length,
+      };
+      if (inventory.status !== 'current')
+        report.blocker =
+          inventory.status === 'review-required'
+            ? 'dependency-review-required'
+            : 'dependency-inventory-invalid';
+    }
+    if (!report.blocker) {
+      context = qualify(root, manifest);
+      report.tools = context.tools;
+      report.blocker = context.blocker;
+      if (!report.blocker) {
+        report.installedTools = installedState(root, installed);
+        if (report.installedTools.status !== 'current')
+          report.blocker = 'reviewed-tools-unavailable';
+      }
+    }
     if (
       !report.blocker &&
       checks.some(
@@ -75,6 +134,11 @@ export async function verify(
   } catch {
     report.blocker = 'source-or-tool-discovery-failed';
   }
+  if (
+    report.blocker?.startsWith('dependency-') ||
+    report.blocker === 'reviewed-tools-unavailable'
+  )
+    for (const entry of report.checks) entry.reason = report.blocker;
   if (!report.blocker) {
     for (let index = 0; index < checks.length; index++) {
       const started = Date.now();
@@ -103,6 +167,11 @@ export async function verify(
     } catch {
       report.blocker = 'source-state-unavailable';
     }
+  }
+  if (!report.blocker && report.installedTools?.status === 'current') {
+    report.installedTools = installedState(root, installed);
+    if (report.installedTools.status !== 'current')
+      report.blocker = 'reviewed-tools-changed';
   }
   if (signal?.aborted) report.blocker = 'interrupted';
   report.completePass =

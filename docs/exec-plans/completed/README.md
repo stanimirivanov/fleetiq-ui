@@ -31,3 +31,5 @@ evidence and material limitations for future reviewers.
 - [Browser resource stability and inspected diagnostics](2026-10-browser-resource-stability.md) — M02.
 
 - [Checkout upgrade and portable graph ownership](2026-10-checkout-portable-graph.md) — M02.
+
+- [Reviewed dependency upgrades and early qualification](2026-10-dependency-upgrade-review.md) — M02.

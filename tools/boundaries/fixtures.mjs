@@ -14,6 +14,9 @@ import { fileURLToPath } from 'node:url';
 const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url));
 const sensorFiles = [
   'tools/check-boundaries.mjs',
+  'tools/verification/reviewed-dependencies.mjs',
+  'tools/verification/reviewed-dependencies.json',
+  'tools/security/owned.mjs',
   'tools/architecture/sources.mjs',
   'tools/docs/source.mjs',
   'tools/boundaries/policy.mjs',

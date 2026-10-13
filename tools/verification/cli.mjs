@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GROUPS, selectedChecks } from './catalogue.mjs';
-import { verify } from './runner.mjs';
 
 const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -41,9 +40,25 @@ try {
     } catch {
       manifest = {};
     }
+    const { verify } = await import('./runner.mjs');
     const { report, evidencePath } = await verify(root, manifest, group, {
       signal: controller.signal,
     });
+    if (
+      report.dependencyReview?.status !== 'current' &&
+      report.dependencyReview
+    )
+      console.error(
+        'Dependency inventory needs attention. Run pnpm dependencies:review for affected pins, coordinated changes and required qualification.',
+      );
+    if (
+      ['reviewed-tools-unavailable', 'reviewed-tools-changed'].includes(
+        report.blocker,
+      )
+    )
+      console.error(
+        'Declared pins are reviewed, but installed tools are missing or mismatched. Run pnpm install --frozen-lockfile and rerun verification.',
+      );
     for (const entry of report.checks)
       console.log(`${entry.id}: ${entry.status}`);
     console.log(`verification evidence: ${path.relative(root, evidencePath)}`);

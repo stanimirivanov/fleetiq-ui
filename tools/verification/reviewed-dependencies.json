@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "nodeMajor": 24,
+  "pnpm": "12.5.1",
+  "tools": {
+    "compiler": "7.0.2",
+    "astParser": "6.0.3",
+    "dependencyCruiser": "18.5.0",
+    "vite": "8.3.2",
+    "axe": "4.13.0",
+    "archive": "3.4.0",
+    "vitest": "5.0.3",
+    "playwright": "1.63.0"
+  },
+  "actions": {
+    "checkout": {
+      "repository": "actions/checkout",
+      "version": "7.0.1",
+      "commit": "3d3c42e5aac5ba805825da76410c181273ba90b1"
+    },
+    "node": {
+      "repository": "actions/setup-node",
+      "version": "6.5.0",
+      "commit": "249970729cb0ef3589644e2896645e5dc5ba9c38"
+    },
+    "upload": {
+      "repository": "actions/upload-artifact",
+      "version": "6.0.0",
+      "commit": "b7c566a772e6b6bfb58ed0dc250532a479d7789f"
+    },
+    "pages": {
+      "repository": "actions/configure-pages",
+      "version": "6.0.0",
+      "commit": "45bfe0192ca1faeb007ade9deae92b16b8254a0d"
+    },
+    "uploadPages": {
+      "repository": "actions/upload-pages-artifact",
+      "version": "5.0.0",
+      "commit": "fc324d3547104276b827a68afc52ff2a11cc49c9"
+    },
+    "deployPages": {
+      "repository": "actions/deploy-pages",
+      "version": "5.0.1",
+      "commit": "368f82528645a54fb793d4d04e342629a3f51346"
+    }
+  }
+}

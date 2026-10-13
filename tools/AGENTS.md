@@ -19,3 +19,5 @@ policy changes require owner review and external GitHub ruleset configuration.
 Follow [trust and delivery](../docs/development/security-delivery.md) for current/trusted-base policies, checked detector pins, redacted findings and recovery. Keep compiler and AST parser pins independent. Static syntax sensors have documented limits.
 
 Read [measured quality](../docs/development/measured-browser-quality.md) for scoped coverage, actual assertion/browser qualification, final output budgets and payload-free measurements. Missing tools or metrics cannot become successful qualification.
+
+For dependency PRs, read [upgrade review](../docs/development/dependency-upgrades.md) and run pnpm dependencies:review. Never copy candidate pins into approval automatically. Keep exact installed-tool and actual violation probes qualified.

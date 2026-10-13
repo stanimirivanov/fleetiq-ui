@@ -28,3 +28,5 @@ homes rather than growing the root README.
 
 - [Measured browser quality](development/measured-browser-quality.md): critical obligations, output budgets, rendered checks and calibrated workloads.
 - [Harness control register](development/harness-controls.md): owners, review triggers and unqualified areas.
+
+- [Dependency upgrade review](development/dependency-upgrades.md): reviewed pins, read-only proposals, early qualification and recovery.

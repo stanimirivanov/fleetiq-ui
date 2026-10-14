@@ -33,3 +33,5 @@ evidence and material limitations for future reviewers.
 - [Checkout upgrade and portable graph ownership](2026-10-checkout-portable-graph.md) — M02.
 
 - [Reviewed dependency upgrades and early qualification](2026-10-dependency-upgrade-review.md) — M02.
+
+- [Connected operator user guide](2026-10-connected-operator-guide.md) — M04.

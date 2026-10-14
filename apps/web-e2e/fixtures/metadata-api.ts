@@ -24,6 +24,8 @@ export interface MetadataMockOptions {
   readonly sessionStatus?: 200 | 401 | 404 | 500;
   readonly actorId?: string;
   readonly identityDestination?: string;
+  /** Model only the fixed server return, never a real provider exchange. */
+  readonly simulateSignInReturn?: boolean;
   readonly catalogueStatus?: 200 | 401 | 403 | 500;
   readonly emptyCatalogue?: boolean;
   readonly malformedCatalogue?: boolean;
@@ -63,6 +65,7 @@ export async function installMetadataApi(
   let actorId = options.actorId ?? 'operator-a';
   let catalogueStatus = options.catalogueStatus ?? 200;
   let logoutStatus = options.logoutStatus ?? 204;
+  let emptyCatalogue = options.emptyCatalogue ?? false;
 
   await page.route('**/api/v1/**', async (route) => {
     const request = route.request();
@@ -125,12 +128,14 @@ export async function installMetadataApi(
       });
     }
     if (url.pathname === '/api/v1/auth/login') {
+      if (options.simulateSignInReturn) sessionStatus = 200;
       return route.fulfill({
         status: 303,
         headers: {
-          location:
-            options.identityDestination ??
-            `${url.origin}/test-only-identity-provider`,
+          location: options.simulateSignInReturn
+            ? '/'
+            : (options.identityDestination ??
+              `${url.origin}/test-only-identity-provider`),
           'cache-control': 'no-store',
           'referrer-policy': 'no-referrer',
         },
@@ -173,7 +178,7 @@ export async function installMetadataApi(
         offset,
         offset + Number(url.searchParams.get('limit') ?? 50),
       );
-      const records = options.emptyCatalogue
+      const records = emptyCatalogue
         ? []
         : options.catalogueSize !== undefined
           ? bounded
@@ -185,7 +190,7 @@ export async function installMetadataApi(
           ...asset,
           tenant_id: options.wrongTenantCatalogue ? 'tenant-b' : 'tenant-a',
         })),
-        next_after: options.emptyCatalogue
+        next_after: emptyCatalogue
           ? null
           : options.catalogueSize !== undefined
             ? offset + bounded.length < inventory.length
@@ -246,7 +251,12 @@ export async function installMetadataApi(
       };
       const continued = url.searchParams.has('after');
       const effective =
-        effectiveAtMs >= 1000 && effectiveAtMs < 3000 && knownAtMs >= 2000;
+        effectiveAtMs >= 1000 &&
+        effectiveAtMs < 3000 &&
+        knownAtMs >= 2000 &&
+        source.device_asset_id === binding.source.device_asset_id &&
+        source.endpoint_id === binding.source.endpoint_id &&
+        source.signal_id === binding.source.signal_id;
       return reply(200, 'source', {
         ...snapshot,
         source,
@@ -293,6 +303,9 @@ export async function installMetadataApi(
   });
   return {
     requests,
+    setEmptyCatalogue(empty: boolean) {
+      emptyCatalogue = empty;
+    },
     setActorId(id: string) {
       actorId = id;
     },

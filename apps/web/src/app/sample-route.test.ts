@@ -53,3 +53,13 @@ test('shell catalogue links preserve both explicit review times but clear select
     ),
   ).toBe('/assets?tenant=tenant-a&effective_at_ms=1500&known_at_ms=2500');
 });
+
+test('catalogue navigation preserves the bounded tenant-discovery cursor independently of asset cursors', () => {
+  expect(
+    navigationHref(
+      '/assets',
+      false,
+      '?tenant=tenant-b&tenant_after=tenant-a&after=asset-1&q=old',
+    ),
+  ).toBe('/assets?tenant=tenant-b&tenant_after=tenant-a');
+});

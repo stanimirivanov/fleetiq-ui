@@ -9,6 +9,7 @@ import {
   metadataButtonClass,
   metadataInputClass,
 } from './MetadataPanel';
+import { useMetadataReader } from './MetadataReaderProvider';
 import type { MetadataWorkspace } from './useMetadataWorkspace';
 
 function TenantControl(props: { readonly workspace: MetadataWorkspace }) {
@@ -95,10 +96,11 @@ function ReviewTimeControl(props: { readonly workspace: MetadataWorkspace }) {
   );
 }
 
-/** User chooses a tenant; the session endpoint does not advertise tenant discovery. */
+/** Composition supplies discovery controls; isolated consumers can enter a known ID. */
 export function MetadataContextControls(props: {
   readonly workspace: MetadataWorkspace;
 }) {
+  const context = useMetadataReader();
   const invalid = () => {
     const result = props.workspace.result();
     return result.kind === 'invalid' ? result.message : null;
@@ -108,8 +110,15 @@ export function MetadataContextControls(props: {
       title="Review context"
       description="Metadata belongs to one tenant. Effective time selects physical validity; known time limits recorded revisions."
     >
-      <div class="grid gap-4 xl:grid-cols-[minmax(12rem,0.7fr)_minmax(0,1.7fr)]">
-        <TenantControl workspace={props.workspace} />
+      <div class="grid items-start gap-4 2xl:grid-cols-[minmax(18rem,1fr)_minmax(0,1.4fr)]">
+        <Show
+          when={context.tenantControl}
+          fallback={<TenantControl workspace={props.workspace} />}
+        >
+          {(control) =>
+            control()({ tenantId: () => props.workspace.value('tenant') })
+          }
+        </Show>
         <ReviewTimeControl workspace={props.workspace} />
       </div>
       <Show when={props.workspace.result().kind === 'missing-tenant'}>

@@ -35,3 +35,5 @@ evidence and material limitations for future reviewers.
 - [Reviewed dependency upgrades and early qualification](2026-10-dependency-upgrade-review.md) — M02.
 
 - [Connected operator user guide](2026-10-connected-operator-guide.md) — M04.
+
+- [Operator tenant selection and capability-aware navigation](2026-10-operator-tenant-selection.md) — M02, delivery-plan PR 3.

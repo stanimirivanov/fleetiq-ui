@@ -7,6 +7,11 @@ import {
 /** Connected metadata actions; scenarios own assertions and optional guide results. */
 export class ConnectedMetadataPage {
   readonly tenantId: Locator;
+  readonly permittedTenant: Locator;
+  readonly tenantAccess: Locator;
+  readonly nextTenants: Locator;
+  readonly firstTenants: Locator;
+  readonly refreshTenants: Locator;
   readonly openTenant: Locator;
   readonly catalogue: Locator;
   readonly filter: Locator;
@@ -28,6 +33,26 @@ export class ConnectedMetadataPage {
     private readonly page: Page,
     private readonly narrator?: GuideNarrator,
   ) {
+    this.permittedTenant = page.getByRole('combobox', {
+      name: 'Permitted tenant',
+      exact: true,
+    });
+    this.tenantAccess = page.getByRole('region', {
+      name: 'Tenant access',
+      exact: true,
+    });
+    this.nextTenants = page.getByRole('button', {
+      name: 'Next tenants',
+      exact: true,
+    });
+    this.firstTenants = page.getByRole('button', {
+      name: 'First tenants',
+      exact: true,
+    });
+    this.refreshTenants = page.getByRole('button', {
+      name: 'Refresh tenant access',
+      exact: true,
+    });
     this.tenantId = page.getByLabel('Tenant ID', { exact: true });
     this.openTenant = page.getByRole('button', {
       name: 'Open tenant',
@@ -107,13 +132,55 @@ export class ConnectedMetadataPage {
   }
   async chooseTenant(id: string): Promise<void> {
     await this.action(
-      this.tenantId,
+      this.permittedTenant,
       'Choose an authorized tenant',
-      'Enter the tenant supplied by your administrator. Selecting an ID does not grant access.',
+      'Choose from the current bounded discovery page. Exact action badges guide controls; every metadata operation is authorized again.',
       async () => {
-        await this.tenantId.fill(id);
-        await this.openTenant.click();
+        await this.permittedTenant.waitFor({ state: 'visible' });
+        await this.page.waitForFunction(
+          () =>
+            document.querySelector<HTMLSelectElement>(
+              'section[aria-label="Tenant access"] select',
+            )?.disabled === false,
+        );
+        if (
+          await this.permittedTenant
+            .getByRole('option', { name: id, exact: true })
+            .count()
+        ) {
+          await this.permittedTenant.selectOption(id);
+        } else {
+          await this.page
+            .getByText('Open a known tenant ID', { exact: true })
+            .click();
+          await this.tenantId.fill(id);
+          await this.openTenant.click();
+        }
       },
+    );
+  }
+  async nextTenantPage(): Promise<void> {
+    await this.action(
+      this.nextTenants,
+      'Browse the next tenant page',
+      'Follow the exclusive tenant cursor. A tenant missing from this bounded page is unverified, not denied.',
+      () => this.nextTenants.click(),
+    );
+  }
+  async firstTenantPage(): Promise<void> {
+    await this.action(
+      this.firstTenants,
+      'Return to the first tenant page',
+      'Restart discovery from its first page. Grants can change between requests; this is not a cross-page snapshot.',
+      () => this.firstTenants.click(),
+    );
+  }
+  async refreshTenantAccess(): Promise<void> {
+    await this.action(
+      this.refreshTenants,
+      'Refresh current tenant access',
+      'Clear superseded grants and metadata while checking access again. The backend still authorizes every protected operation.',
+      () => this.refreshTenants.click(),
     );
   }
   async filterCatalogue(value: string): Promise<void> {

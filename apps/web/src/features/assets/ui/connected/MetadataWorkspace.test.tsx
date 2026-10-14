@@ -507,3 +507,56 @@ test.each([
     expect(signals[1]?.aborted).toBe(true);
   },
 );
+
+test('capability refresh pauses reads, clears evidence and cancels superseded metadata', async () => {
+  const pending: { resolve?: (value: string) => void }[] = [];
+  const signals: AbortSignal[] = [];
+  const [block, setBlock] = createSignal<string>();
+  const [accessRevision, setAccessRevision] = createSignal(0);
+  const reader = readerWith();
+  function Probe() {
+    const read = useMetadataRead(
+      () => ({ tenantId: 'tenant-a' }),
+      (_reader, _request, options) =>
+        new Promise<string>((resolve) => {
+          pending.push({ resolve });
+          if (options.signal) signals.push(options.signal);
+        }),
+    );
+    return (
+      <MetadataReadContent
+        state={read.state()}
+        label="access-scoped evidence"
+        retry={read.retry}
+      >
+        {(value) => <p>{value}</p>}
+      </MetadataReadContent>
+    );
+  }
+  render(() => (
+    <MetadataReaderProvider
+      reader={reader}
+      accessBlock={block}
+      accessRevision={accessRevision}
+    >
+      <Probe />
+    </MetadataReaderProvider>
+  ));
+  await waitFor(() => expect(pending).toHaveLength(1));
+  setBlock('Checking current access');
+  expect(screen.getByText('Checking current access')).toBeTruthy();
+  expect(signals[0]?.aborted).toBe(true);
+  pending[0]?.resolve?.('Superseded evidence');
+  await Promise.resolve();
+  expect(screen.queryByText('Superseded evidence')).toBeNull();
+  setBlock(undefined);
+  await waitFor(() => expect(pending).toHaveLength(2));
+  pending[1]?.resolve?.('Current evidence');
+  expect(await screen.findByText('Current evidence')).toBeTruthy();
+  setAccessRevision(1);
+  expect(screen.queryByText('Current evidence')).toBeNull();
+  await waitFor(() => expect(pending).toHaveLength(3));
+  expect(signals[1]?.aborted).toBe(true);
+  pending[2]?.resolve?.('Refreshed evidence');
+  expect(await screen.findByText('Refreshed evidence')).toBeTruthy();
+});

@@ -93,7 +93,8 @@ against generated Effect schemas before serving. These fixtures are never import
 by product code. Default legacy shell scenarios explicitly intercept session 404;
 no Vite SPA fallback can masquerade as a successful session.
 
-POM journeys cover account/session/logout, catalogue pagination and local filters,
+POM journeys cover account/session/logout, bounded tenant discovery and exact-grant selection,
+revoked/empty access, tenant cursor history and recovery, catalogue pagination and local filters,
 inspector external IDs and exact definitions, temporal relationship/target/source
 pages, URL reload/history, invalid context blocking, 403 denial, 404 absence,
 malformed and cross-scope data, safe precision, retry, and narrow dark layout.

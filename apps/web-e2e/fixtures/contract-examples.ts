@@ -96,6 +96,7 @@ export const catalogueRecords = [
 
 export const schemas = {
   session: Wire.OperatorSession,
+  tenants: Wire.OperatorTenantPage,
   catalogue: Wire.AssetPage,
   asset: Wire.Asset,
   relationships: Wire.RelationshipSnapshot,

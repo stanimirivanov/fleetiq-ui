@@ -19,7 +19,20 @@ export interface ApiRequestEvidence {
   readonly authorization?: string;
 }
 
+export interface TenantFixture {
+  readonly tenant_id: string;
+  readonly actions: readonly (
+    | 'metadata.read'
+    | 'metadata.manage'
+    | 'access.manage'
+  )[];
+}
+
 export interface MetadataMockOptions {
+  readonly tenants?: readonly TenantFixture[];
+  readonly tenantPageSize?: number;
+  readonly discoveryStatus?: 200 | 401 | 500;
+  readonly malformedDiscovery?: boolean;
   readonly catalogueSize?: number;
   readonly sessionStatus?: 200 | 401 | 404 | 500;
   readonly actorId?: string;
@@ -65,6 +78,10 @@ export async function installMetadataApi(
   let actorId = options.actorId ?? 'operator-a';
   let catalogueStatus = options.catalogueStatus ?? 200;
   let logoutStatus = options.logoutStatus ?? 204;
+  let tenants = options.tenants ?? [
+    { tenant_id: 'tenant-a', actions: ['metadata.read'] as const },
+  ];
+  let discoveryStatus = options.discoveryStatus ?? 200;
   let emptyCatalogue = options.emptyCatalogue ?? false;
 
   await page.route('**/api/v1/**', async (route) => {
@@ -142,6 +159,33 @@ export async function installMetadataApi(
       });
     }
     if (sessionStatus !== 200) return problem(401);
+    if (url.pathname === '/api/v1/me/tenants') {
+      if (discoveryStatus !== 200) return problem(discoveryStatus);
+      const after = url.searchParams.get('after');
+      const offset =
+        after === null
+          ? 0
+          : tenants.findIndex((tenant) => tenant.tenant_id === after) + 1;
+      const limit = Math.min(
+        Number(url.searchParams.get('limit') ?? 50),
+        options.tenantPageSize ?? 50,
+      );
+      const entries = tenants.slice(offset, offset + limit);
+      return reply(
+        200,
+        'tenants',
+        options.malformedDiscovery
+          ? { tenants: 'invalid', next_after: null }
+          : {
+              tenants: entries,
+              next_after:
+                offset + entries.length < tenants.length
+                  ? (entries.at(-1)?.tenant_id ?? null)
+                  : null,
+            },
+        !options.malformedDiscovery,
+      );
+    }
     if (!url.pathname.startsWith('/api/v1/tenants/tenant-a/'))
       return problem(403);
 
@@ -303,6 +347,12 @@ export async function installMetadataApi(
   });
   return {
     requests,
+    setTenants(value: readonly TenantFixture[]) {
+      tenants = value;
+    },
+    setDiscoveryStatus(value: 200 | 401 | 500) {
+      discoveryStatus = value;
+    },
     setEmptyCatalogue(empty: boolean) {
       emptyCatalogue = empty;
     },

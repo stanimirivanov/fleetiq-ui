@@ -1,28 +1,30 @@
 import { useLocation } from '@solidjs/router';
 import { onCleanup, type ParentProps, Show } from 'solid-js';
-import { createMetadataReader, MetadataReaderProvider } from '#features/assets';
+import { createMetadataReader } from '#features/assets';
 import {
   createOperatorSessionService,
+  createOperatorTenantReader,
   OperatorAccessBoundary,
   OperatorSessionProvider,
   useOperatorSession,
 } from '#features/identity';
 import { createBrowserApi } from '#shared/api';
-import { AppShell } from './AppShell';
 import { APP_ROUTES, routeTitle } from './route-metadata';
 import { isDevelopmentSampleRoute } from './sample-route';
+import { TenantMetadataWorkspace } from './TenantMetadataWorkspace';
 
 /** One managed HTTP lifetime serves session and metadata ports for the app mount. */
 export function BrowserWorkspace(props: ParentProps) {
   const browser = createBrowserApi();
   const reader = createMetadataReader(browser);
   const session = createOperatorSessionService(browser);
+  const tenants = createOperatorTenantReader(browser);
   onCleanup(() => {
     void browser.dispose();
   });
   return (
     <OperatorSessionProvider service={session}>
-      <MetadataComposition reader={reader}>
+      <MetadataComposition reader={reader} tenants={tenants}>
         {props.children}
       </MetadataComposition>
     </OperatorSessionProvider>
@@ -32,16 +34,18 @@ export function BrowserWorkspace(props: ParentProps) {
 function MetadataComposition(
   props: ParentProps<{
     readonly reader: ReturnType<typeof createMetadataReader>;
+    readonly tenants: ReturnType<typeof createOperatorTenantReader>;
   }>,
 ) {
   const operator = useOperatorSession();
   return (
-    <MetadataReaderProvider
+    <TenantMetadataWorkspace
       reader={props.reader}
+      tenants={props.tenants}
       onUnauthorized={operator.invalidate}
     >
-      <AppShell>{props.children}</AppShell>
-    </MetadataReaderProvider>
+      {props.children}
+    </TenantMetadataWorkspace>
   );
 }
 

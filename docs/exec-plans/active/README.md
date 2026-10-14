@@ -8,3 +8,4 @@ is implemented in **M04 - Semantic Twin and Live UI**; see [the execution roadma
 The active [dependency candidate qualification slice](2026-10-dependency-candidate-qualification.md)
 in **M02 - Product Foundation** separates proposal test evidence from approval and
 retains the required check merge barrier.
+

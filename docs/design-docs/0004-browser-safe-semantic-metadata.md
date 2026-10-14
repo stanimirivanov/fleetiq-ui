@@ -1,5 +1,12 @@
 # ADR 0004: Connect semantic metadata through same-origin operator sessions
 
+## TL;DR
+
+Use one app-owned managed runtime and same-origin server sessions. Keep identity
+and metadata features independent, validate all external data and scope reads to
+explicit URL context. Discovery grants guide controls; the backend authorizes
+every operation.
+
 Status: accepted, 9 October 2026. Milestone: **M04 - Semantic Twin and Live UI**.
 
 ## Context
@@ -42,6 +49,25 @@ and metadata before mounting the new account's views; same-actor expiry refresh
 preserves ordinary interaction. Native sign-in anchors opt out of Solid Router
 with `rel="external noreferrer"` so the server receives the login request.
 
+## Tenant discovery extension (14 October 2026)
+
+Identity owns the generated, validated `GET /api/v1/me/tenants` adapter and
+its cancellable page controller. App composition supplies the selector and
+capability hints to independent metadata views. The URL owns explicit tenant
+selection and the exclusive `tenant_after` discovery cursor.
+
+Only an explicit `metadata.read` hint enables known-tenant metadata controls.
+Manage grants do not imply read. An absent ID on a partial page is unverified;
+a protected read can still establish denial. Empty continuation pages are not
+evidence of an empty grant inventory. No pages are walked automatically.
+
+Refresh, cursor changes and successful session reinspection clear superseded
+hints and metadata, abort reads and suppress late completions. Discovery errors
+pause metadata reads until recovery. A 401 invalidates the session; a metadata
+403 remains authoritative even when discovery advertised a grant. URL tenant
+selection survives account refresh as explicit context, but no prior account's
+grants or protected evidence is reused.
+
 ## Consequences
 
 Connected metadata uses the approved panel language and responsive shell. It cannot
@@ -53,8 +79,7 @@ not establish one database snapshot.
 Explicit DEV previews remain separate and never activate as auth/error fallback.
 Production tests intercept contract-valid HTTP responses to prove transport/UI
 integration, authorization states, cursor scope, and URL behavior. They do not
-qualify deployed TLS, cookies, or OIDC provider interoperability. The existing guide
-is retained; connected operator chapters belong to the next agreed PR.
+qualify deployed TLS, cookies, or OIDC provider interoperability. The connected operator guide now covers these workflows with synthetic contract fixtures.
 
 ## Alternatives
 

@@ -7,6 +7,7 @@ export {
   isMapSamplePreview,
   isRegistrySamplePreview,
 } from './model/asset-preview-url';
+export { metadataHref, tenantContextChanges } from './model/metadata-query';
 export { AssetInspectorPage } from './ui/AssetInspectorPage';
 export { AssetRegistryPage } from './ui/AssetRegistryPage';
 export { AssetsPage } from './ui/AssetsPage';

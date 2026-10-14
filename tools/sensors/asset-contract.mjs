@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 const operations = {
+  '/api/v1/me/tenants': ['get', 'listOperatorTenants'],
   '/api/v1': ['get', 'getApiVersion'],
   '/api/v1/tenants/{tenant_id}/assets': ['get', 'listAssets'],
   '/api/v1/tenants/{tenant_id}/assets/{asset_id}': ['get', 'getAsset'],
@@ -84,11 +85,14 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.3' ||
+    contract.info?.version !== '1.0.0-baseline.4' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||
     contract.components?.schemas?.OperatorSession === undefined ||
+    contract.components?.schemas?.OperatorTenantPage === undefined ||
+    contract.components?.schemas?.OperatorTenant === undefined ||
+    contract.components?.schemas?.TenantAction === undefined ||
     !contract.components?.securitySchemes?.cookieAuth
   ) {
     throw new Error('Unexpected asset catalogue contract revision');

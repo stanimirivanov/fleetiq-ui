@@ -3,6 +3,14 @@ import type { MetadataReader } from '../../model/metadata';
 
 interface MetadataReaderContext {
   readonly reader?: MetadataReader;
+  /** Advisory availability; the server always authorizes the protected request. */
+  readonly accessBlock?: () => string | undefined;
+  /** A changed identity invalidates retained evidence even for an unchanged URL. */
+  readonly accessRevision?: () => unknown;
+  /** App-owned composition slot keeps identity controls outside this feature. */
+  readonly tenantControl?: (props: {
+    readonly tenantId: () => string;
+  }) => JSX.Element;
   readonly onUnauthorized?: () => void;
 }
 const Context = createContext<MetadataReaderContext>({});

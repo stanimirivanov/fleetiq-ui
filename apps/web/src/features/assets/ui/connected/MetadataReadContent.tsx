@@ -26,6 +26,10 @@ export function MetadataReadContent<T>(props: {
     const state = props.state;
     return state.kind === 'ready' ? state : undefined;
   };
+  const blocked = () => {
+    const state = props.state;
+    return state.kind === 'blocked' ? state : undefined;
+  };
   const failure = () => {
     const state = props.state;
     return state.kind === 'error' ? state : undefined;
@@ -46,6 +50,13 @@ export function MetadataReadContent<T>(props: {
         <p role="status" class="text-sm text-muted">
           Loading {props.label}…
         </p>
+      </Match>
+      <Match when={blocked()}>
+        {(state) => (
+          <p role="status" class="text-sm text-muted">
+            {state().message}
+          </p>
+        )}
       </Match>
       <Match when={failure()}>
         {(error) => (

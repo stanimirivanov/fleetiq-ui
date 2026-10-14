@@ -15,21 +15,30 @@ test('choose a tenant, discover bounded assets and inspect pinned metadata', {
       summary:
         'Select a tenant, filter a bounded catalogue page, follow cursors, preserve browser history and inspect exact asset and property definitions.',
     },
-    {},
+    {
+      tenants: [
+        { tenant_id: 'tenant-a', actions: ['metadata.read'] },
+        {
+          tenant_id: 'tenant-b',
+          actions: ['access.manage', 'metadata.manage'],
+        },
+      ],
+      tenantPageSize: 1,
+    },
     async (guide, api) => {
       const metadata = new ConnectedMetadataPage(guide.page, guide);
 
       await test.step('Choose a tenant explicitly', async () => {
         await guide.page.goto('/assets');
-        await expect(metadata.tenantId).toBeVisible();
+        await expect(metadata.permittedTenant).toBeEnabled();
         expect(
           api.requests.filter((request) =>
             request.path.startsWith('/api/v1/tenants/'),
           ),
         ).toHaveLength(0);
-        await guide.result(metadata.tenantId, {
-          title: 'Start with the tenant supplied by your administrator',
-          body: 'This contract does not enumerate tenants. Enter a known tenant ID; the server still decides whether the operator may read it.',
+        await guide.result(metadata.permittedTenant, {
+          title: 'Discover your permitted tenants',
+          body: 'Choose from current explicit tenant grants. Browse one page at a time; an ID missing from this page is unverified. Refresh access after an administrative change. Manage actions never imply metadata.read, and the server still authorizes every metadata operation.',
         });
         await metadata.chooseTenant('tenant-a');
         await expect(metadata.catalogue).toBeVisible();
@@ -37,6 +46,31 @@ test('choose a tenant, discover bounded assets and inspect pinned metadata', {
         await guide.result(metadata.catalogue, {
           title: 'A bounded identity catalogue',
           body: 'These synthetic identities are valid contract fixtures. The page does not report fleet-wide totals, physical condition, device connectivity or live positions.',
+        });
+      });
+      await test.step('Browse tenant pages and distinguish exact grants', async () => {
+        await metadata.nextTenantPage();
+        await expect(metadata.tenantAccess).toContainText(
+          'access is unverified',
+        );
+        await guide.result(metadata.tenantAccess, {
+          title: 'A page is not your whole tenant inventory',
+          body: 'The URL remembers the tenant cursor. The selected tenant is absent from this page, which does not revoke it or prove denied access.',
+        });
+        await metadata.chooseTenant('tenant-b');
+        await expect(metadata.catalogue).toHaveCount(0);
+        await expect(metadata.tenantAccess).toContainText('do not imply read');
+        await guide.result(metadata.tenantAccess, {
+          title: 'Manage actions are separate from read access',
+          body: 'This tenant advertises access.manage and metadata.manage, but not metadata.read. Metadata navigation and reads are unavailable. These badges are hints, never reusable authorization.',
+        });
+        await metadata.firstTenantPage();
+        await metadata.chooseTenant('tenant-a');
+        await metadata.refreshTenantAccess();
+        await expect(metadata.catalogue).toBeVisible();
+        await guide.result(metadata.tenantAccess, {
+          title: 'Refresh before continuing after an access change',
+          body: 'Refresh cancels reads and removes superseded evidence before rechecking grants. A revoked session returns to sign-in; an unavailable discovery service offers retry.',
         });
       });
       await test.step('Filter only the loaded page', async () => {

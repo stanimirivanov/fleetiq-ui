@@ -45,7 +45,7 @@ test('the byte-identical pinned contract and provenance pass', async (context) =
   const paths = await fixture(context);
   assert.deepEqual(await checkAssetContract(paths), {
     commit: pinnedSource.commit,
-    operations: 13,
+    operations: 14,
   });
   assert.deepEqual(await readFile(paths.contractPath), pinnedBytes);
 });
@@ -150,6 +150,18 @@ for (const [label, mutate] of [
     );
   });
 }
+for (const schema of ['OperatorTenantPage', 'OperatorTenant', 'TenantAction']) {
+  test(`missing tenant discovery schema ${schema} fails despite a refreshed digest`, async (context) => {
+    await assert.rejects(
+      checkAssetContract(
+        await changedContract(context, (contract) => {
+          delete contract.components.schemas[schema];
+        }),
+      ),
+      /Unexpected asset catalogue/,
+    );
+  });
+}
 const publishedOperations = Object.entries(published.paths).flatMap(
   ([route, item]) =>
     Object.entries(item)
@@ -162,7 +174,7 @@ const publishedOperations = Object.entries(published.paths).flatMap(
 );
 assert.equal(
   publishedOperations.length,
-  13,
+  14,
   'fixture must contain every published operation',
 );
 for (const { route, method, id } of publishedOperations) {

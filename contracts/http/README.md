@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.3` from merged
-`fleetiq-platform` commit `6015e46db42a078fce98241db5e6082e329a8e15`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.4` from merged
+`fleetiq-platform` commit `986b9fcb2862bdd4765b6d1719047a21a3a8ea47`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -14,6 +14,7 @@ The published bundle supplies discovery, bounded tenant asset pages, asset detai
 exact asset-type/property/relationship-type versions, directed relationship pages,
 target and exact-source binding pages, and four browser-authentication routes.
 
+- GET `/api/v1/me/tenants`: bounded active tenants and their exact explicit grants, with `limit` and exclusive `after` cursor.
 - GET `/api/v1/auth/login`: native browser navigation to the configured OIDC provider.
 - GET `/api/v1/auth/callback`: backend-only provider exchange and fixed `/` landing.
 - GET `/api/v1/auth/session`: only actor ID and expiry; no provider tokens.
@@ -21,8 +22,11 @@ target and exact-source binding pages, and four browser-authentication routes.
 
 Serve the UI and API under one public HTTPS origin. Same-origin cookies carry the
 session; no credentialed CORS or workload bearer is used by FleetIQ UX. The backend
-chooses/configures the provider at deployment. The browser cannot enumerate tenants;
-operators enter a tenant ID and the server checks permissions. An absent browser
+chooses/configures the provider at deployment. The browser discovers one bounded tenant page at a time. Operators choose explicitly;
+exact actions guide controls and never authorize operations. Missing from one page
+means unverified, and manage actions do not imply metadata.read. Discovery is
+refreshed on session inspection, cursor changes and explicit refresh. A known tenant
+ID outside the page remains a secondary deep-link option. An absent browser
 auth configuration returns session 404; UX reports unavailable sign-in. Standalone
 Vite has no API; use an explicitly configured development reverse proxy for actual
 connected reads. Production browser tests use interception, not a mock product server.

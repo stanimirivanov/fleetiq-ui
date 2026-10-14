@@ -71,3 +71,9 @@ and backend qualification remains separate.
 The active [dependency candidate qualification slice](exec-plans/active/2026-10-dependency-candidate-qualification.md)
 in **M02** gathers unchanged test results before dependency approval while keeping
 original-source acceptance and guide publication blocked until review is current.
+
+The completed [operator tenant selection slice](exec-plans/completed/2026-10-operator-tenant-selection.md)
+in **M02** implements delivery-plan PR 3 after backend tenant/capability discovery.
+It adds explicit bounded discovery, exact action hints, URL paging, capability-aware
+metadata controls, cancellation and recovery, with component and browser coverage
+and an extended connected-operator guide journey.

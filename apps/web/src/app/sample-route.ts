@@ -41,7 +41,12 @@ export function navigationHref(
   if (pathname === APP_ROUTES.assets.path) {
     const current = new URLSearchParams(currentSearch);
     const context = new URLSearchParams();
-    for (const key of ['tenant', 'effective_at_ms', 'known_at_ms']) {
+    for (const key of [
+      'tenant',
+      'tenant_after',
+      'effective_at_ms',
+      'known_at_ms',
+    ]) {
       const value = current.get(key);
       if (value !== null) context.set(key, value);
     }

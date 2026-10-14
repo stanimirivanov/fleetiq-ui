@@ -107,14 +107,13 @@ test('missing tenant requests explicit selection before any protected read', asy
   const api = await installMetadataApi(page);
   await page.goto('/assets');
   const metadata = new ConnectedMetadataPage(page);
-  await expect(metadata.tenantId).toBeVisible();
+  await expect(metadata.permittedTenant).toBeEnabled();
   expect(
     api.requests.filter((request) =>
       request.path.startsWith('/api/v1/tenants/'),
     ),
   ).toHaveLength(0);
-  await metadata.tenantId.fill('tenant-a');
-  await metadata.openTenant.click();
+  await metadata.chooseTenant('tenant-a');
   await expect(page).toHaveURL(/tenant=tenant-a/u);
   await expect(metadata.catalogue).toBeVisible();
 });

@@ -1,5 +1,6 @@
 import { A, useLocation } from '@solidjs/router';
-import { For } from 'solid-js';
+import { For, Show } from 'solid-js';
+import { useOptionalOperatorTenants } from '#features/identity';
 import { APP_ROUTES, PRIMARY_NAVIGATION } from '../route-metadata';
 import { isDevelopmentSampleRoute, navigationHref } from '../sample-route';
 
@@ -34,6 +35,11 @@ function NavIcon(props: { name: keyof typeof ICON_PATHS }) {
 /** Product-level destinations; unavailable areas remain visibly non-interactive. */
 export function PrimaryNav() {
   const location = useLocation();
+  const tenants = useOptionalOperatorTenants();
+  const restricted = (path: string) =>
+    path === APP_ROUTES.assets.path &&
+    !isSampleWorkspace() &&
+    tenants?.canReadMetadata() === false;
   const isSampleWorkspace = () =>
     isDevelopmentSampleRoute(
       location.pathname,
@@ -56,19 +62,33 @@ export function PrimaryNav() {
               <For each={group.items}>
                 {(item) =>
                   item.kind === 'route' ? (
-                    <A
-                      href={navigationHref(
-                        item.route.path,
-                        isSampleWorkspace(),
-                        location.search,
-                      )}
-                      end={item.route.path !== APP_ROUTES.assets.path}
-                      class="fi-nav-link"
-                      activeClass="fi-nav-link--active"
+                    <Show
+                      when={!restricted(item.route.path)}
+                      fallback={
+                        <span
+                          class="fi-nav-link fi-nav-link--planned"
+                          aria-disabled="true"
+                          title="The selected tenant does not advertise metadata.read"
+                        >
+                          <NavIcon name={item.icon} />
+                          {item.route.navigationLabel}
+                        </span>
+                      }
                     >
-                      <NavIcon name={item.icon} />
-                      {item.route.navigationLabel}
-                    </A>
+                      <A
+                        href={navigationHref(
+                          item.route.path,
+                          isSampleWorkspace(),
+                          location.search,
+                        )}
+                        end={item.route.path !== APP_ROUTES.assets.path}
+                        class="fi-nav-link"
+                        activeClass="fi-nav-link--active"
+                      >
+                        <NavIcon name={item.icon} />
+                        {item.route.navigationLabel}
+                      </A>
+                    </Show>
                   ) : (
                     <span
                       class="fi-nav-link fi-nav-link--planned"

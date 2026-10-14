@@ -60,10 +60,11 @@ run `pnpm e2e` for production and development browser suites. Connected browser
 scenarios intercept HTTP with contract-valid test-only responses; deployment
 qualification against an actual OIDC provider remains separate.
 
-After current `pnpm check` and `pnpm e2e` pass, `pnpm guide:generate` records six existing chapters: production shell
-orientation and five labelled development walkthroughs. It creates an ignored
-static guide under `dist/user-guide`. The next guide slice will add connected
-operator procedures. See the [testing guide](docs/development/testing.md).
+After current `pnpm check`, `pnpm e2e`, and `pnpm verify --group browser-quality`
+pass, `pnpm guide:generate` records ten chapters: console orientation, four
+connected-metadata demonstrations, and five separate development previews.
+The ignored Markdown/HTML book uses synthetic data, never live provider or customer
+recordings. See the [testing guide](docs/development/testing.md).
 
 ## Documentation
 

@@ -7,7 +7,7 @@ import { fixture } from './fixtures.mjs';
 
 const createFixture = async (context) => (await fixture(context)).output;
 
-test('assembles distinct production and synthetic guide sections', async (context) => {
+test('assembles distinct shell, connected-contract and development guide sections', async (context) => {
   const root = await createFixture(context);
   await assembleBook(root);
 
@@ -26,6 +26,28 @@ test('assembles distinct production and synthetic guide sections', async (contex
     'utf8',
   );
 
+  const connected = await readFile(
+    path.join(root, 'connected-operator-session', 'index.html'),
+    'utf8',
+  );
+  const connectedMarkdown = await readFile(
+    path.join(root, 'connected-operator-session', 'README.md'),
+    'utf8',
+  );
+  assert.match(home, /Use connected semantic metadata/);
+  assert.match(connected, /mode-note--connected-contract/);
+  assert.match(connected, /Provider sign-in return is simulated/);
+  assert.match(connectedMarkdown, /do not qualify a deployed provider/);
+  assert.doesNotMatch(connected, /mode-note--production-shell/);
+  assert.doesNotMatch(connected, /mode-note--development-sample/);
+  assert.ok(
+    home.indexOf('data-guide-mode="production-shell"') <
+      home.indexOf('data-guide-mode="connected-contract"'),
+  );
+  assert.ok(
+    home.indexOf('data-guide-mode="connected-contract"') <
+      home.indexOf('data-guide-mode="development-sample"'),
+  );
   assert.match(home, /Production console orientation/);
   assert.match(home, /Explore sample workflows/);
   assert.match(home, /synthetic data/);
@@ -58,4 +80,33 @@ test('rejects an incomplete set of planned screen journeys', async (context) => 
   await rm(missing, { recursive: true, force: true });
 
   await assert.rejects(assembleBook(root), /chapter is missing: alert-triage/);
+});
+
+for (const slug of [
+  'connected-operator-session',
+  'connected-asset-discovery',
+  'connected-registry-review',
+  'connected-recovery',
+]) {
+  test(`rejects missing connected procedure: ${slug}`, async (context) => {
+    const root = await createFixture(context);
+    const missing = path.resolve(root, slug);
+    assert.equal(path.dirname(missing), path.resolve(root));
+    await rm(missing, { recursive: true });
+    await assert.rejects(
+      assembleBook(root),
+      new RegExp(`chapter is missing: ${slug}`, 'u'),
+    );
+  });
+}
+test('a connected procedure cannot be relabelled as unconfigured shell behavior', async (context) => {
+  const root = await createFixture(context);
+  const manifest = path.join(root, 'connected-asset-discovery', 'guide.json');
+  const value = JSON.parse(await readFile(manifest, 'utf8'));
+  value.dataMode = 'production-shell';
+  await writeFile(manifest, JSON.stringify(value));
+  await assert.rejects(
+    assembleBook(root),
+    /connected-asset-discovery must use dataMode connected-contract/u,
+  );
 });

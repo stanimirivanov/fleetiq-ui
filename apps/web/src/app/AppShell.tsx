@@ -14,7 +14,8 @@ export function AppShell(props: ParentProps) {
 
   return (
     <>
-      <a href="#main-content" class="fi-skip-link">
+      {/* Let native fragment navigation focus main; SPA interception only scrolls. */}
+      <a href="#main-content" rel="external" class="fi-skip-link">
         Skip to main content
       </a>
       <div class="min-h-screen bg-canvas text-foreground">

@@ -90,7 +90,10 @@ that opt-in, stale/unreviewed pins, persistent credentials and shallow history.
 Guide recording is opt-in and limited to the loopback test server.
 Browser contexts use empty storage, block service workers/live sockets, and deny
 unmocked API traffic. Page-owned contract fixtures can provide synthetic responses.
-Only production-shell and development-sample guide modes are accepted.
+Production-shell, connected-contract and development-sample guide modes are
+accepted. Connected-contract labels production-UI demonstrations with synthetic,
+validated metadata responses and a simulated fixed sign-in return; it grants no
+additional network or recording permissions.
 Never reuse an authenticated browser profile or point recordings at live identity.
 
 The artifact inspector rejects links/junctions, unknown formats, empty content,

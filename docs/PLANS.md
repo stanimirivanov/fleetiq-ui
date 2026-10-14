@@ -56,14 +56,17 @@ secure delivery, then measured browser quality. The
 completed; the [measured-quality slice](exec-plans/completed/2026-10-measured-browser-quality.md)
 completes that sequence.
 
-The next agreed product PR is the **connected operator user guide**, also in M04.
-It will cover sign-in/session/account/sign-out; explicit tenant selection and denied
+The completed [connected operator user guide](exec-plans/completed/2026-10-connected-operator-guide.md)
+completes the connected-guide PR in **M04 - Semantic Twin and Live UI**.
+It covers sign-in/session/account/sign-out; explicit tenant selection and denied
 access; bounded catalogue/filter/cursor/history navigation; inspector identity,
 external IDs, type/property definitions and unavailable readings; registry selection,
 directed relationships, effective/known review times and scoped pages; exact-source
 binding candidates and pinned property definitions; empty/missing/error/retry states;
-and keyboard, narrow-layout, and theme use. Retain clear sample chapters only for
-capabilities without connected backend counterparts. Connected browser assertions are implemented; the new guide chapters remain pending.
+and keyboard, narrow-layout, and theme use. The four connected-contract chapters
+complement the existing shell and five sample chapters. Sample chapters stay separate
+for planned operational capabilities beyond connected metadata. Their production UI uses synthetic contract responses; deployed provider
+and backend qualification remains separate.
 
 The active [dependency candidate qualification slice](exec-plans/active/2026-10-dependency-candidate-qualification.md)
 in **M02** gathers unchanged test results before dependency approval while keeping

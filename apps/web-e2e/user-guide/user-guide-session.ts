@@ -8,6 +8,7 @@ import type {
   Page,
   Video,
 } from '@playwright/test';
+import { requireNoPageErrors } from '../../../tools/quality/policy.mjs';
 import {
   captureOrigin,
   captureRequest,
@@ -20,7 +21,12 @@ import {
 import { browserScenarioMode } from './guide-mode';
 import type { GuideNarrator, GuideStepDefinition } from './guide-narrator';
 
-export type GuideDataMode = 'production-shell' | 'development-sample';
+const guideDataModes = [
+  'production-shell',
+  'connected-contract',
+  'development-sample',
+] as const;
+export type GuideDataMode = (typeof guideDataModes)[number];
 
 interface GuideDefinition {
   readonly dataMode: GuideDataMode;
@@ -58,6 +64,7 @@ export class UserGuideSession implements GuideNarrator {
   private readonly video: Video | null;
   private readonly steps: RecordedStep[] = [];
   private closed = false;
+  private pageErrors = 0;
 
   private constructor(
     context: BrowserContext,
@@ -72,12 +79,24 @@ export class UserGuideSession implements GuideNarrator {
     this.recordsGuide = recordsGuide;
     this.origin = origin;
     this.video = page.video();
+    // Guide-owned contexts are distinct from the ordinary test fixture's page.
+    // Observe categories only; exception messages and payloads are never retained.
+    const observe = (owned: Page) => {
+      owned.on('pageerror', () => {
+        this.pageErrors += 1;
+      });
+    };
+    observe(page);
+    context.on('page', observe);
   }
 
   static async start(
     browser: Browser,
     options: StartGuideOptions,
   ): Promise<UserGuideSession> {
+    if (!guideDataModes.includes(options.dataMode)) {
+      throw new Error('Unsupported guide data mode.');
+    }
     // Validate before joining or deleting any filesystem path supplied by a test.
     if (!safeSlug.test(options.slug)) {
       throw new Error(
@@ -188,6 +207,7 @@ export class UserGuideSession implements GuideNarrator {
 
   async finish(): Promise<void> {
     await this.closeContext();
+    requireNoPageErrors(this.pageErrors);
     if (!this.recordsGuide) {
       return;
     }
@@ -276,10 +296,21 @@ export class UserGuideSession implements GuideNarrator {
         note.textContent = text;
         note.style.cssText =
           'position:fixed;max-width:360px;padding:14px 16px;background:#241a2e;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.32);font:600 16px/1.45 system-ui,sans-serif';
-        note.style.left = `${Math.min(Math.max(12, targetBox.x), window.innerWidth - 372)}px`;
-        note.style.top = `${Math.min(targetBox.y + targetBox.height + 16, window.innerHeight - 120)}px`;
+        // Measure the actual wrapped caption so bottom-edge and narrow captures fit.
+        note.style.boxSizing = 'border-box';
+        note.style.maxWidth = `${Math.min(360, window.innerWidth - 24)}px`;
+        note.style.left = '12px';
+        note.style.top = '12px';
         layer.append(highlight, note);
         document.body.append(layer);
+        const caption = note.getBoundingClientRect();
+        note.style.left = `${Math.max(12, Math.min(targetBox.x, window.innerWidth - caption.width - 12))}px`;
+        // Keep burned-in narration clear of native video playback controls.
+        const bottomLimit = window.innerHeight - caption.height - 96;
+        const below = targetBox.y + targetBox.height + 16;
+        const above = targetBox.y - caption.height - 16;
+        const preferred = below > bottomLimit && above >= 12 ? above : below;
+        note.style.top = `${Math.max(12, Math.min(preferred, bottomLimit))}px`;
       },
       { targetBox: box, text: body },
     );

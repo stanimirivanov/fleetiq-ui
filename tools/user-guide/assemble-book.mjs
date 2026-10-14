@@ -24,8 +24,15 @@ const modes = {
     label: 'Production shell',
     heading: 'Production console orientation',
     description:
-      'Verified shell behavior in a deployment without configured operator sign-in. Connected metadata procedures will be documented separately.',
+      'Verified shell behavior in a deployment without configured operator sign-in. Connected metadata procedures appear in the separate contract-demonstration section.',
     note: 'This chapter covers the production shell. It does not imply that fleet assets or telemetry are connected.',
+  },
+  'connected-contract': {
+    label: 'Connected contract demonstration',
+    heading: 'Use connected semantic metadata',
+    description:
+      'These production-UI journeys use synthetic responses validated against the pinned backend contract. They teach connected workflows without recording a real provider or customer data.',
+    note: 'The UI uses its production HTTP adapter, but all operator and metadata responses here are controlled contract fixtures. Provider sign-in return is simulated; these recordings do not qualify a deployed provider, permissions or live telemetry.',
   },
   'development-sample': {
     label: 'Development sample',
@@ -38,6 +45,10 @@ const modes = {
 
 export const requiredChapters = new Map([
   ['console-orientation', 'production-shell'],
+  ['connected-operator-session', 'connected-contract'],
+  ['connected-asset-discovery', 'connected-contract'],
+  ['connected-registry-review', 'connected-contract'],
+  ['connected-recovery', 'connected-contract'],
   ['fleet-overview', 'development-sample'],
   ['map-workbench', 'development-sample'],
   ['asset-inspector', 'development-sample'],
@@ -91,7 +102,10 @@ const parseManifest = async (outputRoot, directory) => {
     fail(manifest, 'slug must match its safe directory name');
   }
   if (!Object.hasOwn(modes, value.dataMode)) {
-    fail(manifest, 'dataMode must be production-shell or development-sample');
+    fail(
+      manifest,
+      'dataMode must be a registered production-shell, connected-contract or development-sample mode',
+    );
   }
   if (!Array.isArray(value.steps) || value.steps.length < 5) {
     fail(manifest, 'a useful guide must have at least five documented steps');
@@ -182,7 +196,7 @@ const htmlDocument = (
     <nav aria-label="Guide chapters">${navigation}</nav>
     <main id="content">${content}</main>
   </div>
-  <footer>Generated from verified Playwright journeys. Development samples are synthetic.</footer>
+  <footer>Generated from verified Playwright journeys. Connected demonstrations and development samples use synthetic data.</footer>
 </body>
 </html>
 `;
@@ -300,7 +314,7 @@ export const assembleBook = async (outputRoot = defaultOutputRoot) => {
     ownedPath(outputRoot, 'README.md', { missing: true }),
     `# FleetIQ User Guide
 
-Generated from verified Playwright journeys. The production-shell chapter shows the available console without connected fleet data. Development-sample chapters use synthetic data and do not represent live operations.
+Generated from verified Playwright journeys. The production-shell chapter shows the available console without connected fleet data. Connected-contract chapters exercise the production UI with synthetic, contract-validated metadata and a simulated sign-in return. Development-sample chapters use synthetic data and do not represent live operations.
 
 ${sections
   .map(
@@ -325,10 +339,10 @@ ${chapters.map((guide) => `- [${guide.title}](./${guide.slug}/README.md)`).join(
     ownedPath(outputRoot, 'index.html', { missing: true }),
     htmlDocument(
       'Home',
-      'Verified production-shell and synthetic development-sample journeys for FleetIQ.',
+      'Verified shell, connected-contract metadata and development-sample journeys for FleetIQ.',
       './',
       navigation(guides, undefined, false),
-      `<section><p class="eyebrow">FleetIQ documentation</p><h1>Learn through verified journeys</h1><p class="lead">The production guide covers the application shell. Five development-only previews use synthetic data to explain the planned operator workflows.</p>${sections.map(homeSection).join('\n')}</section>`,
+      `<section><p class="eyebrow">FleetIQ documentation</p><h1>Learn through verified journeys</h1><p class="lead">Start with the console orientation, follow four connected metadata demonstrations using synthetic contract responses, then explore five explicitly separate development previews. Provider credentials and customer data are never recorded.</p>${sections.map(homeSection).join('\n')}</section>`,
       './assets/guide.css',
     ),
     'utf8',

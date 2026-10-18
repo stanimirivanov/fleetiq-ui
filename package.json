@@ -48,7 +48,7 @@
     "@biomejs/biome": "2.5.15",
     "@effect/openapi-generator": "4.0.3",
     "@effect/platform-node": "4.0.3",
-    "@playwright/test": "1.64.0",
+    "@playwright/test": "1.64.1",
     "@types/node": "24.19.1",
     "dependency-cruiser": "18.5.0",
     "github-slugger": "2.0.0",

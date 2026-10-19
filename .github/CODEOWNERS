@@ -25,3 +25,7 @@
 /.gitignore @stanimirivanov
 /apps/web-e2e/user-guide/ @stanimirivanov
 /apps/web-e2e/fixtures/ @stanimirivanov
+
+/Dockerfile @stanimirivanov
+/.dockerignore @stanimirivanov
+/packaging/ @stanimirivanov

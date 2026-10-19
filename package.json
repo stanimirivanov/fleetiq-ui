@@ -29,7 +29,7 @@
     "guide:test": "node --test tools/user-guide/*.test.mjs",
     "verify": "node tools/verification/cli.mjs",
     "harness:check": "node tools/verification/check-policy.mjs",
-    "harness:test": "node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/architecture/*.test.mjs tools/boundaries/*.test.mjs tools/security/*.test.mjs tools/verification/*.test.mjs tools/quality/*.test.mjs",
+    "harness:test": "node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/architecture/*.test.mjs tools/boundaries/*.test.mjs tools/security/*.test.mjs tools/verification/*.test.mjs tools/quality/*.test.mjs tools/images/tests/*.test.mjs",
     "boundaries:check": "node tools/check-boundaries.mjs",
     "security:install": "node tools/security/install.mjs",
     "security:secrets": "node tools/security/secrets.mjs",
@@ -41,7 +41,11 @@
     "quality:configuration": "node tools/quality/configuration.mjs",
     "quality:page-errors": "node tools/quality/browser-error-fixture.mjs",
     "dependencies:review": "node tools/verification/upgrades-cli.mjs",
-    "dependencies:qualify": "node tools/verification/cli.mjs --candidate"
+    "dependencies:qualify": "node tools/verification/cli.mjs --candidate",
+    "image:tests": "node --test tools/images/tests/*.test.mjs",
+    "image:policy": "node tools/images/check-policy.mjs",
+    "image:artifact": "node tools/images/qualify.mjs",
+    "image:qualify": "node tools/verification/cli.mjs --group image"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

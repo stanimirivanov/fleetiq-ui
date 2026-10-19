@@ -34,6 +34,7 @@ package scripts and required CI routes. Use pnpm verify --list to inspect groups
 | pnpm verify --group product | Types, unit/component tests, build | Focused product feedback |
 | pnpm e2e | Built-production and development browser scenarios | Browser behavior and sample isolation |
 | pnpm verify --group browser-quality | Production-fixture accessibility/rendering/resource checks and actual page-error fixture qualification | Measured browser regression envelope |
+| pnpm image:qualify | Producer fixtures/policy and real OCI/runtime/browser/TLS/scan/registry checks | Source-owned D03 artifact qualification |
 | pnpm verify --group security | Source/index/history secret scans and frozen-lock registry audit | Focused security feedback |
 
 pnpm verify defaults to acceptance. Existing individual scripts remain available
@@ -52,13 +53,13 @@ documented [port overrides](testing.md) if a browser port is occupied.
 
 ## Dependency upgrade preflight
 
-All groups first compare registered declarations with the strict
+All groups first validate registered declarations against the
 [reviewed registry](../../tools/verification/reviewed-dependencies.json).
 Run pnpm dependencies:review for coordinated candidate pins and review instructions.
 Malformed or inconsistent inventory is blocked. Root/E2E Node declaration versions
 must match each other and the declared runtime major.
 
-Eligible pending npm-tool proposals can run the unchanged group in an owned
+Pending npm major-tool proposals can run the unchanged group in an owned
 disposable workspace through pnpm dependencies:qualify --group followed by
 product, structural, browser or browser-quality. The snapshot preserves complete
 Git history/refs, staged index and raw current source files; only its private
@@ -66,13 +67,12 @@ registry receives coordinated exact candidate tool pins. It performs a fresh fro
 install, scanner setup, policy check, selected group and artifact inspection.
 Action, Node-major and pnpm proposals require review first.
 
-pnpm check gathers candidate acceptance results for eligible pending review and
-still exits nonzero. The required check job remains the merge barrier; the other
-three CI jobs can report candidate qualification results. No actor-name exemption,
-automatic original-registry update or weakened catalogue is involved. When the
-registry is current, the explicit qualification route runs normal original-source
-verification. Read [upgrade review](dependency-upgrades.md) for eligibility,
-review decisions and recovery.
+Exact coordinated npm patch/minor updates run normal original-source verification
+against their declared installed versions. Historical registry drift is informational;
+complete receipts record declared status and can qualify publication. Actual failures
+and major/runtime/action changes retain their gates. No actor-name exemption or
+automatic registry write is involved. Read [upgrade policy](dependency-upgrades.md)
+for eligibility, source-bound generator maintenance, review and recovery.
 
 Ordinary receipts include dependencyReview and installedTools status/counts.
 Exact installed metadata is checked in each owner, including dependency-cruiser's
@@ -188,20 +188,22 @@ Cohesion and appropriate abstractions remain review responsibilities.
 
 Quality CI requires Linux acceptance, functional and measured browser scenarios,
 and Windows structural qualification from frozen installs. The check job retains
-original-source acceptance and pending-review failure. Browser, browser-quality
+original-source acceptance; eligible maintenance updates need no second registry edit. Browser, browser-quality
 and harness-windows use explicit candidate qualification routes so eligible
 dependency proposals expose behavioral results before review. Parsed policy
 verifies these exact routes, the required check barrier and read-only permissions.
 CODEOWNERS assigns harness/configuration changes to the current maintainer.
 
 A GitHub administrator must separately require successful check, browser, browser-quality and
-harness-windows jobs on main; code-owner review; stale-review dismissal; suitable
+harness-windows and image jobs on main; code-owner review; stale-review dismissal; suitable
 bypass restrictions; least-privilege workflow permissions; and publication
 approvals. These external settings have not been verified locally. CODEOWNERS and
 a passing sensor cannot attest they are enabled.
 
-Both guide triggers rerun acceptance and browser qualification at the exact publication SHA, then validate generation, source/evidence/output hashes and artifact inspection. Publication requires clean sources. Actions are immutable pins and checkouts keep no credentials. See [trust and delivery](security-delivery.md) for exception policy, recovery and remaining self-attestation limits. Measured browser quality is enforced by the separate browser-quality group; real identity deployments remain unqualified.
+Both guide triggers rerun acceptance and browser qualification at the exact publication SHA, then validate generation, source/evidence/output hashes and artifact inspection. Publication requires clean sources. Actions use reviewed major-version references and checkouts keep no credentials. See [trust and delivery](security-delivery.md) for exception policy, recovery and remaining self-attestation limits. Measured browser quality is enforced by the separate browser-quality group; real identity deployments remain unqualified.
 
 ## Measured browser-quality qualification
 
 Run pnpm verify --group browser-quality for the dedicated production-fixture lane. Full acceptance now includes complete critical coverage registration, named behavior obligations, assertion mutation qualification and final output budgets. Browser scenarios must use the owned error-observing fixture. Three source-bound groups are required before guide generation/publication. See [measured quality](measured-browser-quality.md) for workload, caps, recovery and [control owners](harness-controls.md).
+
+The [image delivery group](image-publication.md) adds exact-source artifact qualification. PR-only quality CI includes its mandatory image job. Publication is a separate manual current-main operation; no environment is deployed. Image report JSON is inspected separately from canonical .verification receipts.

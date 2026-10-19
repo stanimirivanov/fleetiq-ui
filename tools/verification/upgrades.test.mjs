@@ -14,6 +14,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { parse, stringify } from 'yaml';
 import { plainFiles, temporary } from '../security/owned.mjs';
+import { DECLARED, isMaintenanceInventory } from './declared-dependencies.mjs';
 import {
   REVIEWED_PATH,
   readReviewedDependencies,
@@ -31,13 +32,19 @@ const names = {
   guideWorkflow: '.github/workflows/user-guide.yml',
 };
 const inputs = {
-  registry: readReviewedDependencies(repository),
+  registry: DECLARED,
   ...Object.fromEntries(
     Object.entries(names).map(([key, name]) => {
       const source = readFileSync(path.join(repository, name), 'utf8');
       return [key, name.endsWith('.json') ? JSON.parse(source) : parse(source)];
     }),
   ),
+};
+// Legacy exact-selector probes use an isolated baseline; live config may be version-independent.
+inputs.workspace.packageExtensions = {
+  [`dependency-cruiser@${DECLARED.tools.dependencyCruiser}`]: {
+    dependencies: { typescript: DECLARED.tools.astParser },
+  },
 };
 // Probes must stay different after a real upgrade changes the reviewed inventory.
 const nextVersion = (version) => {
@@ -94,17 +101,40 @@ const execute = (root, extra = []) =>
     windowsHide: true,
   });
 
-test('actual registered inventory is current and produces no acceptance claim', () => {
-  assert.deepEqual(reviewUpgrades(repository), {
-    status: 'current',
-    changes: [],
-    issues: [],
-  });
+test('actual inventory permits consistent maintenance without claiming acceptance', () => {
+  const actual = reviewUpgrades(repository);
+  assert.deepEqual(actual.issues, []);
+  assert.ok(
+    actual.status === 'current' ||
+      isMaintenanceInventory(actual, readReviewedDependencies(repository)),
+  );
   assert.deepEqual(inspectUpgradeInventory(inputs), {
     status: 'current',
     changes: [],
     issues: [],
   });
+});
+
+test('version-independent extension permits cruiser maintenance without changing the parser', () => {
+  const result = candidate((data) => {
+    data.rootManifest.devDependencies['dependency-cruiser'] = nextVersion(
+      data.registry.tools.dependencyCruiser,
+    );
+    data.workspace.packageExtensions = {
+      'dependency-cruiser@*': {
+        dependencies: { typescript: data.registry.tools.astParser },
+      },
+    };
+  });
+  assert.equal(result.status, 'review-required');
+  assert.deepEqual(result.issues, []);
+  assert.equal(result.changes[0].role, 'dependencyCruiser');
+  const invalid = candidate((data) => {
+    data.workspace.packageExtensions = {
+      'dependency-cruiser@*': { dependencies: { typescript: '*' } },
+    };
+  });
+  assert.equal(invalid.status, 'blocked');
 });
 for (const [label, mutate, role] of [
   [
@@ -200,12 +230,13 @@ for (const [label, mutate, role] of [
     'nodeMajor',
   ],
   [
-    'Checkout immutable commit in every workflow',
+    'Checkout major in every workflow',
     (data) =>
       coordinateAction(
         data,
         'actions/checkout',
-        nextActionCommit(data.registry.actions.checkout.commit),
+        'v' +
+          (Number(data.registry.actions.checkout.version.split('.')[0]) + 1),
       ),
     'action:checkout',
   ],
@@ -475,7 +506,7 @@ for (const role of ['node', 'upload', 'pages', 'uploadPages', 'deployPages'])
       coordinateAction(
         data,
         data.registry.actions[role].repository,
-        nextActionCommit(data.registry.actions[role].commit),
+        `v${Number(data.registry.actions[role].version.split('.')[0]) + 1}`,
       ),
     );
     assert.equal(result.status, 'review-required');

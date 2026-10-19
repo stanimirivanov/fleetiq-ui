@@ -30,3 +30,5 @@ homes rather than growing the root README.
 - [Harness control register](development/harness-controls.md): owners, review triggers and unqualified areas.
 
 - [Dependency upgrade review](development/dependency-upgrades.md): reviewed pins, read-only proposals, early qualification and recovery.
+
+- [Immutable UX image delivery](development/image-publication.md): runtime routing, actual artifact qualification and maintainer publication.

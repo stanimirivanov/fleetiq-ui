@@ -12,6 +12,15 @@ test('reviewed declared and installed tool evidence is required for guide public
     true,
   );
 });
+test('complete maintenance-update receipts qualify publication without a registry-edit PR', () => {
+  for (const group of ['acceptance', 'browser', 'browser-quality']) {
+    const value = report(group);
+    value.dependencyReview = { status: 'declared', changes: 2, issues: 0 };
+    assert.equal(qualifiedReport(value, group, source, REVIEWED.pnpm), true);
+    value.completePass = false;
+    assert.equal(qualifiedReport(value, group, source, REVIEWED.pnpm), false);
+  }
+});
 const defects = {
   'candidate receipt renamed as acceptance': (value) => {
     value.kind = 'dependency-candidate';

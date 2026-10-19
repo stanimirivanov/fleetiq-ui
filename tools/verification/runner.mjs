@@ -3,8 +3,10 @@ import { lstatSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { resolveOwnedPath } from '../docs/source.mjs';
 import { REQUIRED_SCRIPTS, selectedChecks } from './catalogue.mjs';
+import { isMaintenanceInventory } from './declared-dependencies.mjs';
 import { executeCheck, qualifyTools } from './execution.mjs';
 import { inspectInstalledTools } from './installed-tools.mjs';
+import { REVIEWED } from './reviewed-dependencies.mjs';
 import { sourceState, unchangedSource } from './source-state.mjs';
 import { reviewUpgrades } from './upgrades.mjs';
 
@@ -103,15 +105,19 @@ export async function verify(
       report.blocker = 'dependency-inventory-invalid';
     } else {
       report.dependencyReview = {
-        status: inventory.status,
+        status: isMaintenanceInventory(inventory, REVIEWED)
+          ? 'declared'
+          : inventory.status,
         changes: inventory.changes.length,
         issues: inventory.issues.length,
       };
-      if (inventory.status !== 'current')
-        report.blocker =
-          inventory.status === 'review-required'
-            ? 'dependency-review-required'
-            : 'dependency-inventory-invalid';
+      if (inventory.status === 'blocked')
+        report.blocker = 'dependency-inventory-invalid';
+      else if (
+        inventory.status === 'review-required' &&
+        !isMaintenanceInventory(inventory, REVIEWED)
+      )
+        report.blocker = 'dependency-review-required';
     }
     if (!report.blocker) {
       context = qualify(root, manifest);

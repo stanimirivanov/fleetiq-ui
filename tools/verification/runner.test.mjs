@@ -258,7 +258,12 @@ test('a running interrupted child closes before execution returns', async () => 
     controller.abort();
     assert.equal(path.dirname(path.resolve(root)), path.resolve(os.tmpdir()));
     assert.ok(path.basename(root).startsWith('fleetiq-verification-cancel-'));
-    rmSync(root, { recursive: true, force: true });
+    rmSync(root, {
+      recursive: true,
+      force: true,
+      maxRetries: 10,
+      retryDelay: 50,
+    });
   }
 });
 

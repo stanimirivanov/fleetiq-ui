@@ -2,10 +2,8 @@ import { lstatSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { ownedFile } from '../security/owned.mjs';
-import {
-  REVIEWED,
-  validateReviewedDependencies,
-} from './reviewed-dependencies.mjs';
+import { DECLARED } from './declared-dependencies.mjs';
+import { validateReviewedDependencies } from './reviewed-dependencies.mjs';
 
 const inventory = [
   ['compiler', 'package.json', 'typescript', 'typescript', 'compiler'],
@@ -151,7 +149,7 @@ function architectureParser(root, pins) {
  * also handles export maps that deliberately hide the package.json subpath.
  * This detects stale installations; it does not attest package authenticity.
  */
-export function inspectInstalledTools(root, reviewed = REVIEWED) {
+export function inspectInstalledTools(root, reviewed = DECLARED) {
   const pins = validateReviewedDependencies(reviewed);
   const diagnostics = [];
   for (const [role, location, dependency, identity, version] of inventory) {

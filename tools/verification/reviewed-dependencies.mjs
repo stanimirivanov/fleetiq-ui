@@ -93,3 +93,15 @@ export function readReviewedDependencies(root = repositoryRoot) {
 }
 
 export const REVIEWED = readReviewedDependencies(path.resolve(repositoryRoot));
+
+/** A complete group may qualify unchanged or approved-policy maintenance declarations. */
+export function qualifiedDependencyInventory(value) {
+  return Boolean(
+    value?.issues === 0 &&
+      Number.isSafeInteger(value.changes) &&
+      ((value.status === 'current' && value.changes === 0) ||
+        (value.status === 'declared' &&
+          value.changes > 0 &&
+          value.changes <= 64)),
+  );
+}

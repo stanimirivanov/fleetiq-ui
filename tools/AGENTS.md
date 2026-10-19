@@ -20,9 +20,9 @@ Follow [trust and delivery](../docs/development/security-delivery.md) for curren
 
 Read [measured quality](../docs/development/measured-browser-quality.md) for scoped coverage, actual assertion/browser qualification, final output budgets and payload-free measurements. Missing tools or metrics cannot become successful qualification.
 
-For dependency PRs, read [upgrade review](../docs/development/dependency-upgrades.md)
-and run pnpm dependencies:review. Qualify eligible npm proposals with
-pnpm dependencies:qualify --group; pending-review pnpm check collects candidate
-tests but stays blocked. Candidate receipts never approve or publish original
-sources. Never copy candidate pins into approval automatically. Keep exact
-installed-tool, runtime/declaration coherence and actual violation probes qualified.
+For dependency PRs, read [upgrade policy](../docs/development/dependency-upgrades.md).
+Exact coordinated npm patch/minor updates run normal checks against declared,
+installed versions; historical registry drift alone must not fail them. Major,
+runtime and action changes retain review. Never skip actual tests or security
+findings to make an upgrade green. Keep source-bound publication evidence and
+generated-client provenance; check mode never rewrites source or approval files.

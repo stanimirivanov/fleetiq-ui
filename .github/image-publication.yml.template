@@ -1,0 +1,89 @@
+name: Publish immutable UX image
+on:
+  workflow_dispatch:
+    inputs:
+      source_revision:
+        description: Exact current merged main SHA with passing PR qualification
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: fleetiq-ux-image-publication
+  cancel-in-progress: false
+jobs:
+  authorize:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    steps:
+      - uses: @checkout@
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: @node@
+        with:
+          node-version: '24'
+      - run: node tools/images/preflight.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          FLEETIQ_SOURCE_REVISION: ${{ inputs.source_revision }}
+  publish:
+    needs: authorize
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      packages: write
+    steps:
+      - uses: @checkout@
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: @node@
+        with:
+          node-version: '24'
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm security:install
+      - run: node tools/images/preflight.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          FLEETIQ_SOURCE_REVISION: ${{ inputs.source_revision }}
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm check
+      - run: pnpm e2e
+      - run: pnpm verify --group browser-quality
+      - run: pnpm image:qualify
+        id: image
+      - run: node tools/images/publish.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          FLEETIQ_SOURCE_REVISION: ${{ inputs.source_revision }}
+          FLEETIQ_QUALIFICATION_DIR: ${{ steps.image.outputs.directory }}
+      - run: pnpm security:artifacts
+        id: artifacts
+        if: always()
+      - uses: @upload@
+        if: always() && steps.artifacts.outcome == 'success'
+        with:
+          name: ux-image-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .verification/*.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+      - uses: @upload@
+        if: always() && steps.artifacts.outcome == 'success'
+        with:
+          name: ux-image-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/image-reports/
+          if-no-files-found: ignore
+          retention-days: 7

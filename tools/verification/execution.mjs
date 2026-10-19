@@ -1,6 +1,6 @@
 import { spawn, spawnSync } from 'node:child_process';
+import { DECLARED } from './declared-dependencies.mjs';
 import { pnpmLaunchers } from './pnpm-launchers.mjs';
-import { REVIEWED } from './reviewed-dependencies.mjs';
 
 /** Qualify native and JavaScript pnpm launchers against the exact manifest pin. */
 export function qualifyTools(
@@ -10,8 +10,8 @@ export function qualifyTools(
   { environment = process.env } = {},
 ) {
   const tools = { node: process.version, pnpm: null, git: null };
-  if (!tools.node.startsWith(`v${REVIEWED.nodeMajor}.`))
-    return { tools, blocker: `node-${REVIEWED.nodeMajor}-required` };
+  if (!tools.node.startsWith(`v${DECLARED.nodeMajor}.`))
+    return { tools, blocker: `node-${DECLARED.nodeMajor}-required` };
   const git = run('git', ['--version'], {
     cwd: root,
     env: environment,

@@ -104,7 +104,8 @@ function fixture(t, { candidate = true } = {}) {
         const action = Object.values(registry.actions).find((entry) =>
           step.uses?.startsWith(`${entry.repository}@`),
         );
-        if (action) step.uses = `${action.repository}@${action.commit}`;
+        if (action)
+          step.uses = `${action.repository}@v${action.version.split('.')[0]}`;
         if (action?.repository === 'actions/setup-node')
           step.with['node-version'] = String(registry.nodeMajor);
       }
@@ -372,10 +373,8 @@ for (const [label, mutate] of [
           root,
           file,
           source.replaceAll(
-            registry.actions.checkout.commit,
-            registry.actions.checkout.commit[0] === 'a'
-              ? `b${registry.actions.checkout.commit.slice(1)}`
-              : `a${registry.actions.checkout.commit.slice(1)}`,
+            `${registry.actions.checkout.repository}@v${registry.actions.checkout.version.split('.')[0]}`,
+            `${registry.actions.checkout.repository}@v${Number(registry.actions.checkout.version.split('.')[0]) + 1}`,
           ),
         );
       }

@@ -138,7 +138,7 @@ test('expression skips, event filters and execution overrides cannot weaken requ
       config.on.pull_request = { branches: ['irrelevant'] };
     },
     (config) => {
-      config.on.push['paths-ignore'] = ['**'];
+      config.on.push = { branches: ['main'] };
     },
     (config) => {
       config.jobs.check.needs = ['conditional-preparation'];

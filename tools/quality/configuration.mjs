@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import browserConfiguration from '../../apps/web-e2e/playwright.quality.config.ts';
 import { runEntrypoint } from '../sensors/entrypoint.mjs';
-import { REVIEWED } from '../verification/reviewed-dependencies.mjs';
+import { DECLARED } from '../verification/declared-dependencies.mjs';
 import { qualityPolicy, repositoryRoot } from './policy.mjs';
 import { coverageScope } from './scope.mjs';
 export function inspectQualityConfiguration(
@@ -14,8 +14,8 @@ export function inspectQualityConfiguration(
   if (
     app.scripts?.['test:component'] !==
       'node ../../tools/quality/component-tests.mjs' ||
-    app.devDependencies?.vitest !== REVIEWED.tools.vitest ||
-    app.devDependencies?.['@vitest/coverage-v8'] !== REVIEWED.tools.vitest
+    app.devDependencies?.vitest !== DECLARED.tools.vitest ||
+    app.devDependencies?.['@vitest/coverage-v8'] !== DECLARED.tools.vitest
   )
     throw new Error(
       'Keep the canonical component coverage runner and matching provider pins.',

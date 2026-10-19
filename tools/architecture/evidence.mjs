@@ -1,10 +1,10 @@
-import { REVIEWED } from '../verification/reviewed-dependencies.mjs';
+import { DECLARED } from '../verification/declared-dependencies.mjs';
 
 /**
  * dependency-cruiser uses its own supported JavaScript compiler API. The app's
  * native TypeScript 7 compiler remains separate from this exact parser pin.
  */
-export const ARCHITECTURE_TYPESCRIPT = `typescript@${REVIEWED.tools.astParser}`;
+export const ARCHITECTURE_TYPESCRIPT = `typescript@${DECLARED.tools.astParser}`;
 
 /** Refuse an unavailable or ambient parser rather than accepting an empty scan. */
 export function assertExtractionEnvironment(environment) {

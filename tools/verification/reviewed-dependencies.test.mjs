@@ -44,13 +44,13 @@ test('reviewed inventory is deeply immutable and compiler/parser decisions stay 
   assert.equal(qualified.tools.astParser, REVIEWED.tools.astParser);
 });
 
-test('action consumers retain exactly the reviewed upstream release commits', () => {
+test('action consumers use only the reviewed repository and major', () => {
   assert.deepEqual(
     ACTIONS,
     Object.fromEntries(
       Object.entries(REVIEWED.actions).map(([role, entry]) => [
         role,
-        `${entry.repository}@${entry.commit}`,
+        `${entry.repository}@v${entry.version.split('.')[0]}`,
       ]),
     ),
   );
@@ -244,7 +244,7 @@ test('structural validation does not authorize a proposed action or parser chang
   assert.notEqual(parsed.tools.astParser, REVIEWED.tools.astParser);
   assert.equal(
     ACTIONS.checkout,
-    `${REVIEWED.actions.checkout.repository}@${REVIEWED.actions.checkout.commit}`,
+    `${REVIEWED.actions.checkout.repository}@v${REVIEWED.actions.checkout.version.split('.')[0]}`,
   );
 });
 

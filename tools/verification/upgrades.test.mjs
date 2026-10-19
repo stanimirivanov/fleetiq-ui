@@ -200,12 +200,13 @@ for (const [label, mutate, role] of [
     'nodeMajor',
   ],
   [
-    'Checkout immutable commit in every workflow',
+    'Checkout major in every workflow',
     (data) =>
       coordinateAction(
         data,
         'actions/checkout',
-        nextActionCommit(data.registry.actions.checkout.commit),
+        'v' +
+          (Number(data.registry.actions.checkout.version.split('.')[0]) + 1),
       ),
     'action:checkout',
   ],
@@ -475,7 +476,7 @@ for (const role of ['node', 'upload', 'pages', 'uploadPages', 'deployPages'])
       coordinateAction(
         data,
         data.registry.actions[role].repository,
-        nextActionCommit(data.registry.actions[role].commit),
+        `v${Number(data.registry.actions[role].version.split('.')[0]) + 1}`,
       ),
     );
     assert.equal(result.status, 'review-required');

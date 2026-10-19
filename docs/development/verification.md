@@ -34,6 +34,7 @@ package scripts and required CI routes. Use pnpm verify --list to inspect groups
 | pnpm verify --group product | Types, unit/component tests, build | Focused product feedback |
 | pnpm e2e | Built-production and development browser scenarios | Browser behavior and sample isolation |
 | pnpm verify --group browser-quality | Production-fixture accessibility/rendering/resource checks and actual page-error fixture qualification | Measured browser regression envelope |
+| pnpm image:qualify | Producer fixtures/policy and real OCI/runtime/browser/TLS/scan/registry checks | Source-owned D03 artifact qualification |
 | pnpm verify --group security | Source/index/history secret scans and frozen-lock registry audit | Focused security feedback |
 
 pnpm verify defaults to acceptance. Existing individual scripts remain available
@@ -195,13 +196,15 @@ verifies these exact routes, the required check barrier and read-only permission
 CODEOWNERS assigns harness/configuration changes to the current maintainer.
 
 A GitHub administrator must separately require successful check, browser, browser-quality and
-harness-windows jobs on main; code-owner review; stale-review dismissal; suitable
+harness-windows and image jobs on main; code-owner review; stale-review dismissal; suitable
 bypass restrictions; least-privilege workflow permissions; and publication
 approvals. These external settings have not been verified locally. CODEOWNERS and
 a passing sensor cannot attest they are enabled.
 
-Both guide triggers rerun acceptance and browser qualification at the exact publication SHA, then validate generation, source/evidence/output hashes and artifact inspection. Publication requires clean sources. Actions are immutable pins and checkouts keep no credentials. See [trust and delivery](security-delivery.md) for exception policy, recovery and remaining self-attestation limits. Measured browser quality is enforced by the separate browser-quality group; real identity deployments remain unqualified.
+Both guide triggers rerun acceptance and browser qualification at the exact publication SHA, then validate generation, source/evidence/output hashes and artifact inspection. Publication requires clean sources. Actions use reviewed major-version references and checkouts keep no credentials. See [trust and delivery](security-delivery.md) for exception policy, recovery and remaining self-attestation limits. Measured browser quality is enforced by the separate browser-quality group; real identity deployments remain unqualified.
 
 ## Measured browser-quality qualification
 
 Run pnpm verify --group browser-quality for the dedicated production-fixture lane. Full acceptance now includes complete critical coverage registration, named behavior obligations, assertion mutation qualification and final output budgets. Browser scenarios must use the owned error-observing fixture. Three source-bound groups are required before guide generation/publication. See [measured quality](measured-browser-quality.md) for workload, caps, recovery and [control owners](harness-controls.md).
+
+The [image delivery group](image-publication.md) adds exact-source artifact qualification. PR-only quality CI includes its mandatory image job. Publication is a separate manual current-main operation; no environment is deployed. Image report JSON is inspected separately from canonical .verification receipts.

@@ -72,7 +72,7 @@ advisories without a vulnerability exception.
 Dependabot updates workflow pins; it does not authorize a new executable in
 [the reviewed action registry](../../tools/verification/reviewed-dependencies.json). Review the
 official release tag, commit and action.yml, then update that exact registry entry
-alongside the workflows. Never accept any arbitrary SHA or mutable version tag.
+alongside the workflows. Workflows use only the reviewed repository and major-version reference; arbitrary commits, patch tags and unreviewed majors are rejected. Reviewed commit metadata is historical evidence, not an immutable pin of an upstream major tag.
 Use [dependency upgrade review](dependency-upgrades.md) for the read-only preflight,
 coordinated manifests and installed-tool qualification. Run delivery-policy fixtures
 and the canonical groups before handoff.
@@ -111,10 +111,12 @@ it is not enabled by this change.
 
 ## Exact-source guide publication and recovery
 
-Both automatic successful-main-push and manual main-branch triggers check out an
-explicit SHA and rerun acceptance plus both browser suites before generation.
+Quality verification is PR-only. Guide workflow completion events from PRs cannot
+publish; the manual main-branch trigger checks out an explicit SHA and reruns
+acceptance plus both browser suites before generation. The retained legacy main-push
+completion condition is inactive while quality has no push trigger.
 Fork, PR, failed and non-main automatic runs cannot publish.
-Actions are pinned to verified upstream commits, credentials are not persisted,
+Actions use reviewed major-version references, credentials are not persisted,
 quality permissions are read-only, and only deployment has Pages write authority.
 
 The generator qualifies the shell-free pinned launcher, requires current group
@@ -142,3 +144,5 @@ belong to the remaining harness PR. No scan, mock journey or source hash proves
 production readiness, visual privacy or deployment capacity.
 
 Measured quality adds the third exact-source qualification group. Raw component coverage/test reports stay ignored and are not uploaded. Only validated category/count/timing quality receipts and inspected synthetic browser artifacts are retained. See [measured browser quality](measured-browser-quality.md).
+
+Production image delivery additionally follows [the image publication guide](image-publication.md). Image reports have their own inspected retention root and cannot substitute for canonical UX verification receipts.

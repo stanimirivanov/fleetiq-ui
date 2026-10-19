@@ -14,3 +14,5 @@ consequences, and alternatives.
 - [0004 - Browser-safe semantic metadata](0004-browser-safe-semantic-metadata.md):
   one managed runtime, independent feature ports, explicit tenant/cutoff/cursor
   scope, and same-origin OIDC session ownership.
+
+- [0005: Source-owned immutable UX/static-edge delivery](0005-immutable-ux-delivery.md) (proposed in issue #71).

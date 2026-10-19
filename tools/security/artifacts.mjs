@@ -279,6 +279,7 @@ export async function inspectRetention(
       'test-results',
       'playwright-report',
       'dist/user-guide',
+      'dist/image-reports',
     ]) {
       const root = path.join(policyRoot, relative);
       if (existsSync(root))
@@ -311,7 +312,12 @@ await runEntrypoint(import.meta.url, async () => {
   if (
     args.length !== 2 ||
     args[0] !== '--path' ||
-    !['dist/user-guide', 'playwright-report', 'test-results'].includes(args[1])
+    ![
+      'dist/user-guide',
+      'dist/image-reports',
+      'playwright-report',
+      'test-results',
+    ].includes(args[1])
   )
     throw new Error('Artifact scan requires one registered --path output.');
   const root = path.join(policyRoot, args[1]);

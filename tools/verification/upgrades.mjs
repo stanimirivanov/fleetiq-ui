@@ -204,7 +204,7 @@ export function inspectUpgradeInventory(inputs) {
   for (const [input, expectedJobs] of [
     [
       'qualityWorkflow',
-      ['check', 'browser', 'browser-quality', 'harness-windows'],
+      ['check', 'browser', 'browser-quality', 'harness-windows', 'image'],
     ],
     ['guideWorkflow', ['build', 'deploy']],
   ]) {
@@ -232,7 +232,7 @@ export function inspectUpgradeInventory(inputs) {
         if (step.uses === undefined) continue;
         const match =
           typeof step.uses === 'string'
-            ? /^([a-z0-9-]+\/[a-z0-9-]+)@([a-f0-9]{40})$/u.exec(step.uses)
+            ? /^([a-z0-9-]+\/[a-z0-9-]+)@(v[1-9][0-9]*)$/u.exec(step.uses)
             : null;
         const role = match ? repositories.get(match[1]) : undefined;
         if (!role) {
@@ -275,7 +275,7 @@ export function inspectUpgradeInventory(inputs) {
     }
     changed(
       `action:${role}`,
-      `${entry.repository}@${entry.commit}`,
+      `${entry.repository}@v${entry.version.split('.')[0]}`,
       `${entry.repository}@${[...candidate.commits][0]}`,
       locations,
     );

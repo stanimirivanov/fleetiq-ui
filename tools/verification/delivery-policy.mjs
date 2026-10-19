@@ -13,6 +13,7 @@ const uploadConditions = new Set([
 ]);
 const artifactPaths = new Set([
   '.verification/*.json',
+  'dist/image-reports/',
   'test-results/\nplaywright-report/',
 ]);
 const allowedRuns = new Set([
@@ -22,6 +23,7 @@ const allowedRuns = new Set([
   'pnpm security:artifacts',
   'pnpm exec playwright install --with-deps chromium',
   'pnpm check',
+  'pnpm image:qualify',
   'pnpm e2e',
   'pnpm dependencies:qualify --group browser',
   'pnpm dependencies:qualify --group browser-quality',
@@ -140,6 +142,7 @@ export function inspectDelivery(quality, guide, fail) {
       'browser-quality',
       'check',
       'harness-windows',
+      'image',
     ])
   )
     fail('Quality job inventory changed.');

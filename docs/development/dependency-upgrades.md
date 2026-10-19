@@ -13,7 +13,8 @@ review before candidate qualification.
 
 [The reviewed registry](../../tools/verification/reviewed-dependencies.json)
 owns the accepted Node major, pnpm version, critical harness tool versions and
-official action release commits. Manifest and workflow declarations are candidate
+official action repositories and reviewed major releases. Historical release
+commits remain review metadata. Manifest and workflow declarations are candidate
 inputs, rather than sources of approval. Compiler and AST parser are independent
 decisions. Parser, coverage and workflow consumers derive their expectations from
 this registry; there is no second executable version list to synchronize.
@@ -145,7 +146,7 @@ No proposal is hidden with ignore rules. GitHub documents the
 [grouping options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference).
 
 There is no bot-specific bypass, automatic approval, merge, workflow write-back or
-pull_request_target path. Existing read-only quality permissions, immutable
+pull_request_target path. Existing read-only quality permissions, reviewed
 action references, exact publication SHA, fork restrictions and scanned artifact
 uploads remain enforced. External GitHub rules must require check and the other
 three quality jobs, along with owner review; a local sensor cannot establish those

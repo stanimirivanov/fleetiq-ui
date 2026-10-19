@@ -76,15 +76,20 @@ export function inspectPolicy(
   ) {
     fail('A group must not invoke itself.');
   }
+  if (
+    workflow['run-name'] !==
+    'FleetIQ PR \u0024{{ github.event.pull_request.number }} from \u0024{{ github.event.pull_request.head.sha }} to \u0024{{ github.event.pull_request.base.ref }} at \u0024{{ github.sha }}'
+  )
+    fail('Quality run identity must bind the exact tested PR merge checkout.');
   const triggers = workflow.on;
   if (
     !triggers ||
     !Object.hasOwn(triggers, 'pull_request') ||
     (triggers.pull_request !== null &&
       JSON.stringify(triggers.pull_request) !== '{}') ||
-    JSON.stringify(triggers.push) !== JSON.stringify({ branches: ['main'] })
+    Object.keys(triggers).join(',') !== 'pull_request'
   ) {
-    fail('Require unfiltered PR and main-push verification.');
+    fail('Require unfiltered PR-only quality verification.');
   }
   if (workflow.defaults !== undefined || workflow.env !== undefined) {
     fail('Unregistered workflow execution defaults or environment.');

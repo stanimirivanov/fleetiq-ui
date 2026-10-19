@@ -1,5 +1,8 @@
 /** Reviewed inventory owns verification, CI entry points and bounded evidence. */
 export const CHECKS = [
+  { id: 'image-policy', script: 'image:policy' },
+  { id: 'image-tests', script: 'image:tests' },
+  { id: 'image-artifact', script: 'image:artifact' },
   { id: 'harness-tests', script: 'harness:test' },
   { id: 'policy', script: 'harness:check' },
   { id: 'quality-configuration', script: 'quality:configuration' },
@@ -26,6 +29,7 @@ export const CHECKS = [
 const structural = [
   'harness-tests',
   'policy',
+  'image-policy',
   'quality-configuration',
   'style',
   'architecture',
@@ -37,6 +41,7 @@ const structural = [
 ];
 const product = ['typecheck', 'unit-tests', 'component-tests', 'build'];
 export const GROUPS = {
+  image: ['image-tests', 'image-policy', 'image-artifact'],
   structural,
   product,
   security: ['secrets', 'dependencies'],
@@ -54,6 +59,10 @@ export const GROUPS = {
 };
 /** Changes must be reviewed with the sensor; changing a script cannot bypass it. */
 export const REQUIRED_SCRIPTS = {
+  'image:tests': 'node --test tools/images/tests/*.test.mjs',
+  'image:policy': 'node tools/images/check-policy.mjs',
+  'image:artifact': 'node tools/images/qualify.mjs',
+  'image:qualify': 'node tools/verification/cli.mjs --group image',
   'dependencies:review': 'node tools/verification/upgrades-cli.mjs',
   'dependencies:qualify': 'node tools/verification/cli.mjs --candidate',
   verify: 'node tools/verification/cli.mjs',
@@ -62,7 +71,7 @@ export const REQUIRED_SCRIPTS = {
   'quality:configuration': 'node tools/quality/configuration.mjs',
   'harness:check': 'node tools/verification/check-policy.mjs',
   'harness:test':
-    'node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/architecture/*.test.mjs tools/boundaries/*.test.mjs tools/security/*.test.mjs tools/verification/*.test.mjs tools/quality/*.test.mjs',
+    'node --test tools/docs/*.test.mjs tools/sensors/*.test.mjs tools/check-architecture.test.mjs tools/architecture/*.test.mjs tools/boundaries/*.test.mjs tools/security/*.test.mjs tools/verification/*.test.mjs tools/quality/*.test.mjs tools/images/tests/*.test.mjs',
   'style:check': 'biome ci .',
   architecture: 'node tools/check-architecture.mjs',
   'boundaries:check': 'node tools/check-boundaries.mjs',
@@ -94,6 +103,7 @@ export const REQUIRED_SCRIPTS = {
     'pnpm exec playwright test --config apps/web-e2e/playwright.development.config.ts',
 };
 export const REQUIRED_JOBS = {
+  image: { platform: 'ubuntu-24.04', command: 'pnpm image:qualify' },
   check: { platform: 'ubuntu-latest', command: 'pnpm check' },
   browser: {
     platform: 'ubuntu-latest',

@@ -9,3 +9,5 @@ The active [dependency candidate qualification slice](2026-10-dependency-candida
 in **M02 - Product Foundation** separates proposal test evidence from approval and
 retains the required check merge barrier.
 
+
+- [D03 immutable UX/static-edge image](2026-10-immutable-ux-image.md): M02 source-owned packaging and publication.

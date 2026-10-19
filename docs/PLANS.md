@@ -77,3 +77,5 @@ in **M02** implements delivery-plan PR 3 after backend tenant/capability discove
 It adds explicit bounded discovery, exact action hints, URL paging, capability-aware
 metadata controls, cancellation and recovery, with component and browser coverage
 and an extended connected-operator guide journey.
+
+The active [D03 immutable UX image slice](exec-plans/active/2026-10-immutable-ux-image.md) in **M02** adds source-owned static-edge packaging and publication; Kubernetes installation and real identity remain deployment-plan work.

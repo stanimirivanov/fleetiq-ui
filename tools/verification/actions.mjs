@@ -1,11 +1,11 @@
 import { REVIEWED } from './reviewed-dependencies.mjs';
 
-/** Exact owner-reviewed upstream commits; dependency candidates cannot authorize themselves. */
+/** Reviewed repository and major references, per delivery policy; commit metadata records review history. */
 export const ACTIONS = Object.freeze(
   Object.fromEntries(
     Object.entries(REVIEWED.actions).map(([role, action]) => [
       role,
-      `${action.repository}@${action.commit}`,
+      `${action.repository}@v${action.version.split('.')[0]}`,
     ]),
   ),
 );

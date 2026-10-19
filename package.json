@@ -50,8 +50,8 @@
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@biomejs/biome": "2.5.15",
-    "@effect/openapi-generator": "4.0.3",
-    "@effect/platform-node": "4.0.3",
+    "@effect/openapi-generator": "4.0.5",
+    "@effect/platform-node": "4.0.5",
     "@playwright/test": "1.64.0",
     "@types/node": "24.19.1",
     "dependency-cruiser": "18.5.0",

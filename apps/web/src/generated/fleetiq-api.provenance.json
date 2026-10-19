@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "name": "@effect/openapi-generator",
+    "version": "4.0.3"
+  },
+  "specSha256": "1d757c6912b6b6e2ceb6e37cec60b5088ee5f4a06a6286e8b5a7287c3fab7f98",
+  "outputSha256": "48f80ee6d6a5ed600829bafa84d87ac04e45baae584eafbc18c515e008f83c00"
+}

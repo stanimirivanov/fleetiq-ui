@@ -16,6 +16,13 @@ const sensorFiles = [
   'tools/check-boundaries.mjs',
   'tools/verification/reviewed-dependencies.mjs',
   'tools/verification/reviewed-dependencies.json',
+  'tools/verification/declared-dependencies.mjs',
+  'tools/verification/upgrades.mjs',
+  'apps/web/package.json',
+  'apps/web-e2e/package.json',
+  'pnpm-workspace.yaml',
+  '.github/workflows/quality.yml',
+  '.github/workflows/user-guide.yml',
   'tools/security/owned.mjs',
   'tools/architecture/sources.mjs',
   'tools/docs/source.mjs',
@@ -47,7 +54,15 @@ export function boundaryFixture(context) {
     path.join(root, 'node_modules'),
     process.platform === 'win32' ? 'junction' : 'dir',
   );
-  write('package.json', '{"private":true,"type":"module"}\n');
+  write(
+    'package.json',
+    JSON.stringify({
+      ...JSON.parse(
+        readFileSync(path.join(repositoryRoot, 'package.json'), 'utf8'),
+      ),
+      type: 'module',
+    }),
+  );
   write(
     'apps/web/src/shared/api/browser-api.ts',
     "import { ManagedRuntime, Effect } from 'effect';\nexport const owned = () => window.fetch('/api/v1/assets');\nexport const run = () => ManagedRuntime.make({}).runPromise(Effect.succeed(1));\n",

@@ -146,7 +146,9 @@ export function inspectUpgradeInventory(inputs) {
   if (
     !exactVersion(cruiser) ||
     cruiserExtensions.length !== 1 ||
-    cruiserExtensions[0] !== `dependency-cruiser@${cruiser}` ||
+    ![`dependency-cruiser@${cruiser}`, 'dependency-cruiser@*'].includes(
+      cruiserExtensions[0],
+    ) ||
     !exactVersion(parserMatch?.[1]) ||
     extensions?.[cruiserExtensions[0]]?.dependencies?.typescript !==
       parserMatch?.[1]

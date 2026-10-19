@@ -9,8 +9,8 @@ import {
   REQUIRED_SCRIPTS,
   selectedChecks,
 } from './catalogue.mjs';
+import { DECLARED } from './declared-dependencies.mjs';
 import { inspectDelivery } from './delivery-policy.mjs';
-import { REVIEWED } from './reviewed-dependencies.mjs';
 
 /** Parse workflow structure rather than trusting text that merely mentions a gate. */
 export function inspectPolicy(
@@ -35,28 +35,35 @@ export function inspectPolicy(
   inspectDelivery(workflow, guide, fail);
   if (
     manifest.devDependencies?.['typescript-parser'] !==
-      `npm:typescript@${REVIEWED.tools.astParser}` ||
-    manifest.devDependencies?.yauzl !== REVIEWED.tools.archive
+      `npm:typescript@${DECLARED.tools.astParser}` ||
+    manifest.devDependencies?.yauzl !== DECLARED.tools.archive
   )
     fail('Keep explicit reviewed AST and archive parser pins.');
   if (
-    manifest.devDependencies?.['@axe-core/playwright'] !== REVIEWED.tools.axe ||
-    manifest.devDependencies?.vite !== REVIEWED.tools.vite
+    manifest.devDependencies?.['@axe-core/playwright'] !== DECLARED.tools.axe ||
+    manifest.devDependencies?.vite !== DECLARED.tools.vite
   )
     fail('Keep the reviewed browser-quality tool pins.');
-  if (manifest.packageManager !== `pnpm@${REVIEWED.pnpm}`)
-    fail(`Pin the reviewed package manager pnpm@${REVIEWED.pnpm}.`);
+  if (manifest.packageManager !== `pnpm@${DECLARED.pnpm}`)
+    fail(`Pin the reviewed package manager pnpm@${DECLARED.pnpm}.`);
   if (
-    manifest.devDependencies?.typescript !== REVIEWED.tools.compiler ||
+    manifest.devDependencies?.typescript !== DECLARED.tools.compiler ||
     manifest.devDependencies?.['dependency-cruiser'] !==
-      REVIEWED.tools.dependencyCruiser
+      DECLARED.tools.dependencyCruiser
   ) {
     fail('Keep the reviewed compiler and architecture tool pins.');
   }
+  const parserExtensions = Object.keys(
+    workspace.packageExtensions ?? {},
+  ).filter((name) => name.startsWith('dependency-cruiser'));
   if (
-    workspace.packageExtensions?.[
-      `dependency-cruiser@${REVIEWED.tools.dependencyCruiser}`
-    ]?.dependencies?.typescript !== REVIEWED.tools.astParser
+    parserExtensions.length !== 1 ||
+    ![
+      `dependency-cruiser@${DECLARED.tools.dependencyCruiser}`,
+      'dependency-cruiser@*',
+    ].includes(parserExtensions[0]) ||
+    workspace.packageExtensions[parserExtensions[0]]?.dependencies
+      ?.typescript !== DECLARED.tools.astParser
   ) {
     fail('Declare the architecture parser package extension explicitly.');
   }
@@ -127,7 +134,7 @@ export function inspectPolicy(
     const node = steps.filter(
       (step) =>
         step.uses === ACTIONS.node &&
-        String(step.with?.['node-version']) === String(REVIEWED.nodeMajor),
+        String(step.with?.['node-version']) === String(DECLARED.nodeMajor),
     );
     const checkout = steps.filter((step) => step.uses === ACTIONS.checkout);
     if (

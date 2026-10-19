@@ -1,5 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
+import {
+  checkGenerationProvenance,
+  generationProvenance,
+  maintenanceGeneratorUpdate,
+} from './generation-provenance.mjs';
 
 const maxBuffer = 4 * 1024 * 1024;
 function bytes(value) {
@@ -19,7 +24,20 @@ export async function generateAssetContract({
   check = false,
   run = spawnSync,
   nodeExecutable = process.execPath,
+  provenancePath,
+  generatorVersion,
 }) {
+  if (Boolean(provenancePath) !== Boolean(generatorVersion))
+    throw new Error(
+      'Generator version and provenance must be supplied together.',
+    );
+  if (
+    provenancePath &&
+    (typeof generatorVersion !== 'string' ||
+      generatorVersion.length > 64 ||
+      !/^\d+\.\d+\.\d+$/u.test(generatorVersion))
+  )
+    throw new Error('Invalid installed generator version.');
   let result;
   try {
     result = run(
@@ -65,6 +83,27 @@ export async function generateAssetContract({
     } catch {
       throw new Error('Cannot read generated FleetIQ HTTP contract');
     }
+    let previousVersion;
+    if (provenancePath)
+      previousVersion = await checkGenerationProvenance(
+        provenancePath,
+        committed,
+        await readFile(specPath),
+      );
+    if (
+      provenancePath &&
+      previousVersion !== generatorVersion &&
+      !maintenanceGeneratorUpdate(previousVersion, generatorVersion)
+    )
+      throw new Error(
+        'Generated FleetIQ HTTP contract is stale for this generator version; run pnpm contract:generate',
+      );
+    if (
+      !committed.equals(generated) &&
+      provenancePath &&
+      maintenanceGeneratorUpdate(previousVersion, generatorVersion)
+    )
+      return { checked: true, bytes: generated.length, generatorDrift: true };
     if (!committed.equals(generated)) {
       throw new Error(
         'Generated FleetIQ HTTP contract is stale; run pnpm contract:generate',
@@ -72,6 +111,11 @@ export async function generateAssetContract({
     }
   } else {
     await writeFile(outputPath, generated);
+    if (provenancePath)
+      await writeFile(
+        provenancePath,
+        `${JSON.stringify(generationProvenance(generated, await readFile(specPath), generatorVersion), null, 2)}\n`,
+      );
   }
   return { checked: check, bytes: generated.length };
 }

@@ -53,13 +53,13 @@ documented [port overrides](testing.md) if a browser port is occupied.
 
 ## Dependency upgrade preflight
 
-All groups first compare registered declarations with the strict
+All groups first validate registered declarations against the
 [reviewed registry](../../tools/verification/reviewed-dependencies.json).
 Run pnpm dependencies:review for coordinated candidate pins and review instructions.
 Malformed or inconsistent inventory is blocked. Root/E2E Node declaration versions
 must match each other and the declared runtime major.
 
-Eligible pending npm-tool proposals can run the unchanged group in an owned
+Pending npm major-tool proposals can run the unchanged group in an owned
 disposable workspace through pnpm dependencies:qualify --group followed by
 product, structural, browser or browser-quality. The snapshot preserves complete
 Git history/refs, staged index and raw current source files; only its private
@@ -67,13 +67,12 @@ registry receives coordinated exact candidate tool pins. It performs a fresh fro
 install, scanner setup, policy check, selected group and artifact inspection.
 Action, Node-major and pnpm proposals require review first.
 
-pnpm check gathers candidate acceptance results for eligible pending review and
-still exits nonzero. The required check job remains the merge barrier; the other
-three CI jobs can report candidate qualification results. No actor-name exemption,
-automatic original-registry update or weakened catalogue is involved. When the
-registry is current, the explicit qualification route runs normal original-source
-verification. Read [upgrade review](dependency-upgrades.md) for eligibility,
-review decisions and recovery.
+Exact coordinated npm patch/minor updates run normal original-source verification
+against their declared installed versions. Historical registry drift is informational;
+complete receipts record declared status and can qualify publication. Actual failures
+and major/runtime/action changes retain their gates. No actor-name exemption or
+automatic registry write is involved. Read [upgrade policy](dependency-upgrades.md)
+for eligibility, source-bound generator maintenance, review and recovery.
 
 Ordinary receipts include dependencyReview and installedTools status/counts.
 Exact installed metadata is checked in each owner, including dependency-cruiser's
@@ -189,7 +188,7 @@ Cohesion and appropriate abstractions remain review responsibilities.
 
 Quality CI requires Linux acceptance, functional and measured browser scenarios,
 and Windows structural qualification from frozen installs. The check job retains
-original-source acceptance and pending-review failure. Browser, browser-quality
+original-source acceptance; eligible maintenance updates need no second registry edit. Browser, browser-quality
 and harness-windows use explicit candidate qualification routes so eligible
 dependency proposals expose behavioral results before review. Parsed policy
 verifies these exact routes, the required check barrier and read-only permissions.

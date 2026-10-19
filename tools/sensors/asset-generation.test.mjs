@@ -6,6 +6,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { generateAssetContract } from './asset-generation.mjs';
 import { ownedFixture } from './fixtures.mjs';
+import { generationProvenance } from './generation-provenance.mjs';
 
 const canonical = Buffer.from('export const AssetPage = {};\n');
 async function fixture(
@@ -200,9 +201,90 @@ test('the installed pinned generator reproduces the real committed client withou
       ),
     ),
     check: true,
+    provenancePath: fileURLToPath(
+      new URL(
+        '../../apps/web/src/generated/fleetiq-api.provenance.json',
+        import.meta.url,
+      ),
+    ),
+    generatorVersion: JSON.parse(
+      await readFile(
+        new URL(
+          '../../node_modules/@effect/openapi-generator/package.json',
+          import.meta.url,
+        ),
+        'utf8',
+      ),
+    ).version,
   });
   assert.deepEqual(await readFile(outputPath), beforeOutput);
   assert.deepEqual(await readFile(specPath), beforeSpec);
+});
+
+test('generator-only maintenance drift is advisory for an unchanged recorded client', async (context) => {
+  const paths = await fixture(
+    context,
+    'process.stdout.write("export const AssetPage = { newerGenerator: true };\\n");',
+  );
+  const provenancePath = path.join(paths.repositoryRoot, 'generation.json');
+  const record = JSON.stringify(
+    generationProvenance(canonical, Buffer.from('{}\n'), '4.0.3'),
+  );
+  await writeFile(provenancePath, record);
+  const result = await generateAssetContract({
+    ...paths,
+    check: true,
+    provenancePath,
+    generatorVersion: '4.0.5',
+  });
+  assert.equal(result.generatorDrift, true);
+  await assertUnchanged(paths);
+  assert.equal(await readFile(provenancePath, 'utf8'), record);
+  for (const generatorVersion of ['4.0.3', '5.0.0'])
+    await assert.rejects(
+      generateAssetContract({
+        ...paths,
+        check: true,
+        provenancePath,
+        generatorVersion,
+      }),
+      /contract is stale/u,
+    );
+});
+
+test('generator updates cannot hide changed committed bytes or specification', async (context) => {
+  const paths = await fixture(context);
+  const provenancePath = path.join(paths.repositoryRoot, 'generation.json');
+  await writeFile(
+    provenancePath,
+    JSON.stringify(
+      generationProvenance(canonical, Buffer.from('{}\n'), '4.0.3'),
+    ),
+  );
+  await writeFile(
+    paths.outputPath,
+    'export const AssetPage = { changed: true };\n',
+  );
+  await assert.rejects(
+    generateAssetContract({
+      ...paths,
+      check: true,
+      provenancePath,
+      generatorVersion: '4.0.5',
+    }),
+    /provenance is stale/u,
+  );
+  await writeFile(paths.outputPath, canonical);
+  await writeFile(paths.specPath, '{"changed":true}\n');
+  await assert.rejects(
+    generateAssetContract({
+      ...paths,
+      check: true,
+      provenancePath,
+      generatorVersion: '4.0.5',
+    }),
+    /provenance is stale/u,
+  );
 });
 test('importing all three CLI modules is silent and side-effect free', () => {
   const urls = [

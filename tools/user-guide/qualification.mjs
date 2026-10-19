@@ -1,6 +1,9 @@
 import { lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { selectedChecks } from '../verification/catalogue.mjs';
-import { REVIEWED } from '../verification/reviewed-dependencies.mjs';
+import {
+  qualifiedDependencyInventory,
+  REVIEWED,
+} from '../verification/reviewed-dependencies.mjs';
 import { unchangedSource } from '../verification/source-state.mjs';
 import { ownedPath } from './owned-output.mjs';
 
@@ -13,9 +16,7 @@ export function qualifiedReport(report, group, source, pin) {
     report.completePass !== true ||
     report.sourceStable !== true ||
     report.blocker !== null ||
-    report.dependencyReview?.status !== 'current' ||
-    report.dependencyReview.changes !== 0 ||
-    report.dependencyReview.issues !== 0 ||
+    !qualifiedDependencyInventory(report.dependencyReview) ||
     report.installedTools?.status !== 'current' ||
     report.installedTools.issues !== 0 ||
     !report.source ||

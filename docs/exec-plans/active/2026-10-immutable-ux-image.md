@@ -55,6 +55,11 @@ fixtures passed. UX acceptance, browser, and measured-quality scenarios have
 also passed locally; the final source-bound receipts and limitations belong in
 the pull request. No publication or deployment has been performed.
 
+PR #72 feedback replaces the unavailable cached Skopeo digest with a version-tagged
+remote pin and checks tool availability before building. The user approved normal
+acceptance for coordinated npm patch/minor upgrades; actual checks remain required,
+major changes retain review, and generator-only drift uses source-bound provenance.
+
 ## Out of scope
 
 Kubernetes packaging, activation, certificate provisioning, real OIDC/browser

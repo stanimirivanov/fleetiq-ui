@@ -61,7 +61,10 @@ read simply because the registry uses temporal cutoffs.
    authored source is modular YAML; UX vendors its standalone downstream bundle.
 3. Update [source.json](source.json) with commit, artifact path, and SHA-256.
 4. Run `pnpm contract:generate` to regenerate
-   `apps/web/src/generated/fleetiq-api.ts`; never edit generated code manually.
+   `apps/web/src/generated/fleetiq-api.ts` and its generation provenance; never edit
+   generated code manually. Generator-only patch/minor output drift is informational
+   when the recorded specification and committed client hashes still match. See
+   [dependency upgrades](../../docs/development/dependency-upgrades.md).
 5. Reconcile expected operations, feature validators, fixtures, and browser scenarios.
 6. Run `pnpm contract:check`, `pnpm check`, and affected browser gates.
 

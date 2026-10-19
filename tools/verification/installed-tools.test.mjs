@@ -5,31 +5,31 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { temporary } from '../security/owned.mjs';
+import { DECLARED } from './declared-dependencies.mjs';
 import { inspectInstalledTools } from './installed-tools.mjs';
-import { REVIEWED } from './reviewed-dependencies.mjs';
 
 const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url));
 const rootPackages = {
-  typescript: ['typescript', REVIEWED.tools.compiler],
-  'typescript-parser': ['typescript', REVIEWED.tools.astParser],
+  typescript: ['typescript', DECLARED.tools.compiler],
+  'typescript-parser': ['typescript', DECLARED.tools.astParser],
   'dependency-cruiser': [
     'dependency-cruiser',
-    REVIEWED.tools.dependencyCruiser,
+    DECLARED.tools.dependencyCruiser,
   ],
-  vite: ['vite', REVIEWED.tools.vite],
-  '@axe-core/playwright': ['@axe-core/playwright', REVIEWED.tools.axe],
-  yauzl: ['yauzl', REVIEWED.tools.archive],
-  '@playwright/test': ['@playwright/test', REVIEWED.tools.playwright],
+  vite: ['vite', DECLARED.tools.vite],
+  '@axe-core/playwright': ['@axe-core/playwright', DECLARED.tools.axe],
+  yauzl: ['yauzl', DECLARED.tools.archive],
+  '@playwright/test': ['@playwright/test', DECLARED.tools.playwright],
 };
 const webPackages = {
-  typescript: ['typescript', REVIEWED.tools.compiler],
-  vite: ['vite', REVIEWED.tools.vite],
-  vitest: ['vitest', REVIEWED.tools.vitest],
-  '@vitest/coverage-v8': ['@vitest/coverage-v8', REVIEWED.tools.vitest],
+  typescript: ['typescript', DECLARED.tools.compiler],
+  vite: ['vite', DECLARED.tools.vite],
+  vitest: ['vitest', DECLARED.tools.vitest],
+  '@vitest/coverage-v8': ['@vitest/coverage-v8', DECLARED.tools.vitest],
 };
 const e2ePackages = {
-  typescript: ['typescript', REVIEWED.tools.compiler],
-  '@playwright/test': ['@playwright/test', REVIEWED.tools.playwright],
+  typescript: ['typescript', DECLARED.tools.compiler],
+  '@playwright/test': ['@playwright/test', DECLARED.tools.playwright],
 };
 
 function metadata(directory, name, version, extra = {}) {
@@ -56,7 +56,7 @@ function fixture(context) {
   metadata(
     path.join(root, 'node_modules/dependency-cruiser/node_modules/typescript'),
     'typescript',
-    REVIEWED.tools.astParser,
+    DECLARED.tools.astParser,
   );
   return {
     root,
@@ -110,7 +110,7 @@ for (const [scope, dependency, role] of [
 
 test('an upgraded reviewed parser cannot qualify an older installed alias', (context) => {
   const owner = fixture(context);
-  const proposed = structuredClone(REVIEWED);
+  const proposed = structuredClone(DECLARED);
   proposed.tools.astParser = '0.0.0';
   assert.deepEqual(inspectInstalledTools(owner.root, proposed), [
     {
@@ -131,7 +131,7 @@ test('aliases require the real package identity and do not accept impersonated m
   metadata(
     owner.package('', 'typescript-parser'),
     'private-parser-marker',
-    REVIEWED.tools.astParser,
+    DECLARED.tools.astParser,
   );
   const report = inspectInstalledTools(owner.root);
   assert.deepEqual(report, [
@@ -147,7 +147,7 @@ test('aliases require the real package identity and do not accept impersonated m
 test('hidden package.json exports qualify without executing package entrypoints', (context) => {
   const owner = fixture(context);
   const directory = owner.package('', 'vite');
-  metadata(directory, 'vite', REVIEWED.tools.vite, {
+  metadata(directory, 'vite', DECLARED.tools.vite, {
     exports: { '.': './never-executed.cjs' },
     main: './never-executed.cjs',
   });
@@ -173,12 +173,12 @@ test('intentional package-manager directory links qualify by exact target identi
 
 for (const [label, value] of [
   ['malformed JSON', '{private malformed metadata marker'],
-  ['missing identity', JSON.stringify({ version: REVIEWED.tools.astParser })],
+  ['missing identity', JSON.stringify({ version: DECLARED.tools.astParser })],
   ['missing version', JSON.stringify({ name: 'typescript' })],
   ['array metadata', '[]'],
   [
     'oversized metadata',
-    `${JSON.stringify({ name: 'typescript', version: REVIEWED.tools.astParser })}${' '.repeat(64 * 1024)}`,
+    `${JSON.stringify({ name: 'typescript', version: DECLARED.tools.astParser })}${' '.repeat(64 * 1024)}`,
   ],
 ]) {
   test(`${label} is unavailable rather than accepted or echoed`, (context) => {
@@ -312,7 +312,7 @@ test('dependency-cruiser must resolve its own reviewed parser independently of t
 
 test('a missing cruiser extension cannot borrow the native root compiler', (context) => {
   const owner = fixture(context);
-  const proposed = structuredClone(REVIEWED);
+  const proposed = structuredClone(DECLARED);
   proposed.tools.compiler =
     proposed.tools.astParser === '0.0.0' ? '0.0.1' : '0.0.0';
   for (const scope of ['', 'apps/web', 'apps/web-e2e'])

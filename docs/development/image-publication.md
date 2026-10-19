@@ -34,6 +34,10 @@ Buildx, and Playwright Chromium. Run `pnpm security:install` and
 On Windows, set FLEETIQ_DOCKER to Docker Desktop's executable if it is not on PATH.
 All fixture ports are allocated loopback ports; no PostgreSQL or cluster is used.
 The image job has a bounded deadline. No skipped scan or missing browser is a pass.
+Qualification pulls every pinned runtime tool before building, even on a warm
+daemon. A missing upstream digest fails early with the tool role and Docker pull
+diagnostic. The Skopeo pin includes its version tag and a remotely checked digest;
+the local image cache alone cannot establish upstream availability.
 
 ## Runtime contract
 

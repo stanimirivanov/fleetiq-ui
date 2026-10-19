@@ -19,6 +19,7 @@ import {
   validateDockerfile,
   validateTools,
 } from './policy.mjs';
+import { pullToolImages } from './prerequisites.mjs';
 import { cancellation, docker, jsonDocker } from './process.mjs';
 import { Resources } from './resources.mjs';
 import { qualifyRuntime } from './runtime.mjs';
@@ -93,8 +94,10 @@ export async function qualify() {
     loaded,
     success = false,
     failure;
-  let stage = 'build';
+  let stage = 'tool-pull';
   try {
+    await pullToolImages(tools);
+    stage = 'build';
     await docker([
       'buildx',
       'create',

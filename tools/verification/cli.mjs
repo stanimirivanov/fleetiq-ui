@@ -67,8 +67,7 @@ try {
       );
     }
     if (
-      report.dependencyReview?.status !== 'current' &&
-      report.dependencyReview
+      ['review-required', 'blocked'].includes(report.dependencyReview?.status)
     )
       console.error(
         'Dependency inventory needs attention. Run pnpm dependencies:review for affected pins, coordinated changes and required qualification.',

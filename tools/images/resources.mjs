@@ -22,17 +22,20 @@ export class Resources {
   async container(suffix, args, network = this.network) {
     const name = `${this.network}-${suffix}`;
     this.containers.push(name);
-    await docker([
-      'run',
-      '--detach',
-      '--name',
-      name,
-      '--label',
-      `${this.label}=${this.id}`,
-      '--network',
-      network,
-      ...args,
-    ]);
+    await docker(
+      [
+        'run',
+        '--detach',
+        '--name',
+        name,
+        '--label',
+        `${this.label}=${this.id}`,
+        '--network',
+        network,
+        ...args,
+      ],
+      { diagnostics: true },
+    );
     return name;
   }
   async cleanup() {

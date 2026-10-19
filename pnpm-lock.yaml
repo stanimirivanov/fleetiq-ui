@@ -223,8 +223,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0(solid-js@1.9.17)
       effect:
-        specifier: 4.0.2
-        version: 4.0.2
+        specifier: 4.0.5
+        version: 4.0.5
       solid-js:
         specifier: 1.9.17
         version: 1.9.17
@@ -272,8 +272,8 @@ importers:
         specifier: 24.19.1
         version: 24.19.1
       effect:
-        specifier: 4.0.2
-        version: 4.0.2
+        specifier: 4.0.5
+        version: 4.0.5
       typescript:
         specifier: 7.0.2
         version: 7.0.2
@@ -1169,9 +1169,6 @@ packages:
 
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
-
-  effect@4.0.2:
-    resolution: {integrity: sha512-YeYnLqSFrL4+tCOXRrfNP03w8FILoF/wDl+ukraJAGzXrjcS383W7LAAvGBbLatEyktmLxRq+9xJinx7QzXW5A==}
 
   effect@4.0.5:
     resolution: {integrity: sha512-BY4/28NlpOd99yzmV741xbVGmp+1U7tks4oB7F/Png64bTa5tm5eCA6W0RiXsnuLDDoJpjfVSo4Dnq4BZb/89Q==}
@@ -2917,8 +2914,6 @@ snapshots:
   dom-accessibility-api@0.5.16: {}
 
   dom-accessibility-api@0.6.3: {}
-
-  effect@4.0.2: {}
 
   effect@4.0.5: {}
 

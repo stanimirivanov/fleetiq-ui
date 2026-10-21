@@ -26,6 +26,11 @@ no selector edit; its parser remains exactly pinned. This uses pnpm's standard
 Node type packages must match the execution runtime major. Missing packages, floating pins,
 downgrades, malformed inventories and inconsistent installations remain failures.
 The application compiler and JavaScript AST parser are separate dependencies.
+After architecture-tool or extension updates, check that the application lockfile
+snapshot retains dependency-cruiser's exact TypeScript dependency. A frozen install
+consumes the recorded graph; it does not repair missing extension edges. Qualify a
+fresh checkout/install as well as any existing installation. The actual-lockfile
+regression rejects a missing edge even when stale virtual-store packages remain.
 
 ## Commands and evidence
 

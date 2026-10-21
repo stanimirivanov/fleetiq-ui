@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, renameSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { parseAllDocuments } from 'yaml';
 import { temporary } from '../security/owned.mjs';
 import { DECLARED } from './declared-dependencies.mjs';
 import { inspectInstalledTools } from './installed-tools.mjs';
@@ -66,6 +73,34 @@ function fixture(context) {
     },
   };
 }
+
+test('the frozen lockfile supplies the declared parser directly to dependency-cruiser', () => {
+  const documents = parseAllDocuments(
+    readFileSync(path.join(repositoryRoot, 'pnpm-lock.yaml'), 'utf8'),
+  );
+  assert.ok(
+    documents.every((document) => document.errors.length === 0),
+    'The frozen lockfile must parse without errors.',
+  );
+  const graphs = documents.filter((document) =>
+    document.hasIn(['importers', '.', 'devDependencies', 'dependency-cruiser']),
+  );
+  assert.equal(
+    graphs.length,
+    1,
+    'Exactly one dependency graph must own parser resolution.',
+  );
+  assert.equal(
+    graphs[0].getIn([
+      'snapshots',
+      `dependency-cruiser@${DECLARED.tools.dependencyCruiser}`,
+      'dependencies',
+      'typescript',
+    ]),
+    DECLARED.tools.astParser,
+    'The frozen graph must supply the parser; a warm virtual store cannot qualify a missing edge.',
+  );
+});
 
 test('actual installed critical tools agree with the reviewed inventory', () => {
   assert.deepEqual(inspectInstalledTools(repositoryRoot), []);

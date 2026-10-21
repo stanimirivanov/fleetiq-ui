@@ -7,7 +7,7 @@ Milestone: M02 - Product Foundation.
 
 ## Goal
 
-Unblock exact-source UX qualification for D06 without changing tool pins or gates.
+Unblock exact-source UX qualification for D06 while preserving exact tool versions and all verification gates.
 
 ## Scope
 
@@ -66,6 +66,12 @@ at revision 7c51685608c61851319ac7313b4a1739cc0ec89b in
 [run 39628417018](https://github.com/stanimirivanov/fleetiq-deploy/actions/runs/39628417018).
 Their receipt hashes and exact source bindings were checked. This does not qualify
 the unpublished UX artifact or a persistent installation.
+
+PR image CI subsequently exposed an unavailable Skopeo manifest digest. The
+replacement is the official v1.22.3 linux/amd64 manifest, independently inspected
+at Quay and pulled by exact digest; it also matches the backend producer pin.
+The tool version and unconditional remote-pull requirement remain unchanged.
+Final image qualification results belong in the PR verification record.
 
 ## Out of scope
 

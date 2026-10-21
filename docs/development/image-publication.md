@@ -38,6 +38,9 @@ Qualification pulls every pinned runtime tool before building, even on a warm
 daemon. A missing upstream digest fails early with the tool role and Docker pull
 diagnostic. The Skopeo pin includes its version tag and a remotely checked digest;
 the local image cache alone cannot establish upstream availability.
+For a pin update, inspect the upstream tag's manifest list and select its
+linux/amd64 manifest, then pull the exact digest and verify the tool version.
+Record those checks in the PR; syntax fixtures cannot prove registry availability.
 
 ## Runtime contract
 

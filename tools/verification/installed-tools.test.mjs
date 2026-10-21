@@ -388,3 +388,95 @@ test('pnpm-style cruiser package links use the parser beside the resolved packag
   );
   assert.deepEqual(inspectInstalledTools(owner.root), []);
 });
+
+// Reproduce the frozen pnpm installation: an undeclared optional parser is
+// visible through the virtual store's shared node_modules, before the native
+// application compiler at the workspace root.
+function sharedStoreFixture(context, external = false) {
+  const owner = fixture(context);
+  const store = path.join(
+    external ? owner.owner : path.join(owner.root, 'node_modules'),
+    '.pnpm',
+  );
+  const shared = path.join(store, 'node_modules', 'typescript');
+  const source = owner.package('', 'dependency-cruiser');
+  mkdirSync(path.dirname(shared), { recursive: true });
+  renameSync(path.join(source, 'node_modules/typescript'), shared);
+  const target = path.join(
+    store,
+    'dependency-cruiser@fixture',
+    'node_modules',
+    'dependency-cruiser',
+  );
+  mkdirSync(path.dirname(target), { recursive: true });
+  renameSync(source, target);
+  symlinkSync(
+    target,
+    source,
+    process.platform === 'win32' ? 'junction' : 'dir',
+  );
+  return {
+    ...owner,
+    shared,
+    privateParser: path.join(target, 'node_modules/typescript'),
+  };
+}
+
+test('pnpm shared-store parser qualifies before the native root compiler', (context) => {
+  const owner = sharedStoreFixture(context);
+  assert.deepEqual(inspectInstalledTools(owner.root), []);
+});
+
+for (const invalid of ['wrong-version', 'malformed', 'broken-link']) {
+  test(`pnpm shared-store ${invalid} parser fails without borrowing another copy`, (context) => {
+    const owner = sharedStoreFixture(context);
+    if (invalid === 'wrong-version') {
+      metadata(owner.shared, 'typescript', '0.0.0');
+    } else if (invalid === 'malformed') {
+      writeFileSync(
+        path.join(owner.shared, 'package.json'),
+        '{private malformed marker',
+      );
+    } else {
+      renameSync(owner.shared, path.join(owner.owner, 'removed-shared-parser'));
+      symlinkSync(
+        path.join(owner.owner, 'absent-parser'),
+        owner.shared,
+        process.platform === 'win32' ? 'junction' : 'dir',
+      );
+    }
+    assert.deepEqual(inspectInstalledTools(owner.root), [
+      {
+        role: 'astParser',
+        location: 'dependency-cruiser/package.json',
+        code:
+          invalid === 'wrong-version'
+            ? 'installed-pin-mismatch'
+            : 'installed-tool-unavailable',
+      },
+    ]);
+  });
+}
+
+test('pnpm shared-store correct parser cannot hide an incorrect closer parser', (context) => {
+  const owner = sharedStoreFixture(context);
+  metadata(owner.privateParser, 'typescript', '0.0.0');
+  assert.deepEqual(inspectInstalledTools(owner.root), [
+    {
+      role: 'astParser',
+      location: 'dependency-cruiser/package.json',
+      code: 'installed-pin-mismatch',
+    },
+  ]);
+});
+
+test('pnpm shared-store lookup outside the repository cannot qualify', (context) => {
+  const owner = sharedStoreFixture(context, true);
+  assert.deepEqual(inspectInstalledTools(owner.root), [
+    {
+      role: 'astParser',
+      location: 'dependency-cruiser/package.json',
+      code: 'installed-tool-unavailable',
+    },
+  ]);
+});

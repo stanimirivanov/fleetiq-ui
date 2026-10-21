@@ -76,7 +76,11 @@ for eligibility, source-bound generator maintenance, review and recovery.
 
 Ordinary receipts include dependencyReview and installedTools status/counts.
 Exact installed metadata is checked in each owner, including dependency-cruiser's
-private parser, and resampled after execution. Guide qualification requires current
+private parser, and resampled after execution. Parser discovery follows Node's
+lookup order through the package's private container and repository-owned
+ancestor node_modules directories, including pnpm's shared virtual store. A
+present malformed/broken closer package fails instead of borrowing a later copy;
+external ancestor and NODE_PATH packages remain excluded. Guide qualification requires current
 review/install status with zero issues and no proposed changes. Candidate receipts
 are explicitly marked kind: dependency-candidate, retain completePass: false and
 cannot establish publication acceptance; legacy or incomplete receipts also fail.

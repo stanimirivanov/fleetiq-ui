@@ -61,7 +61,10 @@ export function applyMutation(source, before, after) {
     throw new Error('Critical mutation anchor changed; owner review required.');
   return source.replace(before, after);
 }
-/** Load-hook mutations execute real component assertions without ever editing application source. */
+/** Load-hook mutations execute real component assertions without ever editing application source.
+ * Persistent transform caching is disabled in these synthetic subprocesses: the
+ * on-disk source stays unchanged while the plugin supplies different bytes.
+ */
 export function qualifyMutations(root = repositoryRoot, run = spawnSync) {
   const owned = temporary('fleetiq-quality-mutants-');
   const web = path.join(root, 'apps/web');
@@ -89,7 +92,7 @@ export default {
  root:${JSON.stringify(web)},
  plugins:[{name:'owned-negative-control',enforce:'pre',load(id){if(id.split('?')[0].replaceAll('\\\\','/')===${JSON.stringify(target)})return ${JSON.stringify(content)};}},solid({hot:false})],
  resolve:{conditions:['development','browser']},
- test:{environment:'jsdom',maxWorkers:1,include:[${JSON.stringify(`src/${item.file}`)}],reporters:['json'],outputFile:${JSON.stringify(report)},coverage:{enabled:false}}
+ test:{fsModuleCache:false,environment:'jsdom',maxWorkers:1,include:[${JSON.stringify(`src/${item.file}`)}],reporters:['json'],outputFile:${JSON.stringify(report)},coverage:{enabled:false}}
 };`,
         );
         const execution = run(

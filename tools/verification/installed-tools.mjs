@@ -139,6 +139,24 @@ function architectureParser(root, pins) {
     parent = next;
   }
   if (isContainer(parent)) allowed.add(parent);
+
+  // Node also searches pnpm's shared virtual-store node_modules. Walk only
+  // ancestors inside this repository; a linked package outside it must not
+  // acquire access to that external store's hoisted or ambient dependencies.
+  const repository = realpathSync(root);
+  let ancestor = path.dirname(cruiser.file);
+  while (true) {
+    const relative = path.relative(repository, ancestor);
+    if (
+      relative === '..' ||
+      relative.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relative)
+    )
+      break;
+    allowed.add(path.join(ancestor, 'node_modules'));
+    if (relative === '') break;
+    ancestor = path.dirname(ancestor);
+  }
   return resolveMetadata(cruiser.file, allowed, 'typescript');
 }
 

@@ -35,6 +35,10 @@ load hooks against real component assertions: deleting immediate logout hiding,
 read cancellation or stale-completion suppression must fail its named assertion.
 Positive controls pass first. Changed anchors, setup failures and surviving
 mutants require investigation; application files are never edited by qualification.
+Mutation subprocesses explicitly disable the persistent transformed-module cache.
+The unchanged on-disk source must not let a mutant reuse its positive control's
+compiled bytes. Ordinary component runs retain their normal caching. See the
+[Vitest cache limitation for dynamic plugins](https://vitest.dev/config/fsmodulecache).
 
 ## Production output
 

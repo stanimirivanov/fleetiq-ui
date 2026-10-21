@@ -18,6 +18,7 @@ export function CatalogueAssetRow(props: {
       ...clearSnapshotSelection(),
       binding: null,
     });
+  const selected = () => props.workspace.query()?.assetId === props.asset.id;
   return (
     <li class="grid gap-2 border-t border-outline p-3 sm:grid-cols-[minmax(0,1fr)_auto]">
       <div class="min-w-0">
@@ -39,15 +40,13 @@ export function CatalogueAssetRow(props: {
         <button
           type="button"
           class={metadataButtonClass}
-          aria-label={`Select ${props.asset.name}`}
-          aria-pressed={props.workspace.query()?.assetId === props.asset.id}
+          aria-label={`${selected() ? 'Selected' : 'Select'} ${props.asset.name}`}
+          aria-pressed={selected()}
           onClick={() =>
             props.workspace.update(assetSelectionChanges(props.asset.id))
           }
         >
-          {props.workspace.query()?.assetId === props.asset.id
-            ? 'Selected'
-            : 'Select'}
+          {selected() ? 'Selected' : 'Select'}
         </button>
       </Show>
     </li>

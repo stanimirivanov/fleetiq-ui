@@ -54,7 +54,6 @@ export function AppHeader() {
       <div class="fi-header-identity flex min-w-0 shrink-0 items-center gap-3">
         <A
           href="/"
-          aria-label="FleetIQ overview"
           class="fi-brand flex shrink-0 items-center gap-2 text-foreground no-underline"
         >
           <span
@@ -83,7 +82,6 @@ export function AppHeader() {
       <button
         type="button"
         disabled
-        aria-label="Fleet search planned"
         title="Fleet search is planned"
         class="fi-header-search hidden w-full min-w-0 items-center gap-2 rounded-md border border-outline bg-canvas px-3 py-1.5 text-xs text-muted xl:flex"
       >

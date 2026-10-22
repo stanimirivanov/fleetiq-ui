@@ -21,11 +21,14 @@ The official Caddy 2.11.7 image contains a Go 1.26.8 binary and x/net 0.59.0;
 the current runtime scan finds high-severity vulnerabilities in those compiled
 dependencies. The Dockerfile builds the same Caddy release and standard modules
 as a separate, versioned Go module in [packaging/caddy](../../packaging/caddy/),
-using the reviewed Go 1.26.9 image and x/net 0.60.0. Its committed go.mod and
+using the reviewed Go 1.26.10 image and x/net 0.60.0. Its committed go.mod and
 go.sum lock the dependency graph. The rebuilt binary replaces the official
 image's binary, preserving its runtime layout while correcting the findings.
-The build uses local toolchains, read-only module resolution and verified module
-checksums. The final runtime scan remains authoritative: if a new high or
+Go 1.26.10 also corrects [CVE-2026-111943](https://pkg.go.dev/vuln/GO-2026-6809),
+a HIGH standard-library finding in the earlier Go 1.26.9 build. Updating the
+compiler rebuilds the embedded standard library; it does not require a Go module
+version change. The build uses local toolchains, read-only module resolution and
+verified module checksums. The final runtime scan remains authoritative: if a new high or
 critical finding appears, qualification fails until the dependency is fixed.
 
 Use reviewed Node 24/pnpm, a frozen install, Git, Docker's Linux daemon with
@@ -34,10 +37,26 @@ Buildx, and Playwright Chromium. Run `pnpm security:install` and
 On Windows, set FLEETIQ_DOCKER to Docker Desktop's executable if it is not on PATH.
 All fixture ports are allocated loopback ports; no PostgreSQL or cluster is used.
 The image job has a bounded deadline. No skipped scan or missing browser is a pass.
-Qualification pulls every pinned runtime tool before building, even on a warm
-daemon. A missing upstream digest fails early with the tool role and Docker pull
-diagnostic. The Skopeo pin includes its version tag and a remotely checked digest;
-the local image cache alone cannot establish upstream availability.
+Qualification first exercises the actual Buildx CLI against an owned loopback
+registry: a served manifest must pass, then removal must fail. A cached response
+cannot satisfy the negative control. This is mandatory in the artifact gate; unit
+mocks alone do not prove registry behavior. No daemon image or host trust change
+is needed for this small registry fixture.
+
+Before building, Buildx reads all nine pinned tool/base manifests directly from
+their registries. Their raw bytes must hash to the reviewed digests and parse as
+OCI/Docker metadata. Subsequent Docker pulls acquire runtime tools; a successful
+Docker pull alone is not remote-availability evidence on a warm daemon. Errors
+identify the role and distinguish remote lookup/integrity from image acquisition.
+
+Skopeo uses the upstream `quay.io/containers/skopeo:vX.Y.Z-immutable` channel
+and a reviewed digest. Ordinary `stable:vX.Y.Z` images are rebuilt daily and
+are rejected by policy. See [upstream retention policy](https://github.com/podman-container-tools/image_build#overview).
+Immutable tags are retained except for extreme security problems; they are not a
+substitute for reviewed security updates or an owned mirror when stronger
+retention guarantees are required. For a pin update, inspect the upstream manifest
+list, select linux/amd64, verify remote bytes, pull the exact digest and check the
+tool version. Record these checks in the PR.
 
 ## Runtime contract
 
@@ -88,16 +107,17 @@ The image group runs producer fixtures, recipe/context/publication policy and th
 real artifact qualification. Existing acceptance, browser and browser-quality
 groups remain independently required. The producer:
 
-1. Builds once with locked JavaScript and Go dependencies and digest-pinned inputs.
-2. Checks source labels, the complete OCI index, SPDX runtime/builder coverage,
+1. Proves the real remote-manifest CLI controls and verifies all remote pins.
+2. Builds once with locked JavaScript and Go dependencies and digest-pinned inputs.
+3. Checks source labels, the complete OCI index, SPDX runtime/builder coverage,
    npm builder packages and SLSA v1 source/subject agreement.
-3. Copies that complete index to an owned private registry. A standard Skopeo
+4. Copies that complete index to an owned private registry. A standard Skopeo
    Docker import executes its runtime with verified active configuration and ordered
    uncompressed filesystem digests; no host registry port or daemon trust change is needed.
-4. Inspects the actual files/restrictions and exercises HTTP contracts, a packaged
+5. Inspects the actual files/restrictions and exercises HTTP contracts, a packaged
    browser/theme/deep-link smoke and a real synthetic TLS-terminating gateway.
-5. Proves bad configuration, untrusted TLS, upstream failure and graceful stop.
-6. Roundtrips the complete index, scans the original runtime blobs with fresh
+6. Proves bad configuration, untrusted TLS, upstream failure and graceful stop.
+7. Roundtrips the complete index, scans the original runtime blobs with fresh
    Trivy vulnerability/secret data, checks stable source and cleans owned resources.
 
 Trivy uses a small standard single-runtime OCI entrypoint because its pinned
@@ -112,7 +132,11 @@ registered root before seven-day retention. Canonical group receipts stay in
 .verification; image reports cannot impersonate those receipts. Finding matches
 and code are removed from secret-scan evidence without removing the rejection.
 Source, stage, checks and content digests explain incomplete runs. No success is
-recorded after a failed stage or owned cleanup. There is no global prune or shared
+recorded after a failed stage or owned cleanup. Failures print their qualification
+stage. Scan failures distinguish security findings from execution/report errors;
+only counts and at most eight validated advisory IDs appear in summaries. Raw
+secret matches, source snippets and arbitrary report text are never printed. The
+redacted scan report remains available for diagnosis. There is no global prune or shared
 Docker/cluster reset.
 
 ## Publication authority

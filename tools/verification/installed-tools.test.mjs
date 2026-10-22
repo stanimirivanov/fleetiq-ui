@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, renameSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { parseAllDocuments } from 'yaml';
 import { temporary } from '../security/owned.mjs';
 import { DECLARED } from './declared-dependencies.mjs';
 import { inspectInstalledTools } from './installed-tools.mjs';
@@ -66,6 +73,34 @@ function fixture(context) {
     },
   };
 }
+
+test('the frozen lockfile supplies the declared parser directly to dependency-cruiser', () => {
+  const documents = parseAllDocuments(
+    readFileSync(path.join(repositoryRoot, 'pnpm-lock.yaml'), 'utf8'),
+  );
+  assert.ok(
+    documents.every((document) => document.errors.length === 0),
+    'The frozen lockfile must parse without errors.',
+  );
+  const graphs = documents.filter((document) =>
+    document.hasIn(['importers', '.', 'devDependencies', 'dependency-cruiser']),
+  );
+  assert.equal(
+    graphs.length,
+    1,
+    'Exactly one dependency graph must own parser resolution.',
+  );
+  assert.equal(
+    graphs[0].getIn([
+      'snapshots',
+      `dependency-cruiser@${DECLARED.tools.dependencyCruiser}`,
+      'dependencies',
+      'typescript',
+    ]),
+    DECLARED.tools.astParser,
+    'The frozen graph must supply the parser; a warm virtual store cannot qualify a missing edge.',
+  );
+});
 
 test('actual installed critical tools agree with the reviewed inventory', () => {
   assert.deepEqual(inspectInstalledTools(repositoryRoot), []);
@@ -387,4 +422,96 @@ test('pnpm-style cruiser package links use the parser beside the resolved packag
     process.platform === 'win32' ? 'junction' : 'dir',
   );
   assert.deepEqual(inspectInstalledTools(owner.root), []);
+});
+
+// Reproduce the frozen pnpm installation: an undeclared optional parser is
+// visible through the virtual store's shared node_modules, before the native
+// application compiler at the workspace root.
+function sharedStoreFixture(context, external = false) {
+  const owner = fixture(context);
+  const store = path.join(
+    external ? owner.owner : path.join(owner.root, 'node_modules'),
+    '.pnpm',
+  );
+  const shared = path.join(store, 'node_modules', 'typescript');
+  const source = owner.package('', 'dependency-cruiser');
+  mkdirSync(path.dirname(shared), { recursive: true });
+  renameSync(path.join(source, 'node_modules/typescript'), shared);
+  const target = path.join(
+    store,
+    'dependency-cruiser@fixture',
+    'node_modules',
+    'dependency-cruiser',
+  );
+  mkdirSync(path.dirname(target), { recursive: true });
+  renameSync(source, target);
+  symlinkSync(
+    target,
+    source,
+    process.platform === 'win32' ? 'junction' : 'dir',
+  );
+  return {
+    ...owner,
+    shared,
+    privateParser: path.join(target, 'node_modules/typescript'),
+  };
+}
+
+test('pnpm shared-store parser qualifies before the native root compiler', (context) => {
+  const owner = sharedStoreFixture(context);
+  assert.deepEqual(inspectInstalledTools(owner.root), []);
+});
+
+for (const invalid of ['wrong-version', 'malformed', 'broken-link']) {
+  test(`pnpm shared-store ${invalid} parser fails without borrowing another copy`, (context) => {
+    const owner = sharedStoreFixture(context);
+    if (invalid === 'wrong-version') {
+      metadata(owner.shared, 'typescript', '0.0.0');
+    } else if (invalid === 'malformed') {
+      writeFileSync(
+        path.join(owner.shared, 'package.json'),
+        '{private malformed marker',
+      );
+    } else {
+      renameSync(owner.shared, path.join(owner.owner, 'removed-shared-parser'));
+      symlinkSync(
+        path.join(owner.owner, 'absent-parser'),
+        owner.shared,
+        process.platform === 'win32' ? 'junction' : 'dir',
+      );
+    }
+    assert.deepEqual(inspectInstalledTools(owner.root), [
+      {
+        role: 'astParser',
+        location: 'dependency-cruiser/package.json',
+        code:
+          invalid === 'wrong-version'
+            ? 'installed-pin-mismatch'
+            : 'installed-tool-unavailable',
+      },
+    ]);
+  });
+}
+
+test('pnpm shared-store correct parser cannot hide an incorrect closer parser', (context) => {
+  const owner = sharedStoreFixture(context);
+  metadata(owner.privateParser, 'typescript', '0.0.0');
+  assert.deepEqual(inspectInstalledTools(owner.root), [
+    {
+      role: 'astParser',
+      location: 'dependency-cruiser/package.json',
+      code: 'installed-pin-mismatch',
+    },
+  ]);
+});
+
+test('pnpm shared-store lookup outside the repository cannot qualify', (context) => {
+  const owner = sharedStoreFixture(context, true);
+  assert.deepEqual(inspectInstalledTools(owner.root), [
+    {
+      role: 'astParser',
+      location: 'dependency-cruiser/package.json',
+      code: 'installed-tool-unavailable',
+    },
+  ]);
 });

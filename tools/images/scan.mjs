@@ -7,6 +7,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { join } from 'node:path';
+import { scanDiagnostic } from './diagnostics.mjs';
 import { DIGEST, ensure, hash, readJson, validateScan } from './policy.mjs';
 import { containerUser, docker } from './process.mjs';
 export function redactScan(scan) {
@@ -81,7 +82,9 @@ export async function scanRuntime(
     'infinity',
   ]);
   const base = ['exec', scanner, 'trivy', '--cache-dir', '/cache'];
-  let failure;
+  let failure,
+    scan,
+    invalidReport = false;
   try {
     await execute(
       [
@@ -117,16 +120,24 @@ export async function scanRuntime(
     const raw = join(privateOutput, 'raw.json');
     if (existsSync(raw)) {
       try {
+        scan = redactScan(readJson(raw));
         writeFileSync(
           join(reports, 'scan.json'),
-          `${JSON.stringify(redactScan(readJson(raw)), null, 2)}\n`,
+          `${JSON.stringify(scan, null, 2)}\n`,
         );
+      } catch {
+        invalidReport = true;
       } finally {
         rmSync(raw);
       }
     }
   }
-  if (failure) throw failure;
+  if (invalidReport)
+    throw new Error(
+      'Runtime security scan incomplete (category=scanner-report-invalid).',
+    );
+  const diagnostic = scanDiagnostic(scan);
+  if (failure || diagnostic.findings) throw new Error(diagnostic.message);
   const database = JSON.parse(
     await execute([...base, 'version', '--format', 'json']),
   );

@@ -76,10 +76,22 @@ try {
       ['reviewed-tools-unavailable', 'reviewed-tools-changed'].includes(
         report.blocker,
       )
-    )
+    ) {
       console.error(
-        'Declared pins are reviewed, but installed tools are missing or mismatched. Run pnpm install --frozen-lockfile and rerun verification.',
+        'Declared pins are reviewed, but installed tools are missing or mismatched. Run pnpm install --frozen-lockfile and check the declared dependency graph before rerunning verification.',
       );
+      try {
+        const { inspectInstalledTools } = await import('./installed-tools.mjs');
+        // The inspector emits fixed inventory labels/codes only, never package
+        // fields, absolute paths, resolver exceptions or candidate output.
+        for (const { role, location, code } of inspectInstalledTools(root))
+          console.error(`Installed tool: ${role} (${location}): ${code}.`);
+      } catch {
+        console.error(
+          'Installed tool inspection unavailable (details redacted).',
+        );
+      }
+    }
     for (const entry of report.checks)
       console.log(`${entry.id}: ${entry.status}`);
     console.log(`verification evidence: ${path.relative(root, evidencePath)}`);

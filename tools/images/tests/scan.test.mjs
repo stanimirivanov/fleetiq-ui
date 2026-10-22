@@ -133,3 +133,79 @@ test('analysis errors, different images and malformed selectors cannot become a 
     }
   }
 });
+
+test('scanner findings and operational failures have distinct redacted diagnostics', async () => {
+  for (const mode of [
+    'vulnerability',
+    'secret',
+    'execution',
+    'invalid-report',
+    'contradictory-success',
+  ]) {
+    const f = layoutFixture();
+    try {
+      const s = scannerFixture(f);
+      if (['vulnerability', 'contradictory-success'].includes(mode))
+        s.report.Results[1].Vulnerabilities = [
+          {
+            Severity: 'HIGH',
+            VulnerabilityID: 'CVE-2026-111943',
+            PkgName: 'private package',
+            Title: 'private report text',
+          },
+        ];
+      if (mode === 'secret')
+        s.report.Results[1].Secrets = [
+          {
+            RuleID: 'synthetic',
+            Severity: 'HIGH',
+            Match: 'private credential',
+            Code: { Lines: ['private source'] },
+          },
+        ];
+      const execute = async (args) => {
+        const result = await s.execute(args);
+        if (!args.includes('version')) {
+          if (mode === 'invalid-report')
+            writeFileSync(
+              join(f.directory, 'private-scan/raw.json'),
+              'private malformed report',
+            );
+          if (mode !== 'contradictory-success')
+            throw new Error('private process error');
+        }
+        return result;
+      };
+      await assert.rejects(
+        scanRuntime(f.directory, s.tools, s.artifact, s.resources, execute),
+        (error) => {
+          assert.ok(!error.message.includes('private'));
+          if (['vulnerability', 'contradictory-success'].includes(mode))
+            assert.match(
+              error.message,
+              /security-findings.*high=1.*CVE-2026-111943/u,
+            );
+          else if (mode === 'secret')
+            assert.match(error.message, /security-findings.*secrets=1/u);
+          else if (mode === 'execution')
+            assert.match(error.message, /incomplete.*scanner-execution/u);
+          else
+            assert.match(error.message, /incomplete.*scanner-report-invalid/u);
+          return true;
+        },
+      );
+      assert.ok(!existsSync(join(f.directory, 'private-scan/raw.json')));
+      assert.equal(s.calls.length, 1);
+      if (mode === 'secret') {
+        const retained = readFileSync(
+          join(f.directory, 'reports/scan.json'),
+          'utf8',
+        );
+        assert.ok(!retained.includes('private'));
+        assert.match(retained, /synthetic/u);
+      }
+    } finally {
+      f.cleanup();
+    }
+  }
+});

@@ -62,7 +62,7 @@ test('actual image recipe/context/workflow pass strict producer policy', () => {
 test('floating tools, root images and environment-specific browser builds fail', () => {
   for (const mutate of [
     (t) => (t.edge = 'caddy:latest'),
-    (t) => (t.go = 'golang:1.26.9-alpine3.23'),
+    (t) => (t.go = 'golang:1.26.10-alpine3.23'),
     (t) => (t.platform = 'linux/arm64'),
     (t) => (t.node = `untrusted/node@${digest}`),
   ]) {
@@ -73,7 +73,7 @@ test('floating tools, root images and environment-specific browser builds fail',
   for (const bad of [
     recipe.replace('USER 10001:10001', 'USER root'),
     recipe.replace('--frozen-lockfile', ''),
-    recipe.replace('FROM golang:1.26.9-alpine3.23@', 'FROM golang:latest@'),
+    recipe.replace('FROM golang:1.26.10-alpine3.23@', 'FROM golang:latest@'),
     recipe.replace('go mod verify', 'go mod tidy'),
     recipe.replace('-mod=readonly', ''),
     recipe.replace('COPY --from=edge-builder /edge/caddy /usr/bin/caddy', ''),

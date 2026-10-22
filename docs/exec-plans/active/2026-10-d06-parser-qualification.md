@@ -1,5 +1,11 @@
 # D06: qualify pnpm parser resolution
 
+## TL;DR
+
+Repair clean-install parser resolution, mutation qualification, accessibility and
+image prerequisites for D06. Preserve existing gates; UX publication and persistent
+installation remain incomplete until their separate qualification passes.
+
 Status: active (issue #74; implementation complete, final qualification pending).
 Milestone: M02 - Product Foundation.
 
@@ -72,6 +78,12 @@ replacement is the official v1.22.3 linux/amd64 manifest, independently inspecte
 at Quay and pulled by exact digest; it also matches the backend producer pin.
 The tool version and unconditional remote-pull requirement remain unchanged.
 Final image qualification results belong in the PR verification record.
+
+The following CI run completed runtime checks but rejected CVE-2026-111943
+in Caddy's embedded Go 1.26.9 standard library. Rebuild the same Caddy release
+with the official digest-pinned Go 1.26.10 linux/amd64 compiler image. Preserve
+the frozen module graph and require the original OCI runtime scan to pass; no
+scanner exclusions or severity changes are introduced.
 
 ## Out of scope
 

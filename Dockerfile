@@ -8,7 +8,7 @@ RUN pnpm install --frozen-lockfile && pnpm build
 RUN node tools/images/inline-csp.mjs apps/web/dist/index.html /tmp/csp.caddy
 # Keep graph evidence outside the public document root.
 RUN cp apps/web/dist/quality-manifest.json /tmp/quality-manifest.json && rm apps/web/dist/quality-manifest.json
-FROM golang:1.26.9-alpine3.23@sha256:6750308561953d451210ed1a8086d36c8c8bdcbf672d38d9d0d424b8a7a0216c AS edge-builder
+FROM golang:1.26.10-alpine3.23@sha256:9d1e2c4fda593efb2c405e1c855c75ec17fe42dc02f6b7142a5ea7af7f386bf4 AS edge-builder
 
 ARG BUILDKIT_SBOM_SCAN_STAGE=true
 WORKDIR /edge

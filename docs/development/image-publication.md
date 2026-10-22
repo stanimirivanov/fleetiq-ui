@@ -21,11 +21,14 @@ The official Caddy 2.11.7 image contains a Go 1.26.8 binary and x/net 0.59.0;
 the current runtime scan finds high-severity vulnerabilities in those compiled
 dependencies. The Dockerfile builds the same Caddy release and standard modules
 as a separate, versioned Go module in [packaging/caddy](../../packaging/caddy/),
-using the reviewed Go 1.26.9 image and x/net 0.60.0. Its committed go.mod and
+using the reviewed Go 1.26.10 image and x/net 0.60.0. Its committed go.mod and
 go.sum lock the dependency graph. The rebuilt binary replaces the official
 image's binary, preserving its runtime layout while correcting the findings.
-The build uses local toolchains, read-only module resolution and verified module
-checksums. The final runtime scan remains authoritative: if a new high or
+Go 1.26.10 also corrects [CVE-2026-111943](https://pkg.go.dev/vuln/GO-2026-6809),
+a HIGH standard-library finding in the earlier Go 1.26.9 build. Updating the
+compiler rebuilds the embedded standard library; it does not require a Go module
+version change. The build uses local toolchains, read-only module resolution and
+verified module checksums. The final runtime scan remains authoritative: if a new high or
 critical finding appears, qualification fails until the dependency is fixed.
 
 Use reviewed Node 24/pnpm, a frozen install, Git, Docker's Linux daemon with

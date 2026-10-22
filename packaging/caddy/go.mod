@@ -1,4 +1,4 @@
-module github.com/stanimirivanov/fleetiq-ux/edge
+module github.com/stanimirivanov/fleetiq-ui/edge
 
 go 1.26.0
 

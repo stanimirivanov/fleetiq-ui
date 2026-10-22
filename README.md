@@ -1,4 +1,4 @@
-# FleetIQ UX
+# FleetIQ UI
 
 ## TL;DR
 

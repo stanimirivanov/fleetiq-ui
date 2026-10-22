@@ -13,3 +13,5 @@ retains the required check merge barrier.
 - [D03 immutable UX/static-edge image](2026-10-immutable-ux-image.md): M02 source-owned packaging and publication.
 
 - [D06 parser qualification](2026-10-d06-parser-qualification.md): repair installed-tool lookup without weakening verification.
+
+- [Canonical UI producer rename](2026-10-ui-producer-rename.md): M02 repository and immutable-publication identity integration.

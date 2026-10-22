@@ -1,7 +1,15 @@
 /** OCI content checks supplement maintained BuildKit/Skopeo transports. */
 import { lstatSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DIGEST, ensure, hash, readJson, validateRuntime } from './policy.mjs';
+import {
+  DIGEST,
+  ensure,
+  hash,
+  REPOSITORY,
+  readJson,
+  SOURCE,
+  validateRuntime,
+} from './policy.mjs';
 
 function blob(layout, descriptor) {
   ensure(
@@ -96,11 +104,9 @@ export function inspectLayout(layout, revision) {
     'Build provenance source revision differs.',
   );
   ensure(
-    [
-      'https://github.com/stanimirivanov/fleetiq-ux',
-      'https://github.com/stanimirivanov/fleetiq-ux.git',
-      'git@github.com:stanimirivanov/fleetiq-ux.git',
-    ].includes(vcs.source),
+    [SOURCE, `${SOURCE}.git`, `git@github.com:${REPOSITORY}.git`].includes(
+      vcs.source,
+    ),
     'Build provenance repository differs.',
   );
   return {

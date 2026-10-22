@@ -1,8 +1,11 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
-import { hash } from '../policy.mjs';
-export function layoutFixture() {
+import { hash, SOURCE } from '../policy.mjs';
+export function layoutFixture({
+  source = SOURCE,
+  provenanceSource = `${SOURCE}.git`,
+} = {}) {
   const directory = mkdtempSync(join(tmpdir(), 'fleetiq-image-oci-'));
   const root = resolve(directory);
   const parent = resolve(tmpdir());
@@ -29,8 +32,7 @@ export function layoutFixture() {
       Entrypoint: ['/usr/local/bin/fleetiq-edge'],
       Labels: {
         'org.opencontainers.image.revision': revision,
-        'org.opencontainers.image.source':
-          'https://github.com/stanimirivanov/fleetiq-ux',
+        'org.opencontainers.image.source': source,
       },
     },
   });
@@ -83,7 +85,7 @@ export function layoutFixture() {
           buildkit_metadata: {
             vcs: {
               revision,
-              source: 'https://github.com/stanimirivanov/fleetiq-ux.git',
+              source: provenanceSource,
             },
           },
         },

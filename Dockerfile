@@ -18,7 +18,7 @@ COPY packaging/caddy/main.go ./
 RUN CGO_ENABLED=0 GOTOOLCHAIN=local go build -mod=readonly -trimpath -ldflags="-s -w" -o /edge/caddy ./main.go
 FROM caddy:2.11.7-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f AS runtime
 ARG SOURCE_REVISION
-LABEL org.opencontainers.image.title="FleetIQ UX" org.opencontainers.image.description="FleetIQ production static edge" org.opencontainers.image.source="https://github.com/stanimirivanov/fleetiq-ux" org.opencontainers.image.revision=$SOURCE_REVISION
+LABEL org.opencontainers.image.title="FleetIQ UI" org.opencontainers.image.description="FleetIQ production static edge" org.opencontainers.image.source="https://github.com/stanimirivanov/fleetiq-ui" org.opencontainers.image.revision=$SOURCE_REVISION
 # No low ports or file capabilities are required behind the TLS gateway.
 COPY --from=edge-builder /edge/caddy /usr/bin/caddy
 RUN test -z "$(getcap /usr/bin/caddy)" && mkdir -p /srv /usr/share/fleetiq

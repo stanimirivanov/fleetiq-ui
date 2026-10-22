@@ -11,7 +11,7 @@ const revision = 'a'.repeat(40);
 const head = 'b'.repeat(40);
 const request = {
   event: 'workflow_dispatch',
-  repository: 'stanimirivanov/fleetiq-ux',
+  repository: 'stanimirivanov/fleetiq-ui',
   ref: 'refs/heads/main',
   revision,
   workflowRevision: revision,
@@ -43,6 +43,7 @@ test('only exact manual current-main publication requests qualify', () => {
     { ...request, ref: 'refs/tags/main' },
     { ...request, ref: 'refs/heads/feature' },
     { ...request, repository: 'other/platform' },
+    { ...request, repository: 'stanimirivanov/fleetiq-ux' },
     { ...request, revision: 'main' },
     { ...request, workflowRevision: head },
     { ...request, attempt: '0' },

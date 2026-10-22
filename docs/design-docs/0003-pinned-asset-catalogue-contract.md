@@ -5,7 +5,7 @@ Status: accepted, amended 7 October 2026
 ## Context
 
 The backend now publishes an OpenAPI 3.1 UI baseline for version discovery and
-a bounded tenant asset catalogue. FleetIQ UX needs stable test payloads while
+a bounded tenant asset catalogue. FleetIQ UI needs stable test payloads while
 the backend and web app evolve in parallel. The protected route currently uses
 a single-principal workload bearer secret, not a browser-safe sign-in flow.
 

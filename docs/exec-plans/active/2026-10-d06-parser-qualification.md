@@ -85,6 +85,13 @@ with the official digest-pinned Go 1.26.10 linux/amd64 compiler image. Preserve
 the frozen module graph and require the original OCI runtime scan to pass; no
 scanner exclusions or severity changes are introduced.
 
+The repeated Skopeo failure came from daily upstream tag replacement and a warm
+Docker pull falsely treated as remote evidence. Use the upstream immutable
+channel, verify raw remote manifest digests before pulls, and require actual
+Buildx present/removed controls against an owned loopback registry. Unit fixtures
+cover cached success masking removal, corruption, policy regressions and bounded
+scanner diagnostics. All existing runtime and security gates remain required.
+
 ## Out of scope
 
 UX publication before merge, environment promotion and live Kubernetes mutation.

@@ -9,6 +9,7 @@ export const DIGEST = /^sha256:[a-f0-9]{64}$/u;
 export const SBOM_CATALOGERS =
   'image,file,+sbom-cataloger,+javascript-package-cataloger';
 export const CHECKS = [
+  'remote-manifest-probe',
   'oci-metadata',
   'production-bundle',
   'runtime-config',
@@ -40,11 +41,17 @@ export function validateTools(tools) {
       tools.platform === 'linux/amd64',
     'Unsupported image tool contract.',
   );
+  ensure(
+    /^quay\.io\/containers\/skopeo:v\d+\.\d+\.\d+-immutable@sha256:[a-f0-9]{64}$/u.test(
+      tools.transport,
+    ),
+    'Transport requires the upstream immutable channel and a reviewed digest.',
+  );
   for (const [name, repo] of Object.entries({
     frontend: 'docker/dockerfile',
     buildkit: 'moby/buildkit',
     sbom: 'docker/buildkit-syft-scanner',
-    transport: 'quay.io/skopeo/stable',
+    transport: 'quay.io/containers/skopeo',
     scanner: 'aquasec/trivy',
     registry: 'registry',
     node: 'node',

@@ -1,7 +1,66 @@
+import { DIGEST, hash } from './policy.mjs';
 import { docker } from './process.mjs';
 
-/** Prove remote availability before building; a warm daemon cache is not evidence. */
+export const IMAGE_ROLES = [
+  'transport',
+  'registry',
+  'scanner',
+  'node',
+  'edge',
+  'frontend',
+  'buildkit',
+  'sbom',
+  'go',
+];
+
+function prerequisiteError(role, category) {
+  const error = new Error(
+    `Image prerequisite failed (role=${role}, category=${category}); check the pinned digest and registry diagnostics.`,
+  );
+  error.code = category;
+  return error;
+}
+
+/** Buildx reads the registry directly; a daemon-cached pull cannot prove availability. */
+export async function verifyRemoteImage(role, reference, execute = docker) {
+  const digest = reference.split('@')[1];
+  if (!DIGEST.test(digest)) throw prerequisiteError(role, 'invalid-pin');
+  let raw;
+  try {
+    raw = await execute(
+      ['buildx', 'imagetools', 'inspect', '--raw', reference],
+      { diagnostics: true, timeout: 60_000 },
+    );
+  } catch {
+    throw prerequisiteError(role, 'remote-manifest-unavailable');
+  }
+  try {
+    if (
+      typeof raw !== 'string' ||
+      Buffer.byteLength(raw) > 2 * 1024 * 1024 ||
+      `sha256:${hash(raw)}` !== digest
+    )
+      throw new Error();
+    const manifest = JSON.parse(raw);
+    if (
+      manifest.schemaVersion !== 2 ||
+      !(
+        (Array.isArray(manifest.manifests) && manifest.manifests.length > 0) ||
+        (Array.isArray(manifest.layers) && DIGEST.test(manifest.config?.digest))
+      )
+    )
+      throw new Error();
+  } catch {
+    throw prerequisiteError(role, 'remote-manifest-invalid');
+  }
+}
+
+/** Verify every remote build input before allowing cached acquisition or a long build. */
 export async function pullToolImages(tools, execute = docker) {
+  for (const role of IMAGE_ROLES) {
+    console.log(`Verify remote ${role} manifest: ${tools[role]}`);
+    await verifyRemoteImage(role, tools[role], execute);
+  }
   for (const role of ['transport', 'registry', 'scanner', 'node', 'edge']) {
     console.log(`Pull pinned ${role} image: ${tools[role]}`);
     try {
@@ -10,9 +69,7 @@ export async function pullToolImages(tools, execute = docker) {
         timeout: 180_000,
       });
     } catch {
-      throw new Error(
-        `Pinned ${role} image is unavailable; check its registry digest and the pull diagnostic above.`,
-      );
+      throw prerequisiteError(role, 'image-pull-failed');
     }
   }
 }

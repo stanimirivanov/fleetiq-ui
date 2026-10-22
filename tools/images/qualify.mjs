@@ -21,6 +21,7 @@ import {
 } from './policy.mjs';
 import { pullToolImages } from './prerequisites.mjs';
 import { cancellation, docker, jsonDocker } from './process.mjs';
+import { qualifyRemoteProbe } from './remote-probe.mjs';
 import { Resources } from './resources.mjs';
 import { qualifyRuntime } from './runtime.mjs';
 import { scanRuntime } from './scan.mjs';
@@ -94,8 +95,11 @@ export async function qualify() {
     loaded,
     success = false,
     failure;
-  let stage = 'tool-pull';
+  let stage = 'remote-manifest-probe';
   try {
+    await qualifyRemoteProbe();
+    record.checks.push('remote-manifest-probe');
+    stage = 'tool-acquisition';
     await pullToolImages(tools);
     stage = 'build';
     await docker([
@@ -194,7 +198,9 @@ export async function qualify() {
     cancel.check();
     success = true;
   } catch (error) {
-    failure = error;
+    failure = new Error(
+      `Image qualification failed (stage=${stage}): ${error.message}`,
+    );
   } finally {
     const cleanupErrors = [];
     const attempt = async (task) => {

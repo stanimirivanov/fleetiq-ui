@@ -62,6 +62,10 @@ test('actual image recipe/context/workflow pass strict producer policy', () => {
 test('floating tools, root images and environment-specific browser builds fail', () => {
   for (const mutate of [
     (t) => (t.edge = 'caddy:latest'),
+    (t) => (t.transport = `quay.io/skopeo/stable:v1.22.3@${digest}`),
+    (t) => (t.transport = `quay.io/containers/skopeo:v1.22.3@${digest}`),
+    (t) =>
+      (t.transport = `quay.io/containers/skopeo:latest-immutable@${digest}`),
     (t) => (t.go = 'golang:1.26.10-alpine3.23'),
     (t) => (t.platform = 'linux/arm64'),
     (t) => (t.node = `untrusted/node@${digest}`),

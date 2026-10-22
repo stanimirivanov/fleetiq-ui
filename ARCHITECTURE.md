@@ -2,7 +2,7 @@
 
 ## TL;DR
 
-FleetIQ UX is a SolidJS web console. App composition owns routing and one managed
+FleetIQ UI is a SolidJS web console. App composition owns routing and one managed
 Effect v4 HTTP runtime. Independent features own pure models, validated adapters,
 and reactive presentation. Operator sessions gate the connected catalogue,
 inspector, and registry. Explicit development previews remain separate from

@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: fleetiq-ux-image-publication
+  group: fleetiq-ui-image-publication
   cancel-in-progress: false
 jobs:
   authorize:

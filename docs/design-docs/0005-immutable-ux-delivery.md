@@ -4,7 +4,7 @@ Status: Proposed for review in issue #71.
 
 ## TL;DR
 
-Build and qualify a reusable Caddy/static-UI OCI artifact in fleetiq-ux. Configure
+Build and qualify a reusable Caddy/static-UI OCI artifact in fleetiq-ui. Configure
 private backend routing at runtime behind an external HTTPS gateway. Publish exact
 qualified bytes only after maintainer authorization; deployment/promotion stays
 with fleetiq-deploy.

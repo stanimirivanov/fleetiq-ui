@@ -21,7 +21,7 @@ target and exact-source binding pages, and four browser-authentication routes.
 - POST `/api/v1/auth/logout`: empty 204, `X-FleetIQ-CSRF: 1`, browser-managed Origin.
 
 Serve the UI and API under one public HTTPS origin. Same-origin cookies carry the
-session; no credentialed CORS or workload bearer is used by FleetIQ UX. The backend
+session; no credentialed CORS or workload bearer is used by FleetIQ UI. The backend
 chooses/configures the provider at deployment. The browser discovers one bounded tenant page at a time. Operators choose explicitly;
 exact actions guide controls and never authorize operations. Missing from one page
 means unverified, and manage actions do not imply metadata.read. Discovery is

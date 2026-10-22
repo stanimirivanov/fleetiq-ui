@@ -58,6 +58,28 @@ retention guarantees are required. For a pin update, inspect the upstream manife
 list, select linux/amd64, verify remote bytes, pull the exact digest and check the
 tool version. Record these checks in the PR.
 
+## Repository rename and next publication
+
+The canonical producer is `stanimirivanov/fleetiq-ui`; current source labels,
+GitHub authorization, BuildKit provenance and GHCR transport all use that identity.
+Future publication produces `ghcr.io/stanimirivanov/fleetiq-ui@sha256:...`.
+The root package and local Caddy module also use the renamed repository identity.
+
+The existing `fleetiq-ux-image-qualification.v1` format and deployment `ux` role
+remain stable wire identifiers. They do not authorize the retired repository.
+Historical source revisions, run receipts and the already published
+`ghcr.io/stanimirivanov/fleetiq-ux@sha256:761141c95348b6c64963787a4e9167b03ea5dc09ab4fd07a109268983d6fd3cd`
+remain unchanged. Do not retag old bytes or edit their receipts to imply a new
+reviewed publication. Current qualification rejects old labels or provenance.
+
+Merge the producer rename and the matching
+[deployment issue 19](https://github.com/stanimirivanov/fleetiq-deploy/issues/19),
+then dispatch `publish-image.yml` only for the exact eligible merged UI main SHA.
+The normal publisher reruns every gate and emits the new actual digest. Select
+that receipt through deployment verification afterwards; no digest or accepted
+release is fabricated in this rename PR. Auth0 configuration and environment
+promotion remain separate work.
+
 ## Runtime contract
 
 The same image runs in every environment, without a Vite rebuild. Supply:

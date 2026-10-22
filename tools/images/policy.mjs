@@ -1,7 +1,7 @@
 /** Producer invariants are reviewable policy, not an independent attestation. */
 import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync } from 'node:fs';
-export const REPOSITORY = 'stanimirivanov/fleetiq-ux';
+export const REPOSITORY = 'stanimirivanov/fleetiq-ui';
 export const SOURCE = `https://github.com/${REPOSITORY}`;
 export const IMAGE = `ghcr.io/${REPOSITORY}`;
 export const SHA = /^[a-f0-9]{40}$/u;

@@ -24,6 +24,7 @@ import {
   ensure,
   hash,
   IMAGE,
+  REPOSITORY,
   readJson,
   validateQualification,
   validateScan,
@@ -85,7 +86,7 @@ async function registryToken() {
     'Registry credential is unavailable.',
   );
   const response = await fetch(
-    'https://ghcr.io/token?service=ghcr.io&scope=repository:stanimirivanov/fleetiq-ux:pull,push',
+    `https://ghcr.io/token?service=ghcr.io&scope=repository:${REPOSITORY}:pull,push`,
     {
       headers: {
         Authorization:
@@ -111,7 +112,7 @@ async function registryToken() {
 }
 async function registryManifest(method, reference, token) {
   return await fetch(
-    `https://ghcr.io/v2/stanimirivanov/fleetiq-ux/manifests/${reference}`,
+    `https://ghcr.io/v2/${REPOSITORY}/manifests/${reference}`,
     {
       method,
       headers: {

@@ -7,8 +7,10 @@ import { cspFor, inlineScriptHashes } from '../inline-csp.mjs';
 import { inspectLayout } from '../oci.mjs';
 import {
   CHECKS,
+  IMAGE,
   REPOSITORY,
   readJson,
+  SOURCE,
   validateDockerfile,
   validateQualification,
   validateScan,
@@ -128,6 +130,27 @@ test('real OCI descriptors bind runtime, SBOM, npm builder coverage and source',
     f.cleanup();
   }
 });
+test('canonical UI identity rejects historical labels and provenance in new artifacts', () => {
+  assert.equal(REPOSITORY, 'stanimirivanov/fleetiq-ui');
+  assert.equal(SOURCE, 'https://github.com/stanimirivanov/fleetiq-ui');
+  assert.equal(IMAGE, 'ghcr.io/stanimirivanov/fleetiq-ui');
+  for (const options of [
+    { source: 'https://github.com/stanimirivanov/fleetiq-ux' },
+    { provenanceSource: 'https://github.com/stanimirivanov/fleetiq-ux.git' },
+    { provenanceSource: 'git@github.com:stanimirivanov/fleetiq-ux.git' },
+  ]) {
+    const fixture = layoutFixture(options);
+    try {
+      assert.throws(
+        () => inspectLayout(fixture.layout, fixture.revision),
+        /source labels|repository differs/,
+      );
+    } finally {
+      fixture.cleanup();
+    }
+  }
+});
+
 test('wrong image, incomplete OS/Go coverage, findings and stale DB fail closed', () => {
   const good = scanFixture();
   validateScan(good.scan, good.db, good.now, digest);

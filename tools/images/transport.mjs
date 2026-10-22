@@ -130,7 +130,7 @@ export async function loadRuntime(tools, directory, artifact, resources) {
     ['--network', resources.network],
     true,
   );
-  const image = `fleetiq-ux-qualified:${resources.id}`;
+  const image = `fleetiq-ui-qualified:${resources.id}`;
   ensure(
     !(
       await docker([

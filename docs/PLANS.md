@@ -1,6 +1,6 @@
 # Execution plans
 
-FleetIQ UX follows the existing numbered milestones. Scaffold, visual-language
+FleetIQ UI follows the existing numbered milestones. Scaffold, visual-language
 foundation, shell, testing, contract, and architectural hardening work belong
 to **M02 - Product Foundation**. The first complete visual workspace belongs
 to **M04 - Semantic Twin and Live UI**.

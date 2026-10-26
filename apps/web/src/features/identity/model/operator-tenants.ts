@@ -2,7 +2,8 @@
 export type TenantAction =
   | 'access.manage'
   | 'metadata.manage'
-  | 'metadata.read';
+  | 'metadata.read'
+  | 'protocol.manage';
 
 export interface OperatorTenant {
   readonly id: string;

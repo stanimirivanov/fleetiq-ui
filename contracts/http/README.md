@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.4` from merged
-`fleetiq-platform` commit `986b9fcb2862bdd4765b6d1719047a21a3a8ea47`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.15` from merged
+`fleetiq-platform` commit `3455f923a20314fb72ff7d0090fd004047ae5ae7`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -12,7 +12,7 @@ The bundled snapshot is a partial `/api/v1` contract, not the whole platform API
 
 The published bundle supplies discovery, bounded tenant asset pages, asset detail,
 exact asset-type/property/relationship-type versions, directed relationship pages,
-target and exact-source binding pages, and four browser-authentication routes.
+target and exact-source binding pages, four browser-authentication routes, and the device commissioning/diagnostics APIs.
 
 - GET `/api/v1/me/tenants`: bounded active tenants and their exact explicit grants, with `limit` and exclusive `after` cursor.
 - GET `/api/v1/auth/login`: native browser navigation to the configured OIDC provider.
@@ -44,7 +44,7 @@ decimal strings to preserve u64. Signed millisecond times must be safe JS intege
 unrepresentable values are rejected before display.
 
 Search and type filtering are local to the loaded catalogue page. There is no
-server filter/total endpoint, global definition list, source inventory, live property
+server filter/total endpoint, complete source inventory, live property
 state, position, telemetry stream, or alert lifecycle in this baseline.
 
 An opaque `after` cursor is exclusive. Preserve tenant, resource/source, cutoffs,
@@ -72,3 +72,33 @@ The snapshot is exempt from Biome formatting so its hash matches upstream. Addit
 unknown response fields remain compatible; missing required fields, unsafe numbers,
 and cross-scope responses fail validation. Do not relax invariants to accommodate a
 mock that does not match the published contract.
+
+## Device commissioning and consumer generation
+
+The byte-identical bundle contains the broader backend API. The generated browser
+client includes only the 22 consumed operations registered in
+[the contract sensor](../../tools/sensors/asset-contract.mjs), plus their complete
+transitive schema closure. Administration operations outside this UI are retained
+in the upstream snapshot but are not added to browser code. Negative fixtures
+cover every consumed operation; missing references and selection drift fail closed.
+
+Effect 4.0.5 cannot import JSON Schema `if/then/else`. The
+[generation adapter](../../tools/sensors/route-generation.mjs) validates the exact
+published route condition, then expresses the same active/retired cases as a
+disjoint union. Both variants preserve all base required fields and constraints.
+It does not edit the snapshot or remove the route invariant. Generated-schema and
+adapter tests reject contradictory selection/admission-policy pairs. A private
+temporary patch file avoids Windows command-line limits and is removed after use.
+
+Device commands use same-origin sessions and `X-FleetIQ-CSRF: 1`; the browser
+supplies Origin. Registration is create-only, with exact complete-content retries.
+An unconfirmed response is not success: the form preserves its captured request
+and permits only an explicit exact retry. Route assignment/retirement compares
+an observed revision and re-reads the current head after acknowledgement; retry
+receipts can describe older generations. No automatic command retry is enabled.
+
+`metadata.read`, `metadata.manage` and `protocol.manage` remain independent.
+Package lookup proves stored immutable identity, not current admission. Route
+mutation rechecks eligibility on the backend. Diagnostics exposes only safe
+persisted evidence, explicit 64-frame/64-output/128-source coverage, and
+`not_observed` worker/connection liveness. No fake operational fallback is used.

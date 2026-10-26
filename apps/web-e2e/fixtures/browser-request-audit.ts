@@ -44,13 +44,26 @@ export class BrowserRequestAudit {
       return;
     if (!url.pathname.startsWith('/api/v1/'))
       this.violations.push('unowned-api-path');
-    if (!['GET', 'POST'].includes(request.method()))
+    if (!['GET', 'POST', 'PUT'].includes(request.method()))
       this.violations.push('unowned-api-method');
-    if (
-      request.method() === 'POST' &&
-      (url.pathname !== '/api/v1/auth/logout' ||
-        headers['x-fleetiq-csrf'] !== '1')
-    )
-      this.violations.push('unowned-api-mutation');
+    if (request.method() !== 'GET') {
+      const post =
+        request.method() === 'POST' &&
+        (url.pathname === '/api/v1/auth/logout' ||
+          /^\/api\/v1\/tenants\/[^/]+\/assets(?:\/[^/]+\/device)?$/u.test(
+            url.pathname,
+          ));
+      const put =
+        request.method() === 'PUT' &&
+        /^\/api\/v1\/tenants\/[^/]+\/assets\/[^/]+\/protocol-routes\/[A-Za-z0-9_.-]{1,128}$/u.test(
+          url.pathname,
+        );
+      if (
+        (!post && !put) ||
+        headers['x-fleetiq-csrf'] !== '1' ||
+        headers.origin !== this.origin
+      )
+        this.violations.push('unowned-api-mutation');
+    }
   }
 }

@@ -202,6 +202,78 @@
         "percent": 73,
         "minimumTotal": 15
       }
+    },
+    "src/features/devices/api/device-gateway.ts": {
+      "lines": {
+        "percent": 96,
+        "minimumTotal": 63
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 27
+      },
+      "statements": {
+        "percent": 93,
+        "minimumTotal": 65
+      },
+      "branches": {
+        "percent": 84,
+        "minimumTotal": 59
+      }
+    },
+    "src/features/devices/api/validation.ts": {
+      "lines": {
+        "percent": 88,
+        "minimumTotal": 27
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 7
+      },
+      "statements": {
+        "percent": 89,
+        "minimumTotal": 29
+      },
+      "branches": {
+        "percent": 92,
+        "minimumTotal": 55
+      }
+    },
+    "src/features/devices/ui/useDeviceCommand.ts": {
+      "lines": {
+        "percent": 97,
+        "minimumTotal": 40
+      },
+      "functions": {
+        "percent": 88,
+        "minimumTotal": 9
+      },
+      "statements": {
+        "percent": 93,
+        "minimumTotal": 43
+      },
+      "branches": {
+        "percent": 81,
+        "minimumTotal": 37
+      }
+    },
+    "src/features/devices/ui/useDeviceRead.ts": {
+      "lines": {
+        "percent": 92,
+        "minimumTotal": 27
+      },
+      "functions": {
+        "percent": 80,
+        "minimumTotal": 10
+      },
+      "statements": {
+        "percent": 84,
+        "minimumTotal": 32
+      },
+      "branches": {
+        "percent": 64,
+        "minimumTotal": 14
+      }
     }
   },
   "obligations": [

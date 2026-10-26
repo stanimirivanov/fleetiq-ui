@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
-import { checkAssetContract } from './asset-contract.mjs';
+import { BROWSER_OPERATIONS, checkAssetContract } from './asset-contract.mjs';
 import { ownedFixture } from './fixtures.mjs';
 
 const pinnedBytes = await readFile(
@@ -45,7 +45,7 @@ test('the byte-identical pinned contract and provenance pass', async (context) =
   const paths = await fixture(context);
   assert.deepEqual(await checkAssetContract(paths), {
     commit: pinnedSource.commit,
-    operations: 14,
+    operations: 22,
   });
   assert.deepEqual(await readFile(paths.contractPath), pinnedBytes);
 });
@@ -162,20 +162,13 @@ for (const schema of ['OperatorTenantPage', 'OperatorTenant', 'TenantAction']) {
     );
   });
 }
-const publishedOperations = Object.entries(published.paths).flatMap(
-  ([route, item]) =>
-    Object.entries(item)
-      .filter(([, operation]) => operation?.operationId)
-      .map(([method, operation]) => ({
-        route,
-        method,
-        id: operation.operationId,
-      })),
+const publishedOperations = BROWSER_OPERATIONS.map(
+  ({ path: route, method, id }) => ({ route, method, id }),
 );
 assert.equal(
   publishedOperations.length,
-  14,
-  'fixture must contain every published operation',
+  22,
+  'every consumed browser operation has a negative fixture',
 );
 for (const { route, method, id } of publishedOperations) {
   for (const change of ['missing', 'changed']) {

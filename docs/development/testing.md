@@ -64,9 +64,9 @@ to main, or through a main-branch manual run. It publishes the generated
 book to GitHub Pages. Repository administrators must select GitHub Actions
 as the Pages source before first deployment.
 
-The guide has ten browser-verified parts. The production orientation teaches
+The guide has eleven browser-verified parts. The production orientation teaches
 shell navigation, unavailable sign-in and operational states, status vocabulary, and appearance.
-Four connected-contract chapters teach operator sessions, asset discovery and
+Five connected-contract chapters teach operator sessions, asset discovery and
 pinned definitions, temporal relationships/source mappings, and recovery/accessibility.
 They use the production HTTP adapter with synthetic contract-valid responses, not
 a deployed provider or customer records. The sign-in fixture demonstrates only the
@@ -103,11 +103,11 @@ status categorization before error-body parsing, body/operation bounds, interrup
 and runtime disposal. Solid tests prove stale response suppression and protected
 content removal; assertions must not be replaced with arbitrary timing waits.
 
-Four connected journeys carry the @user-guide tag and run both as ordinary
+Five connected journeys carry the @user-guide tag and run both as ordinary
 assertion-first tests and narrated recordings. The assembler rejects missing or
 misclassified connected chapters. Guide-owned pages enforce their own page-error
 counter because they use fresh contexts outside the ordinary fixture page.
-The complete ten-chapter guide must generate.
+The complete eleven-chapter guide must generate.
 Contract interception is not deployment qualification: run a separate backend-backed
 journey to qualify the chosen provider, HTTPS proxy, session cookie, and permission
 configuration. Do not record provider tokens, credentials, or one-time callback URLs.
@@ -121,3 +121,10 @@ Guide release also requires exact source/evidence/output hashes and inspection. 
 ## Measured quality and mandatory browser fixture
 
 Run pnpm verify --group browser-quality after the functional browser group. The separate built-preview lane records bounded workloads, repeated samples, rendered accessibility and resource growth; it does not qualify backend/network capacity. Scenarios import fixtures/production-test or fixtures/browser-quality-test so unexpected page errors cannot be silently discarded. Direct SDK test imports are lint violations. Follow [measured quality](measured-browser-quality.md) and the [control register](harness-controls.md). Guide release requires acceptance, browser and browser-quality evidence at unchanged sources.
+
+The connected device chapter commissions an asset and endpoints, checks an exact
+stored package, assigns a revision-checked route, reviews sampled processing/source
+evidence and retires the route. Its responses are synthetic contract fixtures;
+D06, real provider/browser acceptance and hardware qualification remain separate.
+Device regressions additionally cover ambiguous exact retries, conflicts, independent
+grants, invalid URL context, unsafe evidence, disposal and late completions.

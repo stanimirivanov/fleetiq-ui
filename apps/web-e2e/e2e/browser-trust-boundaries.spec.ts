@@ -51,3 +51,28 @@ test('the browser observer detects real forbidden requests even when the network
     audit.dispose();
   }
 });
+
+test('device mutation ownership rejects other endpoints and missing CSRF', async ({
+  page,
+  baseURL,
+}) => {
+  if (!baseURL) throw new Error('Production origin required');
+  await installMetadataApi(page);
+  const audit = new BrowserRequestAudit(page, baseURL);
+  try {
+    await page.goto('/');
+    await page.evaluate(async () => {
+      await fetch('/api/v1/tenants/tenant-a/assets', {
+        method: 'POST',
+        body: '{}',
+      });
+      await fetch(
+        '/api/v1/tenants/tenant-a/protocol-packages/foreign/versions/1',
+        { method: 'PUT', headers: { 'X-FleetIQ-CSRF': '1' }, body: '{}' },
+      );
+    });
+    expect(await audit.result()).toContain('unowned-api-mutation');
+  } finally {
+    audit.dispose();
+  }
+});

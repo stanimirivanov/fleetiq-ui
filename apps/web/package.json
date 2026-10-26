@@ -9,7 +9,8 @@
     "#features/alerts": "./src/features/alerts/index.ts",
     "#shared/api": "./src/shared/api/index.ts",
     "#shared/model": "./src/shared/model/index.ts",
-    "#features/identity": "./src/features/identity/index.ts"
+    "#features/identity": "./src/features/identity/index.ts",
+    "#features/devices": "./src/features/devices/index.ts"
   },
   "scripts": {
     "dev": "vite",

@@ -327,6 +327,16 @@ test('page errors and payload-bearing observation extensions cannot be discarded
     observations: [{ screen: 'catalogue', violations: [] }],
   };
   validateObservation('accessibility', value);
+  validateObservation('accessibility', {
+    ...value,
+    observations: [{ screen: 'device-commissioning', violations: [] }],
+  });
+  assert.throws(() =>
+    validateObservation('accessibility', {
+      ...value,
+      observations: [{ screen: 'unregistered-device-screen', violations: [] }],
+    }),
+  );
   assert.throws(() =>
     validateObservation('accessibility', { ...value, html: 'private-marker' }),
   );

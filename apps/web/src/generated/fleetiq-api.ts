@@ -7,14 +7,18 @@ import * as HttpClientError from "effect/http/HttpClientError"
 import * as HttpClientRequest from "effect/http/HttpClientRequest"
 import * as HttpClientResponse from "effect/http/HttpClientResponse"
 // non-recursive definitions
-export type TenantAction = "access.manage" | "metadata.manage" | "metadata.read"
-export const TenantAction = Schema.Literals(["access.manage", "metadata.manage", "metadata.read"]).annotate({ "description": "An exact granted tenant action; no action implies another.", "identifier": "TenantAction" })
+export type TenantAction = "access.manage" | "metadata.manage" | "metadata.read" | "protocol.manage"
+export const TenantAction = Schema.Literals(["access.manage", "metadata.manage", "metadata.read", "protocol.manage"]).annotate({ "description": "An exact granted tenant action; no action implies another.", "identifier": "TenantAction" })
 export type Problem = { readonly "type": string, readonly "title": string, readonly "status": number } & { readonly [x: string]: Schema.Json }
 export const Problem = Schema.StructWithRest(Schema.Struct({ "type": Schema.String, "title": Schema.String, "status": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(400).annotate({ "expected": "a value greater than or equal to 400" })).check(Schema.isLessThanOrEqualTo(599).annotate({ "expected": "a value less than or equal to 599" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "Minimum application/problem+json shape. Future compatible problems may include optional fields.", "identifier": "Problem" })
 export type ApiDescription = { readonly "service": "FleetIQ", readonly "version": "v1" } & { readonly [x: string]: Schema.Json }
 export const ApiDescription = Schema.StructWithRest(Schema.Struct({ "service": Schema.Literal("FleetIQ"), "version": Schema.Literal("v1") }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "ApiDescription" })
 export type AssetTypeRef = { readonly "id": string, readonly "version": number } & { readonly [x: string]: Schema.Json }
 export const AssetTypeRef = Schema.StructWithRest(Schema.Struct({ "id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetTypeRef" })
+export type AdministrationIdentifier = string
+export const AdministrationIdentifier = Schema.String.annotate({ "description": "Exact opaque domain identifier; no surrounding whitespace or control characters." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })).check(Schema.isPattern(new RegExp("^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "u")).annotate({ "expected": "a string matching the RegExp ^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "identifier": "AdministrationIdentifier" }))
+export type SemanticDefinitionName = string
+export const SemanticDefinitionName = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(200).annotate({ "expected": "a string with at most 200 code points" })).check(Schema.isPattern(new RegExp("^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "u")).annotate({ "expected": "a string matching the RegExp ^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "identifier": "SemanticDefinitionName" }))
 export type ExternalIdentifier = { readonly "kind": string, readonly "authority": string | null, readonly "value": string } & { readonly [x: string]: Schema.Json }
 export const ExternalIdentifier = Schema.StructWithRest(Schema.Struct({ "kind": Schema.String.annotate({ "description": "Identifier namespace, such as manufacturer.serial-number." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "authority": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]).annotate({ "description": "Optional issuing authority within this tenant-owned namespace." }), "value": Schema.String.annotate({ "description": "External identifier value; no kind is assumed universal." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "Tenant-owned typed external identifier.", "identifier": "ExternalIdentifier" })
 export type RelationshipTypeRef = { readonly "id": string, readonly "version": number } & { readonly [x: string]: Schema.Json }
@@ -31,10 +35,32 @@ export type RelationshipTypeDefinition = { readonly "id": string, readonly "vers
 export const RelationshipTypeDefinition = Schema.StructWithRest(Schema.Struct({ "id": Schema.String.annotate({ "description": "Immutable relationship-type definition ID." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), "name": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "RelationshipTypeDefinition" })
 export type OperatorSession = { readonly "actor_id": string, readonly "expires_at_ms": number }
 export const OperatorSession = Schema.Struct({ "actor_id": Schema.String.annotate({ "description": "Internal actor established at sign-in, with its current identity mapping revalidated." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })), "expires_at_ms": Schema.Number.annotate({ "description": "Absolute expiry in Unix epoch milliseconds; no sliding renewal.", "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })) }).annotate({ "identifier": "OperatorSession" })
+export type ProtocolRouteSelection = { readonly "package_id": string, readonly "package_version": string, readonly "world": "runtime-v1" | "identity-v1" }
+export const ProtocolRouteSelection = Schema.Struct({ "package_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "package_version": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "world": Schema.Literals(["runtime-v1", "identity-v1"]) }).annotate({ "identifier": "ProtocolRouteSelection" })
+export type ProtocolPackageRelease = { readonly "package_id": string, readonly "package_version": string, readonly "artifact_sha256": string, readonly "artifact_size_bytes": number }
+export const ProtocolPackageRelease = Schema.Struct({ "package_id": Schema.String, "package_version": Schema.String, "artifact_sha256": Schema.String.check(Schema.isPattern(new RegExp("^[a-f0-9]{64}$", "u")).annotate({ "expected": "a string matching the RegExp ^[a-f0-9]{64}$" })), "artifact_size_bytes": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(8388608).annotate({ "expected": "a value less than or equal to 8388608" })) }).annotate({ "identifier": "ProtocolPackageRelease" })
+export type IngestionDiagnosticCoverage = { readonly "frame_limit": 64, readonly "output_limit_per_frame": 64, readonly "source_limit": 128, readonly "frames_truncated": boolean, readonly "observations_truncated": boolean, readonly "sources_truncated": boolean }
+export const IngestionDiagnosticCoverage = Schema.Struct({ "frame_limit": Schema.Literal(64), "output_limit_per_frame": Schema.Literal(64), "source_limit": Schema.Literal(128), "frames_truncated": Schema.Boolean, "observations_truncated": Schema.Boolean, "sources_truncated": Schema.Boolean }).annotate({ "identifier": "IngestionDiagnosticCoverage" })
+export type IngestionDiagnosticFrame = { readonly "message_id": string, readonly "package_id": string, readonly "package_version": string, readonly "received_at_ms": number, readonly "processing": "accepted" | "queued" | "leased" | "expired" | "poisoned" | "decoded", readonly "observation_count": number | null }
+export const IngestionDiagnosticFrame = Schema.Struct({ "message_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "package_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "package_version": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "received_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })), "processing": Schema.Literals(["accepted", "queued", "leased", "expired", "poisoned", "decoded"]).annotate({ "description": "Durable evidence only. Leased does not prove a live worker; expired does not prove terminal failure." }), "observation_count": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(4294967296).annotate({ "expected": "a value less than or equal to 4294967296" })), Schema.Null]).annotate({ "description": "Null without a decoded completion marker; zero is successful empty decoding." }) }).annotate({ "identifier": "IngestionDiagnosticFrame" })
+export type IngestionObservedSource = { readonly "package_id": string, readonly "package_version": string, readonly "endpoint_id": string, readonly "signal_id": string }
+export const IngestionObservedSource = Schema.Struct({ "package_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "package_version": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "endpoint_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "signal_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })) }).annotate({ "identifier": "IngestionObservedSource" })
 export type OperatorTenant = { readonly "tenant_id": string, readonly "actions": ReadonlyArray<TenantAction> }
 export const OperatorTenant = Schema.Struct({ "tenant_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "actions": Schema.Array(TenantAction).annotate({ "description": "Explicit current grants ordered by action name; never reusable authorization." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxLength(3).annotate({ "expected": "a value with a length of at most 3" })).check(Schema.isUnique().annotate({ "expected": "an array with unique items" })) }).annotate({ "identifier": "OperatorTenant" })
 export type AssetSummary = { readonly "id": string, readonly "tenant_id": string, readonly "name": string, readonly "asset_type": AssetTypeRef } & { readonly [x: string]: Schema.Json }
 export const AssetSummary = Schema.StructWithRest(Schema.Struct({ "id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "tenant_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "name": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })), "asset_type": AssetTypeRef }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetSummary" })
+export type RegistrationAssetType = { readonly "id": AdministrationIdentifier, readonly "version": number }
+export const RegistrationAssetType = Schema.Struct({ "id": AdministrationIdentifier, "version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })) }).annotate({ "description": "Exact immutable asset-type version in the selected tenant.", "identifier": "RegistrationAssetType" })
+export type RegistrationExternalIdentifier = { readonly "kind": AdministrationIdentifier, readonly "authority"?: AdministrationIdentifier | null, readonly "value": AdministrationIdentifier }
+export const RegistrationExternalIdentifier = Schema.Struct({ "kind": AdministrationIdentifier, "authority": Schema.optionalKey(Schema.Union([AdministrationIdentifier, Schema.Null]).annotate({ "description": "Omitted authority means null; no issuer namespace is assumed universal." })), "value": AdministrationIdentifier }).annotate({ "identifier": "RegistrationExternalIdentifier" })
+export type MetadataRegistrationResult = { readonly "outcome": "registered" | "already_registered", readonly "registered_by": AdministrationIdentifier, readonly "recorded_at_ms": number }
+export const MetadataRegistrationResult = Schema.Struct({ "outcome": Schema.Literals(["registered", "already_registered"]), "registered_by": AdministrationIdentifier, "recorded_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })) }).annotate({ "description": "Immutable first-registration evidence, including on an exact retry by a different currently authorized actor. Receipt time is signed Unix milliseconds sampled by the host.", "identifier": "MetadataRegistrationResult" })
+export type SemanticDefinitionPosition = { readonly "id": AdministrationIdentifier, readonly "version": number }
+export const SemanticDefinitionPosition = Schema.Struct({ "id": AdministrationIdentifier, "version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })) }).annotate({ "identifier": "SemanticDefinitionPosition" })
+export type DeviceEndpoint = { readonly "id": AdministrationIdentifier, readonly "kind": AdministrationIdentifier, readonly "name": SemanticDefinitionName }
+export const DeviceEndpoint = Schema.Struct({ "id": AdministrationIdentifier, "kind": AdministrationIdentifier, "name": SemanticDefinitionName }).annotate({ "description": "Stable source boundary under a communication device; kind is extensible and no protocol or semantic binding is implied.", "identifier": "DeviceEndpoint" })
+export type SemanticDefinitionSummary = { readonly "id": AdministrationIdentifier, readonly "version": number, readonly "name": SemanticDefinitionName }
+export const SemanticDefinitionSummary = Schema.Struct({ "id": AdministrationIdentifier, "version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), "name": SemanticDefinitionName }).annotate({ "identifier": "SemanticDefinitionSummary" })
 export type Asset = { readonly "id": string, readonly "tenant_id": string, readonly "name": string, readonly "asset_type": AssetTypeRef, readonly "external_identifiers": ReadonlyArray<ExternalIdentifier> } & { readonly [x: string]: Schema.Json }
 export const Asset = Schema.StructWithRest(Schema.Struct({ "id": Schema.String.annotate({ "description": "Internal FleetIQ asset identity." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "tenant_id": Schema.String.annotate({ "description": "Owning tenant." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "name": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })), "asset_type": AssetTypeRef, "external_identifiers": Schema.Array(ExternalIdentifier) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "Exact asset identity with its pinned type and external identifiers.", "identifier": "Asset" })
 export type Relationship = { readonly "id": string, readonly "tenant_id": string, readonly "revision": string, readonly "recorded_at_ms": number, readonly "relationship_type": RelationshipTypeRef, readonly "source_asset_id": string, readonly "target_asset_id": string, readonly "effective_interval": EffectiveInterval } & { readonly [x: string]: Schema.Json }
@@ -43,10 +69,24 @@ export type SignalTarget = { readonly "asset_id": string, readonly "property": P
 export const SignalTarget = Schema.StructWithRest(Schema.Struct({ "asset_id": Schema.String.annotate({ "description": "Observed target asset ID." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "property": PropertyReference }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "Semantically attributed target asset and exact property version.", "identifier": "SignalTarget" })
 export type AssetTypeDefinition = { readonly "id": string, readonly "version": number, readonly "name": string, readonly "supported_properties": ReadonlyArray<PropertyReference> } & { readonly [x: string]: Schema.Json }
 export const AssetTypeDefinition = Schema.StructWithRest(Schema.Struct({ "id": Schema.String.annotate({ "description": "Immutable asset-type definition ID." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), "name": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })), "supported_properties": Schema.Array(PropertyReference).annotate({ "description": "Ordered exact property-definition references." }) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetTypeDefinition" })
+export type ProtocolDeviceRoute = { readonly "device_asset_id": string, readonly "channel_id": string, readonly "revision": number, readonly "selection": ProtocolRouteSelection, readonly "policy_version": number, readonly "actor_id": string, readonly "recorded_at_ms": number } | { readonly "device_asset_id": string, readonly "channel_id": string, readonly "revision": number, readonly "selection": null, readonly "policy_version": null, readonly "actor_id": string, readonly "recorded_at_ms": number }
+export const ProtocolDeviceRoute = Schema.Union([Schema.Struct({ "device_asset_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "channel_id": Schema.String.check(Schema.isPattern(new RegExp("^[A-Za-z0-9_.-]{1,128}$", "u")).annotate({ "expected": "a string matching the RegExp ^[A-Za-z0-9_.-]{1,128}$" })), "revision": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), "selection": ProtocolRouteSelection, "policy_version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })), "actor_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "recorded_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })) }), Schema.Struct({ "device_asset_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "channel_id": Schema.String.check(Schema.isPattern(new RegExp("^[A-Za-z0-9_.-]{1,128}$", "u")).annotate({ "expected": "a string matching the RegExp ^[A-Za-z0-9_.-]{1,128}$" })), "revision": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), "selection": Schema.Null, "policy_version": Schema.Null, "actor_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "recorded_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })) })]).annotate({ "identifier": "ProtocolDeviceRoute" })
+export type ChangeProtocolRouteRequest = { readonly "expected_revision": number, readonly "selection": ProtocolRouteSelection | null }
+export const ChangeProtocolRouteRequest = Schema.Struct({ "expected_revision": Schema.Number.annotate({ "description": "Zero expects an unconfigured route; otherwise the last observed generation." }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), "selection": Schema.Union([ProtocolRouteSelection, Schema.Null]).annotate({ "description": "Explicit null retires this route; omission is never retirement." }) }).annotate({ "identifier": "ChangeProtocolRouteRequest" })
+export type IngestionDiagnostics = { readonly "observed_at_ms": number, readonly "connection_liveness": "not_observed", readonly "worker_liveness": "not_observed", readonly "coverage": IngestionDiagnosticCoverage, readonly "frames": ReadonlyArray<IngestionDiagnosticFrame>, readonly "sources": ReadonlyArray<IngestionObservedSource> }
+export const IngestionDiagnostics = Schema.Struct({ "observed_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })), "connection_liveness": Schema.Literal("not_observed"), "worker_liveness": Schema.Literal("not_observed"), "coverage": IngestionDiagnosticCoverage, "frames": Schema.Array(IngestionDiagnosticFrame).annotate({ "description": "Newest host receipt timestamp, then descending message identity. Not a freshness or connection guarantee." }).check(Schema.isMaxLength(64).annotate({ "expected": "a value with a length of at most 64" })), "sources": Schema.Array(IngestionObservedSource).annotate({ "description": "Distinct package/version/endpoint/signal tuples from the first 64 decoded positions in each sampled frame; lexicographically ordered. Not complete device capabilities." }).check(Schema.isMaxLength(128).annotate({ "expected": "a value with a length of at most 128" })) }).annotate({ "identifier": "IngestionDiagnostics" })
 export type OperatorTenantPage = { readonly "tenants": ReadonlyArray<OperatorTenant>, readonly "next_after": string | null }
 export const OperatorTenantPage = Schema.Struct({ "tenants": Schema.Array(OperatorTenant).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]).annotate({ "description": "Last emitted tenant ID when another tenant exists; otherwise null." }) }).annotate({ "identifier": "OperatorTenantPage" })
 export type AssetPage = { readonly "assets": ReadonlyArray<AssetSummary>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
 export const AssetPage = Schema.StructWithRest(Schema.Struct({ "assets": Schema.Array(AssetSummary).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]).annotate({ "description": "Exclusive cursor for the next page, or null when no next page exists." }) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetPage" })
+export type RegisterAssetRequest = { readonly "id": AdministrationIdentifier, readonly "name": SemanticDefinitionName, readonly "asset_type": RegistrationAssetType, readonly "external_identifiers": ReadonlyArray<RegistrationExternalIdentifier> }
+export const RegisterAssetRequest = Schema.Struct({ "id": AdministrationIdentifier, "name": SemanticDefinitionName, "asset_type": RegistrationAssetType, "external_identifiers": Schema.Array(RegistrationExternalIdentifier).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })).check(Schema.isUnique().annotate({ "expected": "an array with unique items" })) }).annotate({ "description": "Create-only content. Identifier order is irrelevant; duplicate kind/authority/value is invalid, including omitted versus null authority.", "identifier": "RegisterAssetRequest" })
+export type CommunicationDevice = { readonly "tenant_id": string, readonly "asset_id": string, readonly "endpoints": ReadonlyArray<DeviceEndpoint> } & { readonly [x: string]: Schema.Json }
+export const CommunicationDevice = Schema.StructWithRest(Schema.Struct({ "tenant_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "asset_id": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "endpoints": Schema.Array(DeviceEndpoint) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "Existing device GET representation; endpoints retain declaration order.", "identifier": "CommunicationDevice" })
+export type RegisterCommunicationDeviceRequest = { readonly "endpoints": ReadonlyArray<DeviceEndpoint> }
+export const RegisterCommunicationDeviceRequest = Schema.Struct({ "endpoints": Schema.Array(DeviceEndpoint).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })) }).annotate({ "description": "Attach capability to the existing asset in the route. Endpoint IDs are unique within the declaration; declaration order participates in retry equality.", "identifier": "RegisterCommunicationDeviceRequest" })
+export type DefinitionCataloguePage = { readonly "definitions": ReadonlyArray<SemanticDefinitionSummary>, readonly "next_after": SemanticDefinitionPosition | null }
+export const DefinitionCataloguePage = Schema.Struct({ "definitions": Schema.Array(SemanticDefinitionSummary).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([SemanticDefinitionPosition, Schema.Null]) }).annotate({ "identifier": "DefinitionCataloguePage" })
 export type RelationshipSnapshot = { readonly "asset_id": string, readonly "effective_at_ms": number, readonly "known_at_ms": number, readonly "relationships": ReadonlyArray<Relationship>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
 export const RelationshipSnapshot = Schema.StructWithRest(Schema.Struct({ "asset_id": Schema.String.annotate({ "description": "Queried current-catalogue asset." }).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), "effective_at_ms": Schema.Number.annotate({ "description": "Physical time used for this page.", "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })), "known_at_ms": Schema.Number.annotate({ "description": "Recorded-time cutoff used for this page.", "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })), "relationships": Schema.Array(Relationship).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]).annotate({ "description": "Exclusive stable relationship-ID cursor; null ends traversal." }) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "One bounded, bitemporal relationship page for an asset.", "identifier": "RelationshipSnapshot" })
 export type SignalBinding = { readonly "id": string, readonly "tenant_id": string, readonly "revision": string, readonly "recorded_at_ms": number, readonly "source": SignalSource, readonly "target": SignalTarget, readonly "effective_interval": EffectiveInterval } & { readonly [x: string]: Schema.Json }
@@ -80,6 +120,28 @@ export type ListAssets403 = Problem
 export const ListAssets403 = Problem
 export type ListAssets500 = Problem
 export const ListAssets500 = Problem
+export type RegisterAssetParams = { readonly "Origin"?: string, readonly "X-FleetIQ-CSRF"?: "1" }
+export const RegisterAssetParams = Schema.Struct({ "Origin": Schema.optionalKey(Schema.String), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type RegisterAssetRequestJson = RegisterAssetRequest
+export const RegisterAssetRequestJson = RegisterAssetRequest
+export type RegisterAsset200 = MetadataRegistrationResult
+export const RegisterAsset200 = MetadataRegistrationResult
+export type RegisterAsset201 = MetadataRegistrationResult
+export const RegisterAsset201 = MetadataRegistrationResult
+export type RegisterAsset400 = Problem
+export const RegisterAsset400 = Problem
+export type RegisterAsset401 = Problem
+export const RegisterAsset401 = Problem
+export type RegisterAsset403 = Problem
+export const RegisterAsset403 = Problem
+export type RegisterAsset404 = Problem
+export const RegisterAsset404 = Problem
+export type RegisterAsset405 = Problem
+export const RegisterAsset405 = Problem
+export type RegisterAsset409 = Problem
+export const RegisterAsset409 = Problem
+export type RegisterAsset500 = Problem
+export const RegisterAsset500 = Problem
 export type GetAsset200 = Asset
 export const GetAsset200 = Asset
 export type GetAsset400 = Problem
@@ -202,6 +264,108 @@ export type EndOperatorSession405 = Problem
 export const EndOperatorSession405 = Problem
 export type EndOperatorSession500 = Problem
 export const EndOperatorSession500 = Problem
+export type GetCommunicationDevice200 = CommunicationDevice
+export const GetCommunicationDevice200 = CommunicationDevice
+export type GetCommunicationDevice400 = Problem
+export const GetCommunicationDevice400 = Problem
+export type GetCommunicationDevice401 = Problem
+export const GetCommunicationDevice401 = Problem
+export type GetCommunicationDevice403 = Problem
+export const GetCommunicationDevice403 = Problem
+export type GetCommunicationDevice404 = Problem
+export const GetCommunicationDevice404 = Problem
+export type GetCommunicationDevice405 = Problem
+export const GetCommunicationDevice405 = Problem
+export type GetCommunicationDevice500 = Problem
+export const GetCommunicationDevice500 = Problem
+export type RegisterCommunicationDeviceParams = { readonly "Origin"?: string, readonly "X-FleetIQ-CSRF"?: "1" }
+export const RegisterCommunicationDeviceParams = Schema.Struct({ "Origin": Schema.optionalKey(Schema.String), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type RegisterCommunicationDeviceRequestJson = RegisterCommunicationDeviceRequest
+export const RegisterCommunicationDeviceRequestJson = RegisterCommunicationDeviceRequest
+export type RegisterCommunicationDevice200 = MetadataRegistrationResult
+export const RegisterCommunicationDevice200 = MetadataRegistrationResult
+export type RegisterCommunicationDevice201 = MetadataRegistrationResult
+export const RegisterCommunicationDevice201 = MetadataRegistrationResult
+export type RegisterCommunicationDevice400 = Problem
+export const RegisterCommunicationDevice400 = Problem
+export type RegisterCommunicationDevice401 = Problem
+export const RegisterCommunicationDevice401 = Problem
+export type RegisterCommunicationDevice403 = Problem
+export const RegisterCommunicationDevice403 = Problem
+export type RegisterCommunicationDevice404 = Problem
+export const RegisterCommunicationDevice404 = Problem
+export type RegisterCommunicationDevice405 = Problem
+export const RegisterCommunicationDevice405 = Problem
+export type RegisterCommunicationDevice409 = Problem
+export const RegisterCommunicationDevice409 = Problem
+export type RegisterCommunicationDevice500 = Problem
+export const RegisterCommunicationDevice500 = Problem
+export type ListAssetTypeDefinitionsParams = { readonly "limit"?: number, readonly "after_id"?: AdministrationIdentifier, readonly "after_version"?: number }
+export const ListAssetTypeDefinitionsParams = Schema.Struct({ "limit": Schema.optionalKey(Schema.Number.annotate({ "default": 50 }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(100).annotate({ "expected": "a value less than or equal to 100" }))), "after_id": Schema.optionalKey(AdministrationIdentifier), "after_version": Schema.optionalKey(Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" }))) })
+export type ListAssetTypeDefinitions200 = DefinitionCataloguePage
+export const ListAssetTypeDefinitions200 = DefinitionCataloguePage
+export type ListAssetTypeDefinitions400 = Problem
+export const ListAssetTypeDefinitions400 = Problem
+export type ListAssetTypeDefinitions401 = Problem
+export const ListAssetTypeDefinitions401 = Problem
+export type ListAssetTypeDefinitions403 = Problem
+export const ListAssetTypeDefinitions403 = Problem
+export type ListAssetTypeDefinitions405 = Problem
+export const ListAssetTypeDefinitions405 = Problem
+export type ListAssetTypeDefinitions500 = Problem
+export const ListAssetTypeDefinitions500 = Problem
+export type GetDeviceProtocolRoute200 = ProtocolDeviceRoute
+export const GetDeviceProtocolRoute200 = ProtocolDeviceRoute
+export type GetDeviceProtocolRoute400 = Problem
+export const GetDeviceProtocolRoute400 = Problem
+export type GetDeviceProtocolRoute401 = Problem
+export const GetDeviceProtocolRoute401 = Problem
+export type GetDeviceProtocolRoute403 = Problem
+export const GetDeviceProtocolRoute403 = Problem
+export type GetDeviceProtocolRoute404 = Problem
+export const GetDeviceProtocolRoute404 = Problem
+export type GetDeviceProtocolRoute500 = Problem
+export const GetDeviceProtocolRoute500 = Problem
+export type ChangeDeviceProtocolRouteParams = { readonly "Origin"?: string, readonly "X-FleetIQ-CSRF"?: "1" }
+export const ChangeDeviceProtocolRouteParams = Schema.Struct({ "Origin": Schema.optionalKey(Schema.String), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type ChangeDeviceProtocolRouteRequestJson = ChangeProtocolRouteRequest
+export const ChangeDeviceProtocolRouteRequestJson = ChangeProtocolRouteRequest
+export type ChangeDeviceProtocolRoute200 = ProtocolDeviceRoute
+export const ChangeDeviceProtocolRoute200 = ProtocolDeviceRoute
+export type ChangeDeviceProtocolRoute400 = Problem
+export const ChangeDeviceProtocolRoute400 = Problem
+export type ChangeDeviceProtocolRoute401 = Problem
+export const ChangeDeviceProtocolRoute401 = Problem
+export type ChangeDeviceProtocolRoute403 = Problem
+export const ChangeDeviceProtocolRoute403 = Problem
+export type ChangeDeviceProtocolRoute409 = Problem
+export const ChangeDeviceProtocolRoute409 = Problem
+export type ChangeDeviceProtocolRoute500 = Problem
+export const ChangeDeviceProtocolRoute500 = Problem
+export type GetProtocolPackageRelease200 = ProtocolPackageRelease
+export const GetProtocolPackageRelease200 = ProtocolPackageRelease
+export type GetProtocolPackageRelease400 = Problem
+export const GetProtocolPackageRelease400 = Problem
+export type GetProtocolPackageRelease401 = Problem
+export const GetProtocolPackageRelease401 = Problem
+export type GetProtocolPackageRelease403 = Problem
+export const GetProtocolPackageRelease403 = Problem
+export type GetProtocolPackageRelease404 = Problem
+export const GetProtocolPackageRelease404 = Problem
+export type GetProtocolPackageRelease500 = Problem
+export const GetProtocolPackageRelease500 = Problem
+export type GetDeviceIngestionDiagnostics200 = IngestionDiagnostics
+export const GetDeviceIngestionDiagnostics200 = IngestionDiagnostics
+export type GetDeviceIngestionDiagnostics400 = Problem
+export const GetDeviceIngestionDiagnostics400 = Problem
+export type GetDeviceIngestionDiagnostics401 = Problem
+export const GetDeviceIngestionDiagnostics401 = Problem
+export type GetDeviceIngestionDiagnostics403 = Problem
+export const GetDeviceIngestionDiagnostics403 = Problem
+export type GetDeviceIngestionDiagnostics404 = Problem
+export const GetDeviceIngestionDiagnostics404 = Problem
+export type GetDeviceIngestionDiagnostics500 = Problem
+export const GetDeviceIngestionDiagnostics500 = Problem
 
 export interface OperationConfig {
   /**
@@ -330,6 +494,24 @@ export const make = (
       "401": decodeError("ListAssets401", ListAssets401),
       "403": decodeError("ListAssets403", ListAssets403),
       "500": decodeError("ListAssets500", ListAssets500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "registerAsset": (tenantId, options: Parameters<FleetIqApi["registerAsset"]>[1]) => __makePathRequest(HttpClientRequest.post, [tenantId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets").pipe(
+    Effect.flatMap((request) => request.pipe(
+      HttpClientRequest.setHeaders({ "Origin": options.params?.["Origin"] ?? undefined, "X-FleetIQ-CSRF": options.params?.["X-FleetIQ-CSRF"] ?? undefined }),
+      HttpClientRequest.bodyJsonUnsafe(options.payload),
+      withResponse(options.config)(HttpClientResponse.matchStatus({
+      "200": decodeSuccess(RegisterAsset200),
+      "201": decodeSuccess(RegisterAsset201),
+      "400": decodeError("RegisterAsset400", RegisterAsset400),
+      "401": decodeError("RegisterAsset401", RegisterAsset401),
+      "403": decodeError("RegisterAsset403", RegisterAsset403),
+      "404": decodeError("RegisterAsset404", RegisterAsset404),
+      "405": decodeError("RegisterAsset405", RegisterAsset405),
+      "409": decodeError("RegisterAsset409", RegisterAsset409),
+      "500": decodeError("RegisterAsset500", RegisterAsset500),
       orElse: unexpectedStatus
     }))
     ))
@@ -466,7 +648,107 @@ export const make = (
       "204": () => Effect.void,
       orElse: unexpectedStatus
     }))
-    )
+    ),
+    "getCommunicationDevice": (tenantId, assetId, options: Parameters<FleetIqApi["getCommunicationDevice"]>[2]) => __makePathRequest(HttpClientRequest.get, [tenantId, assetId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/device").pipe(
+    Effect.flatMap((request) => request.pipe(
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(GetCommunicationDevice200),
+      "400": decodeError("GetCommunicationDevice400", GetCommunicationDevice400),
+      "401": decodeError("GetCommunicationDevice401", GetCommunicationDevice401),
+      "403": decodeError("GetCommunicationDevice403", GetCommunicationDevice403),
+      "404": decodeError("GetCommunicationDevice404", GetCommunicationDevice404),
+      "405": decodeError("GetCommunicationDevice405", GetCommunicationDevice405),
+      "500": decodeError("GetCommunicationDevice500", GetCommunicationDevice500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "registerCommunicationDevice": (tenantId, assetId, options: Parameters<FleetIqApi["registerCommunicationDevice"]>[2]) => __makePathRequest(HttpClientRequest.post, [tenantId, assetId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/device").pipe(
+    Effect.flatMap((request) => request.pipe(
+      HttpClientRequest.setHeaders({ "Origin": options.params?.["Origin"] ?? undefined, "X-FleetIQ-CSRF": options.params?.["X-FleetIQ-CSRF"] ?? undefined }),
+      HttpClientRequest.bodyJsonUnsafe(options.payload),
+      withResponse(options.config)(HttpClientResponse.matchStatus({
+      "200": decodeSuccess(RegisterCommunicationDevice200),
+      "201": decodeSuccess(RegisterCommunicationDevice201),
+      "400": decodeError("RegisterCommunicationDevice400", RegisterCommunicationDevice400),
+      "401": decodeError("RegisterCommunicationDevice401", RegisterCommunicationDevice401),
+      "403": decodeError("RegisterCommunicationDevice403", RegisterCommunicationDevice403),
+      "404": decodeError("RegisterCommunicationDevice404", RegisterCommunicationDevice404),
+      "405": decodeError("RegisterCommunicationDevice405", RegisterCommunicationDevice405),
+      "409": decodeError("RegisterCommunicationDevice409", RegisterCommunicationDevice409),
+      "500": decodeError("RegisterCommunicationDevice500", RegisterCommunicationDevice500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "listAssetTypeDefinitions": (tenantId, options: Parameters<FleetIqApi["listAssetTypeDefinitions"]>[1]) => __makePathRequest(HttpClientRequest.get, [tenantId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/asset-types").pipe(
+    Effect.flatMap((request) => request.pipe(
+      HttpClientRequest.setUrlParams({ "limit": options?.params?.["limit"] as any, "after_id": options?.params?.["after_id"] as any, "after_version": options?.params?.["after_version"] as any }),
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(ListAssetTypeDefinitions200),
+      "400": decodeError("ListAssetTypeDefinitions400", ListAssetTypeDefinitions400),
+      "401": decodeError("ListAssetTypeDefinitions401", ListAssetTypeDefinitions401),
+      "403": decodeError("ListAssetTypeDefinitions403", ListAssetTypeDefinitions403),
+      "405": decodeError("ListAssetTypeDefinitions405", ListAssetTypeDefinitions405),
+      "500": decodeError("ListAssetTypeDefinitions500", ListAssetTypeDefinitions500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "getDeviceProtocolRoute": (tenantId, assetId, channelId, options: Parameters<FleetIqApi["getDeviceProtocolRoute"]>[3]) => __makePathRequest(HttpClientRequest.get, [tenantId, assetId, channelId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/protocol-routes/" + __encodePathParam(channelId) + "").pipe(
+    Effect.flatMap((request) => request.pipe(
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(GetDeviceProtocolRoute200),
+      "400": decodeError("GetDeviceProtocolRoute400", GetDeviceProtocolRoute400),
+      "401": decodeError("GetDeviceProtocolRoute401", GetDeviceProtocolRoute401),
+      "403": decodeError("GetDeviceProtocolRoute403", GetDeviceProtocolRoute403),
+      "404": decodeError("GetDeviceProtocolRoute404", GetDeviceProtocolRoute404),
+      "500": decodeError("GetDeviceProtocolRoute500", GetDeviceProtocolRoute500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "changeDeviceProtocolRoute": (tenantId, assetId, channelId, options: Parameters<FleetIqApi["changeDeviceProtocolRoute"]>[3]) => __makePathRequest(HttpClientRequest.put, [tenantId, assetId, channelId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/protocol-routes/" + __encodePathParam(channelId) + "").pipe(
+    Effect.flatMap((request) => request.pipe(
+      HttpClientRequest.setHeaders({ "Origin": options.params?.["Origin"] ?? undefined, "X-FleetIQ-CSRF": options.params?.["X-FleetIQ-CSRF"] ?? undefined }),
+      HttpClientRequest.bodyJsonUnsafe(options.payload),
+      withResponse(options.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(ChangeDeviceProtocolRoute200),
+      "400": decodeError("ChangeDeviceProtocolRoute400", ChangeDeviceProtocolRoute400),
+      "401": decodeError("ChangeDeviceProtocolRoute401", ChangeDeviceProtocolRoute401),
+      "403": decodeError("ChangeDeviceProtocolRoute403", ChangeDeviceProtocolRoute403),
+      "409": decodeError("ChangeDeviceProtocolRoute409", ChangeDeviceProtocolRoute409),
+      "500": decodeError("ChangeDeviceProtocolRoute500", ChangeDeviceProtocolRoute500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "getProtocolPackageRelease": (tenantId, packageId, packageVersion, options: Parameters<FleetIqApi["getProtocolPackageRelease"]>[3]) => __makePathRequest(HttpClientRequest.get, [tenantId, packageId, packageVersion], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/protocol-packages/" + __encodePathParam(packageId) + "/versions/" + __encodePathParam(packageVersion) + "").pipe(
+    Effect.flatMap((request) => request.pipe(
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(GetProtocolPackageRelease200),
+      "400": decodeError("GetProtocolPackageRelease400", GetProtocolPackageRelease400),
+      "401": decodeError("GetProtocolPackageRelease401", GetProtocolPackageRelease401),
+      "403": decodeError("GetProtocolPackageRelease403", GetProtocolPackageRelease403),
+      "404": decodeError("GetProtocolPackageRelease404", GetProtocolPackageRelease404),
+      "500": decodeError("GetProtocolPackageRelease500", GetProtocolPackageRelease500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "getDeviceIngestionDiagnostics": (tenantId, assetId, options: Parameters<FleetIqApi["getDeviceIngestionDiagnostics"]>[2]) => __makePathRequest(HttpClientRequest.get, [tenantId, assetId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/ingestion-diagnostics").pipe(
+    Effect.flatMap((request) => request.pipe(
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(GetDeviceIngestionDiagnostics200),
+      "400": decodeError("GetDeviceIngestionDiagnostics400", GetDeviceIngestionDiagnostics400),
+      "401": decodeError("GetDeviceIngestionDiagnostics401", GetDeviceIngestionDiagnostics401),
+      "403": decodeError("GetDeviceIngestionDiagnostics403", GetDeviceIngestionDiagnostics403),
+      "404": decodeError("GetDeviceIngestionDiagnostics404", GetDeviceIngestionDiagnostics404),
+      "500": decodeError("GetDeviceIngestionDiagnostics500", GetDeviceIngestionDiagnostics500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  )
   }
 }
 
@@ -476,99 +758,155 @@ export interface FleetIqApi {
 * Returns only active tenants with explicit current grants for the authenticated active actor. Actions are advisory UI hints, never authorization evidence; every operation rechecks policy. Platform grants imply no tenant access. Order is ascending tenant ID. Pages observe fresh policy independently, without cross-request snapshot guarantees. Missing or inactive browser identities return 401; no grants returns an empty 200 page. Available only with configured browser or workload authentication.
 */
 readonly "listOperatorTenants": {
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly params?: typeof ListOperatorTenantsParams.Encoded | undefined; readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof ListOperatorTenants200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListOperatorTenants400", typeof ListOperatorTenants400.Type> | FleetIqApiError<"ListOperatorTenants401", typeof ListOperatorTenants401.Type> | FleetIqApiError<"ListOperatorTenants500", typeof ListOperatorTenants500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly params?: typeof ListOperatorTenantsParams.Encoded | undefined; readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof ListOperatorTenants200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListOperatorTenants400", typeof ListOperatorTenants400.Type> | FleetIqApiError<"ListOperatorTenants401", typeof ListOperatorTenants401.Type> | FleetIqApiError<"ListOperatorTenants500", typeof ListOperatorTenants500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly params?: typeof ListOperatorTenantsParams.Encoded | undefined; readonly config: Config }): Effect.Effect<WithOptionalResponse<ListOperatorTenants200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListOperatorTenants400", ListOperatorTenants400> | FleetIqApiError<"ListOperatorTenants401", ListOperatorTenants401> | FleetIqApiError<"ListOperatorTenants500", ListOperatorTenants500>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly params?: typeof ListOperatorTenantsParams.Encoded | undefined; readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<ListOperatorTenants200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListOperatorTenants400", ListOperatorTenants400> | FleetIqApiError<"ListOperatorTenants401", ListOperatorTenants401> | FleetIqApiError<"ListOperatorTenants500", ListOperatorTenants500>>;
   }
   /**
 * Discover the active API major version
 */
 readonly "getApiVersion": {
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof GetApiVersion200.Type, Config>, HttpClientError.HttpClientError | SchemaError>;
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof GetApiVersion200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetApiVersion200, Config>, HttpClientError.HttpClientError | SchemaError>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetApiVersion200, Config | undefined>, HttpClientError.HttpClientError | SchemaError>;
   }
   /**
 * The authenticated operator or configured workload identity must have current metadata.read access for the selected tenant. The route is absent without complete browser or workload identity configuration. A cursor traversal is not a cross-request snapshot.
 */
 readonly "listAssets": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof ListAssetsParams.Encoded | undefined; readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof ListAssets200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssets400", typeof ListAssets400.Type> | FleetIqApiError<"ListAssets401", typeof ListAssets401.Type> | FleetIqApiError<"ListAssets403", typeof ListAssets403.Type> | FleetIqApiError<"ListAssets500", typeof ListAssets500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof ListAssetsParams.Encoded | undefined; readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof ListAssets200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssets400", typeof ListAssets400.Type> | FleetIqApiError<"ListAssets401", typeof ListAssets401.Type> | FleetIqApiError<"ListAssets403", typeof ListAssets403.Type> | FleetIqApiError<"ListAssets500", typeof ListAssets500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof ListAssetsParams.Encoded | undefined; readonly config: Config }): Effect.Effect<WithOptionalResponse<ListAssets200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssets400", ListAssets400> | FleetIqApiError<"ListAssets401", ListAssets401> | FleetIqApiError<"ListAssets403", ListAssets403> | FleetIqApiError<"ListAssets500", ListAssets500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof ListAssetsParams.Encoded | undefined; readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<ListAssets200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssets400", ListAssets400> | FleetIqApiError<"ListAssets401", ListAssets401> | FleetIqApiError<"ListAssets403", ListAssets403> | FleetIqApiError<"ListAssets500", ListAssets500>>;
+  }
+  /**
+* Only mounted on an authenticated listener. Requires exact current metadata.manage for the selected active tenant; no other action implies it. Authenticate and authorize before reporting body/resource errors. Invalid, missing, suspended or inaccessible tenant returns 403. Browser mutations require one exact configured Origin and X-FleetIQ-CSRF: 1; browser mode never falls back to bearer. JSON is limited to 32 KiB with closed nested shapes; unknown and duplicate fields are rejected. Return 201 registered for first creation, 200 already_registered for equal complete content and original registration evidence. Retry the same internal identity and complete content after a lost or ambiguous response; a storage/commit error is never success. Different content or an external-identity collision returns 409 without overwrite. Actor/time are trusted host context, never JSON. Different authorized actors may retry; attribution stays with the first. Existing unattributed strict inserts return 409; no historical provenance is invented. All outcomes are no-store and redact database details. The exact asset-type version must exist in this tenant. Up to 100 external identifiers; omitted authority means null. Kind/authority/value defines each external namespace; identifier declaration order is irrelevant. Duplicate identifiers are invalid. IMEI/serial values never replace internal asset identity.
+*/
+readonly "registerAsset": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof RegisterAssetParams.Encoded | undefined; readonly payload: typeof RegisterAssetRequestJson.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<RegisterAsset200 | RegisterAsset201, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"RegisterAsset400", RegisterAsset400> | FleetIqApiError<"RegisterAsset401", RegisterAsset401> | FleetIqApiError<"RegisterAsset403", RegisterAsset403> | FleetIqApiError<"RegisterAsset404", RegisterAsset404> | FleetIqApiError<"RegisterAsset405", RegisterAsset405> | FleetIqApiError<"RegisterAsset409", RegisterAsset409> | FleetIqApiError<"RegisterAsset500", RegisterAsset500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof RegisterAssetParams.Encoded | undefined; readonly payload: typeof RegisterAssetRequestJson.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<RegisterAsset200 | RegisterAsset201, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"RegisterAsset400", RegisterAsset400> | FleetIqApiError<"RegisterAsset401", RegisterAsset401> | FleetIqApiError<"RegisterAsset403", RegisterAsset403> | FleetIqApiError<"RegisterAsset404", RegisterAsset404> | FleetIqApiError<"RegisterAsset405", RegisterAsset405> | FleetIqApiError<"RegisterAsset409", RegisterAsset409> | FleetIqApiError<"RegisterAsset500", RegisterAsset500>>;
   }
   /**
 * Returns asset identity, its exact pinned asset-type version, and tenant-owned typed external identifiers. A missing asset returns 404.
 */
 readonly "getAsset": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof GetAsset200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAsset400", typeof GetAsset400.Type> | FleetIqApiError<"GetAsset401", typeof GetAsset401.Type> | FleetIqApiError<"GetAsset403", typeof GetAsset403.Type> | FleetIqApiError<"GetAsset404", typeof GetAsset404.Type> | FleetIqApiError<"GetAsset500", typeof GetAsset500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof GetAsset200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAsset400", typeof GetAsset400.Type> | FleetIqApiError<"GetAsset401", typeof GetAsset401.Type> | FleetIqApiError<"GetAsset403", typeof GetAsset403.Type> | FleetIqApiError<"GetAsset404", typeof GetAsset404.Type> | FleetIqApiError<"GetAsset500", typeof GetAsset500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetAsset200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAsset400", GetAsset400> | FleetIqApiError<"GetAsset401", GetAsset401> | FleetIqApiError<"GetAsset403", GetAsset403> | FleetIqApiError<"GetAsset404", GetAsset404> | FleetIqApiError<"GetAsset500", GetAsset500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetAsset200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAsset400", GetAsset400> | FleetIqApiError<"GetAsset401", GetAsset401> | FleetIqApiError<"GetAsset403", GetAsset403> | FleetIqApiError<"GetAsset404", GetAsset404> | FleetIqApiError<"GetAsset500", GetAsset500>>;
   }
   /**
 * The latest revision known at known_at_ms is selected, then tested at effective_at_ms. Results are bounded pages ordered by stable ID. A cursor traversal is not a cross-request database snapshot; repeat the same times and limit on the next page. Both directed source and target roles are returned. The asset must exist in the current catalogue; only edges are bitemporal.
 */
 readonly "listAssetRelationships": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetRelationshipsParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof ListAssetRelationships200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetRelationships400", typeof ListAssetRelationships400.Type> | FleetIqApiError<"ListAssetRelationships401", typeof ListAssetRelationships401.Type> | FleetIqApiError<"ListAssetRelationships403", typeof ListAssetRelationships403.Type> | FleetIqApiError<"ListAssetRelationships404", typeof ListAssetRelationships404.Type> | FleetIqApiError<"ListAssetRelationships500", typeof ListAssetRelationships500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetRelationshipsParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<typeof ListAssetRelationships200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetRelationships400", typeof ListAssetRelationships400.Type> | FleetIqApiError<"ListAssetRelationships401", typeof ListAssetRelationships401.Type> | FleetIqApiError<"ListAssetRelationships403", typeof ListAssetRelationships403.Type> | FleetIqApiError<"ListAssetRelationships404", typeof ListAssetRelationships404.Type> | FleetIqApiError<"ListAssetRelationships500", typeof ListAssetRelationships500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetRelationshipsParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<ListAssetRelationships200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetRelationships400", ListAssetRelationships400> | FleetIqApiError<"ListAssetRelationships401", ListAssetRelationships401> | FleetIqApiError<"ListAssetRelationships403", ListAssetRelationships403> | FleetIqApiError<"ListAssetRelationships404", ListAssetRelationships404> | FleetIqApiError<"ListAssetRelationships500", ListAssetRelationships500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetRelationshipsParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<ListAssetRelationships200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetRelationships400", ListAssetRelationships400> | FleetIqApiError<"ListAssetRelationships401", ListAssetRelationships401> | FleetIqApiError<"ListAssetRelationships403", ListAssetRelationships403> | FleetIqApiError<"ListAssetRelationships404", ListAssetRelationships404> | FleetIqApiError<"ListAssetRelationships500", ListAssetRelationships500>>;
   }
   /**
 * The latest revision known at known_at_ms is selected, then tested at effective_at_ms. Results are bounded pages ordered by stable ID. A cursor traversal is not a cross-request database snapshot; repeat the same times and limit on the next page. The selected latest-known binding revision must target this asset. The asset must exist in the current catalogue.
 */
 readonly "listAssetSignalBindings": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetSignalBindingsParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof ListAssetSignalBindings200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetSignalBindings400", typeof ListAssetSignalBindings400.Type> | FleetIqApiError<"ListAssetSignalBindings401", typeof ListAssetSignalBindings401.Type> | FleetIqApiError<"ListAssetSignalBindings403", typeof ListAssetSignalBindings403.Type> | FleetIqApiError<"ListAssetSignalBindings404", typeof ListAssetSignalBindings404.Type> | FleetIqApiError<"ListAssetSignalBindings500", typeof ListAssetSignalBindings500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetSignalBindingsParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<typeof ListAssetSignalBindings200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetSignalBindings400", typeof ListAssetSignalBindings400.Type> | FleetIqApiError<"ListAssetSignalBindings401", typeof ListAssetSignalBindings401.Type> | FleetIqApiError<"ListAssetSignalBindings403", typeof ListAssetSignalBindings403.Type> | FleetIqApiError<"ListAssetSignalBindings404", typeof ListAssetSignalBindings404.Type> | FleetIqApiError<"ListAssetSignalBindings500", typeof ListAssetSignalBindings500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetSignalBindingsParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<ListAssetSignalBindings200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetSignalBindings400", ListAssetSignalBindings400> | FleetIqApiError<"ListAssetSignalBindings401", ListAssetSignalBindings401> | FleetIqApiError<"ListAssetSignalBindings403", ListAssetSignalBindings403> | FleetIqApiError<"ListAssetSignalBindings404", ListAssetSignalBindings404> | FleetIqApiError<"ListAssetSignalBindings500", ListAssetSignalBindings500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params: typeof ListAssetSignalBindingsParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<ListAssetSignalBindings200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetSignalBindings400", ListAssetSignalBindings400> | FleetIqApiError<"ListAssetSignalBindings401", ListAssetSignalBindings401> | FleetIqApiError<"ListAssetSignalBindings403", ListAssetSignalBindings403> | FleetIqApiError<"ListAssetSignalBindings404", ListAssetSignalBindings404> | FleetIqApiError<"ListAssetSignalBindings500", ListAssetSignalBindings500>>;
   }
   /**
 * The latest revision known at known_at_ms is selected, then tested at effective_at_ms. Results are bounded pages ordered by stable ID. A cursor traversal is not a cross-request database snapshot; repeat the same times and limit on the next page. The exact device asset, endpoint, and signal tuple selects a source; an unregistered signal can validly return an empty page.
 */
 readonly "listSourceSignalBindings": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params: typeof ListSourceSignalBindingsParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof ListSourceSignalBindings200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListSourceSignalBindings400", typeof ListSourceSignalBindings400.Type> | FleetIqApiError<"ListSourceSignalBindings401", typeof ListSourceSignalBindings401.Type> | FleetIqApiError<"ListSourceSignalBindings403", typeof ListSourceSignalBindings403.Type> | FleetIqApiError<"ListSourceSignalBindings500", typeof ListSourceSignalBindings500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params: typeof ListSourceSignalBindingsParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<typeof ListSourceSignalBindings200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListSourceSignalBindings400", typeof ListSourceSignalBindings400.Type> | FleetIqApiError<"ListSourceSignalBindings401", typeof ListSourceSignalBindings401.Type> | FleetIqApiError<"ListSourceSignalBindings403", typeof ListSourceSignalBindings403.Type> | FleetIqApiError<"ListSourceSignalBindings500", typeof ListSourceSignalBindings500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params: typeof ListSourceSignalBindingsParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<ListSourceSignalBindings200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListSourceSignalBindings400", ListSourceSignalBindings400> | FleetIqApiError<"ListSourceSignalBindings401", ListSourceSignalBindings401> | FleetIqApiError<"ListSourceSignalBindings403", ListSourceSignalBindings403> | FleetIqApiError<"ListSourceSignalBindings500", ListSourceSignalBindings500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params: typeof ListSourceSignalBindingsParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<ListSourceSignalBindings200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListSourceSignalBindings400", ListSourceSignalBindings400> | FleetIqApiError<"ListSourceSignalBindings401", ListSourceSignalBindings401> | FleetIqApiError<"ListSourceSignalBindings403", ListSourceSignalBindings403> | FleetIqApiError<"ListSourceSignalBindings500", ListSourceSignalBindings500>>;
   }
   /**
 * Read an exact immutable type version. Property references retain definition order and point to exact immutable versions.
 */
 readonly "getAssetTypeDefinition": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof GetAssetTypeDefinition200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAssetTypeDefinition400", typeof GetAssetTypeDefinition400.Type> | FleetIqApiError<"GetAssetTypeDefinition401", typeof GetAssetTypeDefinition401.Type> | FleetIqApiError<"GetAssetTypeDefinition403", typeof GetAssetTypeDefinition403.Type> | FleetIqApiError<"GetAssetTypeDefinition404", typeof GetAssetTypeDefinition404.Type> | FleetIqApiError<"GetAssetTypeDefinition500", typeof GetAssetTypeDefinition500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof GetAssetTypeDefinition200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAssetTypeDefinition400", typeof GetAssetTypeDefinition400.Type> | FleetIqApiError<"GetAssetTypeDefinition401", typeof GetAssetTypeDefinition401.Type> | FleetIqApiError<"GetAssetTypeDefinition403", typeof GetAssetTypeDefinition403.Type> | FleetIqApiError<"GetAssetTypeDefinition404", typeof GetAssetTypeDefinition404.Type> | FleetIqApiError<"GetAssetTypeDefinition500", typeof GetAssetTypeDefinition500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetAssetTypeDefinition200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAssetTypeDefinition400", GetAssetTypeDefinition400> | FleetIqApiError<"GetAssetTypeDefinition401", GetAssetTypeDefinition401> | FleetIqApiError<"GetAssetTypeDefinition403", GetAssetTypeDefinition403> | FleetIqApiError<"GetAssetTypeDefinition404", GetAssetTypeDefinition404> | FleetIqApiError<"GetAssetTypeDefinition500", GetAssetTypeDefinition500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetAssetTypeDefinition200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetAssetTypeDefinition400", GetAssetTypeDefinition400> | FleetIqApiError<"GetAssetTypeDefinition401", GetAssetTypeDefinition401> | FleetIqApiError<"GetAssetTypeDefinition403", GetAssetTypeDefinition403> | FleetIqApiError<"GetAssetTypeDefinition404", GetAssetTypeDefinition404> | FleetIqApiError<"GetAssetTypeDefinition500", GetAssetTypeDefinition500>>;
   }
   /**
 * Read the exact value kind and optional canonical unit; this endpoint performs no measurement conversion.
 */
 readonly "getPropertyDefinition": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, propertyId: string, version: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof GetPropertyDefinition200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetPropertyDefinition400", typeof GetPropertyDefinition400.Type> | FleetIqApiError<"GetPropertyDefinition401", typeof GetPropertyDefinition401.Type> | FleetIqApiError<"GetPropertyDefinition403", typeof GetPropertyDefinition403.Type> | FleetIqApiError<"GetPropertyDefinition404", typeof GetPropertyDefinition404.Type> | FleetIqApiError<"GetPropertyDefinition500", typeof GetPropertyDefinition500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, propertyId: string, version: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof GetPropertyDefinition200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetPropertyDefinition400", typeof GetPropertyDefinition400.Type> | FleetIqApiError<"GetPropertyDefinition401", typeof GetPropertyDefinition401.Type> | FleetIqApiError<"GetPropertyDefinition403", typeof GetPropertyDefinition403.Type> | FleetIqApiError<"GetPropertyDefinition404", typeof GetPropertyDefinition404.Type> | FleetIqApiError<"GetPropertyDefinition500", typeof GetPropertyDefinition500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, propertyId: string, version: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetPropertyDefinition200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetPropertyDefinition400", GetPropertyDefinition400> | FleetIqApiError<"GetPropertyDefinition401", GetPropertyDefinition401> | FleetIqApiError<"GetPropertyDefinition403", GetPropertyDefinition403> | FleetIqApiError<"GetPropertyDefinition404", GetPropertyDefinition404> | FleetIqApiError<"GetPropertyDefinition500", GetPropertyDefinition500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, propertyId: string, version: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetPropertyDefinition200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetPropertyDefinition400", GetPropertyDefinition400> | FleetIqApiError<"GetPropertyDefinition401", GetPropertyDefinition401> | FleetIqApiError<"GetPropertyDefinition403", GetPropertyDefinition403> | FleetIqApiError<"GetPropertyDefinition404", GetPropertyDefinition404> | FleetIqApiError<"GetPropertyDefinition500", GetPropertyDefinition500>>;
   }
   /**
 * Returns the stable name of the exact immutable directed relationship type version.
 */
 readonly "getRelationshipTypeDefinition": {
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof GetRelationshipTypeDefinition200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetRelationshipTypeDefinition400", typeof GetRelationshipTypeDefinition400.Type> | FleetIqApiError<"GetRelationshipTypeDefinition401", typeof GetRelationshipTypeDefinition401.Type> | FleetIqApiError<"GetRelationshipTypeDefinition403", typeof GetRelationshipTypeDefinition403.Type> | FleetIqApiError<"GetRelationshipTypeDefinition404", typeof GetRelationshipTypeDefinition404.Type> | FleetIqApiError<"GetRelationshipTypeDefinition500", typeof GetRelationshipTypeDefinition500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof GetRelationshipTypeDefinition200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetRelationshipTypeDefinition400", typeof GetRelationshipTypeDefinition400.Type> | FleetIqApiError<"GetRelationshipTypeDefinition401", typeof GetRelationshipTypeDefinition401.Type> | FleetIqApiError<"GetRelationshipTypeDefinition403", typeof GetRelationshipTypeDefinition403.Type> | FleetIqApiError<"GetRelationshipTypeDefinition404", typeof GetRelationshipTypeDefinition404.Type> | FleetIqApiError<"GetRelationshipTypeDefinition500", typeof GetRelationshipTypeDefinition500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetRelationshipTypeDefinition200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetRelationshipTypeDefinition400", GetRelationshipTypeDefinition400> | FleetIqApiError<"GetRelationshipTypeDefinition401", GetRelationshipTypeDefinition401> | FleetIqApiError<"GetRelationshipTypeDefinition403", GetRelationshipTypeDefinition403> | FleetIqApiError<"GetRelationshipTypeDefinition404", GetRelationshipTypeDefinition404> | FleetIqApiError<"GetRelationshipTypeDefinition500", GetRelationshipTypeDefinition500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, typeId: string, version: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetRelationshipTypeDefinition200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetRelationshipTypeDefinition400", GetRelationshipTypeDefinition400> | FleetIqApiError<"GetRelationshipTypeDefinition401", GetRelationshipTypeDefinition401> | FleetIqApiError<"GetRelationshipTypeDefinition403", GetRelationshipTypeDefinition403> | FleetIqApiError<"GetRelationshipTypeDefinition404", GetRelationshipTypeDefinition404> | FleetIqApiError<"GetRelationshipTypeDefinition500", GetRelationshipTypeDefinition500>>;
   }
   /**
 * Creates a short-lived bound OIDC authorization-code attempt. Browser identity must be configured. No request-selected issuer, client, callback, or return URL is supported.
 */
 readonly "beginOperatorLogin": {
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<void, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"BeginOperatorLogin401", typeof BeginOperatorLogin401.Type> | FleetIqApiError<"BeginOperatorLogin405", typeof BeginOperatorLogin405.Type> | FleetIqApiError<"BeginOperatorLogin500", typeof BeginOperatorLogin500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<void, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"BeginOperatorLogin401", typeof BeginOperatorLogin401.Type> | FleetIqApiError<"BeginOperatorLogin405", typeof BeginOperatorLogin405.Type> | FleetIqApiError<"BeginOperatorLogin500", typeof BeginOperatorLogin500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<void, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"BeginOperatorLogin401", BeginOperatorLogin401> | FleetIqApiError<"BeginOperatorLogin405", BeginOperatorLogin405> | FleetIqApiError<"BeginOperatorLogin500", BeginOperatorLogin500>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<void, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"BeginOperatorLogin401", BeginOperatorLogin401> | FleetIqApiError<"BeginOperatorLogin405", BeginOperatorLogin405> | FleetIqApiError<"BeginOperatorLogin500", BeginOperatorLogin500>>;
   }
   /**
 * Requires __Host-fleetiq-login from the initiating browser. Atomically consumes the matching state once before code exchange, validates signed provider identity and resolves a provisioned active actor. Provider roles or email never provision access.
 */
 readonly "completeOperatorLogin": {
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof CompleteOperatorLoginParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<void, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"CompleteOperatorLogin400", typeof CompleteOperatorLogin400.Type> | FleetIqApiError<"CompleteOperatorLogin401", typeof CompleteOperatorLogin401.Type> | FleetIqApiError<"CompleteOperatorLogin405", typeof CompleteOperatorLogin405.Type> | FleetIqApiError<"CompleteOperatorLogin500", typeof CompleteOperatorLogin500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof CompleteOperatorLoginParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<void, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"CompleteOperatorLogin400", typeof CompleteOperatorLogin400.Type> | FleetIqApiError<"CompleteOperatorLogin401", typeof CompleteOperatorLogin401.Type> | FleetIqApiError<"CompleteOperatorLogin405", typeof CompleteOperatorLogin405.Type> | FleetIqApiError<"CompleteOperatorLogin500", typeof CompleteOperatorLogin500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof CompleteOperatorLoginParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<void, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"CompleteOperatorLogin400", CompleteOperatorLogin400> | FleetIqApiError<"CompleteOperatorLogin401", CompleteOperatorLogin401> | FleetIqApiError<"CompleteOperatorLogin405", CompleteOperatorLogin405> | FleetIqApiError<"CompleteOperatorLogin500", CompleteOperatorLogin500>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof CompleteOperatorLoginParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<void, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"CompleteOperatorLogin400", CompleteOperatorLogin400> | FleetIqApiError<"CompleteOperatorLogin401", CompleteOperatorLogin401> | FleetIqApiError<"CompleteOperatorLogin405", CompleteOperatorLogin405> | FleetIqApiError<"CompleteOperatorLogin500", CompleteOperatorLogin500>>;
   }
   /**
 * Revalidates session expiry and the current external-identity mapping to the actor established at login. Returns no provider claims, tokens, or tenant grants.
 */
 readonly "getOperatorSession": {
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<typeof GetOperatorSession200.Type, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetOperatorSession401", typeof GetOperatorSession401.Type> | FleetIqApiError<"GetOperatorSession405", typeof GetOperatorSession405.Type> | FleetIqApiError<"GetOperatorSession500", typeof GetOperatorSession500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<typeof GetOperatorSession200.Type, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetOperatorSession401", typeof GetOperatorSession401.Type> | FleetIqApiError<"GetOperatorSession405", typeof GetOperatorSession405.Type> | FleetIqApiError<"GetOperatorSession500", typeof GetOperatorSession500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetOperatorSession200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetOperatorSession401", GetOperatorSession401> | FleetIqApiError<"GetOperatorSession405", GetOperatorSession405> | FleetIqApiError<"GetOperatorSession500", GetOperatorSession500>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetOperatorSession200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetOperatorSession401", GetOperatorSession401> | FleetIqApiError<"GetOperatorSession405", GetOperatorSession405> | FleetIqApiError<"GetOperatorSession500", GetOperatorSession500>>;
   }
   /**
 * Requires exact configured Origin and X-FleetIQ-CSRF: 1. Deletes the stored session and browser-bound pending login attempts, then clears cookies; success is idempotent when no session is present. Existing in-flight reads may complete.
 */
 readonly "endOperatorSession": {
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof EndOperatorSessionParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<void, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"EndOperatorSession401", typeof EndOperatorSession401.Type> | FleetIqApiError<"EndOperatorSession403", typeof EndOperatorSession403.Type> | FleetIqApiError<"EndOperatorSession405", typeof EndOperatorSession405.Type> | FleetIqApiError<"EndOperatorSession500", typeof EndOperatorSession500.Type>>;
-    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof EndOperatorSessionParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<void, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"EndOperatorSession401", typeof EndOperatorSession401.Type> | FleetIqApiError<"EndOperatorSession403", typeof EndOperatorSession403.Type> | FleetIqApiError<"EndOperatorSession405", typeof EndOperatorSession405.Type> | FleetIqApiError<"EndOperatorSession500", typeof EndOperatorSession500.Type>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof EndOperatorSessionParams.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<void, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"EndOperatorSession401", EndOperatorSession401> | FleetIqApiError<"EndOperatorSession403", EndOperatorSession403> | FleetIqApiError<"EndOperatorSession405", EndOperatorSession405> | FleetIqApiError<"EndOperatorSession500", EndOperatorSession500>>;
+    <Config extends OperationConfig | undefined = undefined>(options: { readonly params: typeof EndOperatorSessionParams.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<void, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"EndOperatorSession401", EndOperatorSession401> | FleetIqApiError<"EndOperatorSession403", EndOperatorSession403> | FleetIqApiError<"EndOperatorSession405", EndOperatorSession405> | FleetIqApiError<"EndOperatorSession500", EndOperatorSession500>>;
+  }
+  /**
+* Requires exact current metadata.read for the selected tenant through the existing listener-selected identity boundary. Returns the existing ordered endpoint representation. No registration or history mutation is performed. Returns 404 if the selected asset has no communication capability. Every outcome is no-store.
+*/
+readonly "getCommunicationDevice": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetCommunicationDevice200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetCommunicationDevice400", GetCommunicationDevice400> | FleetIqApiError<"GetCommunicationDevice401", GetCommunicationDevice401> | FleetIqApiError<"GetCommunicationDevice403", GetCommunicationDevice403> | FleetIqApiError<"GetCommunicationDevice404", GetCommunicationDevice404> | FleetIqApiError<"GetCommunicationDevice405", GetCommunicationDevice405> | FleetIqApiError<"GetCommunicationDevice500", GetCommunicationDevice500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetCommunicationDevice200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetCommunicationDevice400", GetCommunicationDevice400> | FleetIqApiError<"GetCommunicationDevice401", GetCommunicationDevice401> | FleetIqApiError<"GetCommunicationDevice403", GetCommunicationDevice403> | FleetIqApiError<"GetCommunicationDevice404", GetCommunicationDevice404> | FleetIqApiError<"GetCommunicationDevice405", GetCommunicationDevice405> | FleetIqApiError<"GetCommunicationDevice500", GetCommunicationDevice500>>;
+  }
+  /**
+* Only mounted on an authenticated listener. Requires exact current metadata.manage for the selected active tenant; no other action implies it. Authenticate and authorize before reporting body/resource errors. Invalid, missing, suspended or inaccessible tenant returns 403. Browser mutations require one exact configured Origin and X-FleetIQ-CSRF: 1; browser mode never falls back to bearer. JSON is limited to 32 KiB with closed nested shapes; unknown and duplicate fields are rejected. Return 201 registered for first creation, 200 already_registered for equal complete content and original registration evidence. Retry the same internal identity and complete content after a lost or ambiguous response; a storage/commit error is never success. Different content or an external-identity collision returns 409 without overwrite. Actor/time are trusted host context, never JSON. Different authorized actors may retry; attribution stays with the first. Existing unattributed strict inserts return 409; no historical provenance is invented. All outcomes are no-store and redact database details. The route asset must already exist in this tenant. Up to 100 endpoints, including an empty declaration. Duplicate endpoint IDs are invalid; complete endpoint ID, kind, name and declaration order participate in retry equality. No protocol activation or semantic binding is performed.
+*/
+readonly "registerCommunicationDevice": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params?: typeof RegisterCommunicationDeviceParams.Encoded | undefined; readonly payload: typeof RegisterCommunicationDeviceRequestJson.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<RegisterCommunicationDevice200 | RegisterCommunicationDevice201, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"RegisterCommunicationDevice400", RegisterCommunicationDevice400> | FleetIqApiError<"RegisterCommunicationDevice401", RegisterCommunicationDevice401> | FleetIqApiError<"RegisterCommunicationDevice403", RegisterCommunicationDevice403> | FleetIqApiError<"RegisterCommunicationDevice404", RegisterCommunicationDevice404> | FleetIqApiError<"RegisterCommunicationDevice405", RegisterCommunicationDevice405> | FleetIqApiError<"RegisterCommunicationDevice409", RegisterCommunicationDevice409> | FleetIqApiError<"RegisterCommunicationDevice500", RegisterCommunicationDevice500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly params?: typeof RegisterCommunicationDeviceParams.Encoded | undefined; readonly payload: typeof RegisterCommunicationDeviceRequestJson.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<RegisterCommunicationDevice200 | RegisterCommunicationDevice201, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"RegisterCommunicationDevice400", RegisterCommunicationDevice400> | FleetIqApiError<"RegisterCommunicationDevice401", RegisterCommunicationDevice401> | FleetIqApiError<"RegisterCommunicationDevice403", RegisterCommunicationDevice403> | FleetIqApiError<"RegisterCommunicationDevice404", RegisterCommunicationDevice404> | FleetIqApiError<"RegisterCommunicationDevice405", RegisterCommunicationDevice405> | FleetIqApiError<"RegisterCommunicationDevice409", RegisterCommunicationDevice409> | FleetIqApiError<"RegisterCommunicationDevice500", RegisterCommunicationDevice500>>;
+  }
+  /**
+* Only mounted on an authenticated listener. Authenticate and authorize the tenant before reporting command, identity or query errors. An invalid, missing, suspended or inaccessible tenant returns 403. Every outcome is no-store and problems redact credentials and database details. Requires exact current metadata.read; metadata.manage and access.manage do not imply read access. Limit 1..100, default 50. Unknown and duplicate query fields are invalid. Both after_id and after_version are required together. Numeric versions sort numerically within case-sensitive IDs. Cursors are exclusive traversal positions, not snapshots or authority. New versions may be published during traversal; no latest-version alias or distinct-definition total is implied.
+*/
+readonly "listAssetTypeDefinitions": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof ListAssetTypeDefinitionsParams.Encoded | undefined; readonly config: Config }): Effect.Effect<WithOptionalResponse<ListAssetTypeDefinitions200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetTypeDefinitions400", ListAssetTypeDefinitions400> | FleetIqApiError<"ListAssetTypeDefinitions401", ListAssetTypeDefinitions401> | FleetIqApiError<"ListAssetTypeDefinitions403", ListAssetTypeDefinitions403> | FleetIqApiError<"ListAssetTypeDefinitions405", ListAssetTypeDefinitions405> | FleetIqApiError<"ListAssetTypeDefinitions500", ListAssetTypeDefinitions500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly params?: typeof ListAssetTypeDefinitionsParams.Encoded | undefined; readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<ListAssetTypeDefinitions200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ListAssetTypeDefinitions400", ListAssetTypeDefinitions400> | FleetIqApiError<"ListAssetTypeDefinitions401", ListAssetTypeDefinitions401> | FleetIqApiError<"ListAssetTypeDefinitions403", ListAssetTypeDefinitions403> | FleetIqApiError<"ListAssetTypeDefinitions405", ListAssetTypeDefinitions405> | FleetIqApiError<"ListAssetTypeDefinitions500", ListAssetTypeDefinitions500>>;
+  }
+  /**
+* Requires current tenant protocol.manage. Includes explicit retirement; configuration is not runtime eligibility or peer authentication. All outcomes are no-store.
+*/
+readonly "getDeviceProtocolRoute": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, channelId: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetDeviceProtocolRoute200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetDeviceProtocolRoute400", GetDeviceProtocolRoute400> | FleetIqApiError<"GetDeviceProtocolRoute401", GetDeviceProtocolRoute401> | FleetIqApiError<"GetDeviceProtocolRoute403", GetDeviceProtocolRoute403> | FleetIqApiError<"GetDeviceProtocolRoute404", GetDeviceProtocolRoute404> | FleetIqApiError<"GetDeviceProtocolRoute500", GetDeviceProtocolRoute500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, channelId: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetDeviceProtocolRoute200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetDeviceProtocolRoute400", GetDeviceProtocolRoute400> | FleetIqApiError<"GetDeviceProtocolRoute401", GetDeviceProtocolRoute401> | FleetIqApiError<"GetDeviceProtocolRoute403", GetDeviceProtocolRoute403> | FleetIqApiError<"GetDeviceProtocolRoute404", GetDeviceProtocolRoute404> | FleetIqApiError<"GetDeviceProtocolRoute500", GetDeviceProtocolRoute500>>;
+  }
+  /**
+* Requires current tenant protocol.manage, a registered communication device and exact stored/current-policy admitted release. Body limit is 4 KiB. expected_revision is a compare-and-swap generation; explicit null selection retires. Same-actor/content retries return the original generation/actor/time even after later edits, without replacing the current head; GET current configuration before further editing. new generations invalidate previous session handoffs even when selecting identical content. Invalid/missing prerequisites return 409; no implicit device creation or artifact activation occurs. Browser commands require exact Origin and X-FleetIQ-CSRF marker. Authentication and authorization precede request diagnostics. All outcomes are no-store.
+*/
+readonly "changeDeviceProtocolRoute": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, channelId: string, options: { readonly params?: typeof ChangeDeviceProtocolRouteParams.Encoded | undefined; readonly payload: typeof ChangeDeviceProtocolRouteRequestJson.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<ChangeDeviceProtocolRoute200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ChangeDeviceProtocolRoute400", ChangeDeviceProtocolRoute400> | FleetIqApiError<"ChangeDeviceProtocolRoute401", ChangeDeviceProtocolRoute401> | FleetIqApiError<"ChangeDeviceProtocolRoute403", ChangeDeviceProtocolRoute403> | FleetIqApiError<"ChangeDeviceProtocolRoute409", ChangeDeviceProtocolRoute409> | FleetIqApiError<"ChangeDeviceProtocolRoute500", ChangeDeviceProtocolRoute500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, channelId: string, options: { readonly params?: typeof ChangeDeviceProtocolRouteParams.Encoded | undefined; readonly payload: typeof ChangeDeviceProtocolRouteRequestJson.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<ChangeDeviceProtocolRoute200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ChangeDeviceProtocolRoute400", ChangeDeviceProtocolRoute400> | FleetIqApiError<"ChangeDeviceProtocolRoute401", ChangeDeviceProtocolRoute401> | FleetIqApiError<"ChangeDeviceProtocolRoute403", ChangeDeviceProtocolRoute403> | FleetIqApiError<"ChangeDeviceProtocolRoute409", ChangeDeviceProtocolRoute409> | FleetIqApiError<"ChangeDeviceProtocolRoute500", ChangeDeviceProtocolRoute500>>;
+  }
+  /**
+* Returns immutable catalogue identity only when exact bytes are durably stored. Raw bytes are never returned. All outcomes are no-store. Authentication/current tenant protocol.manage precedes resource/body diagnostics. Invalid or inaccessible tenants return 403; metadata.manage does not imply code admission.
+*/
+readonly "getProtocolPackageRelease": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, packageId: string, packageVersion: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetProtocolPackageRelease200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetProtocolPackageRelease400", GetProtocolPackageRelease400> | FleetIqApiError<"GetProtocolPackageRelease401", GetProtocolPackageRelease401> | FleetIqApiError<"GetProtocolPackageRelease403", GetProtocolPackageRelease403> | FleetIqApiError<"GetProtocolPackageRelease404", GetProtocolPackageRelease404> | FleetIqApiError<"GetProtocolPackageRelease500", GetProtocolPackageRelease500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, packageId: string, packageVersion: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetProtocolPackageRelease200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetProtocolPackageRelease400", GetProtocolPackageRelease400> | FleetIqApiError<"GetProtocolPackageRelease401", GetProtocolPackageRelease401> | FleetIqApiError<"GetProtocolPackageRelease403", GetProtocolPackageRelease403> | FleetIqApiError<"GetProtocolPackageRelease404", GetProtocolPackageRelease404> | FleetIqApiError<"GetProtocolPackageRelease500", GetProtocolPackageRelease500>>;
+  }
+  /**
+* Requires current tenant protocol.manage. Uses a consistent database snapshot, at most 64 recent accepted messages and the first 64 decoded outputs per message, then at most 128 distinct source tuples. Coverage flags explicitly describe each truncation. Package references identify the immutable decoder, not current admission or activation; use package/route endpoints for configuration. No raw payload, checkpoint state, telemetry values, external identifiers or credentials are returned. No process/socket heartbeat is collected: worker and connection liveness are explicitly not_observed. Receipt age and pending/leased/expired/poisoned states are operational evidence, not a device-health inference. All outcomes are no-store.
+*/
+readonly "getDeviceIngestionDiagnostics": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetDeviceIngestionDiagnostics200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetDeviceIngestionDiagnostics400", GetDeviceIngestionDiagnostics400> | FleetIqApiError<"GetDeviceIngestionDiagnostics401", GetDeviceIngestionDiagnostics401> | FleetIqApiError<"GetDeviceIngestionDiagnostics403", GetDeviceIngestionDiagnostics403> | FleetIqApiError<"GetDeviceIngestionDiagnostics404", GetDeviceIngestionDiagnostics404> | FleetIqApiError<"GetDeviceIngestionDiagnostics500", GetDeviceIngestionDiagnostics500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetDeviceIngestionDiagnostics200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetDeviceIngestionDiagnostics400", GetDeviceIngestionDiagnostics400> | FleetIqApiError<"GetDeviceIngestionDiagnostics401", GetDeviceIngestionDiagnostics401> | FleetIqApiError<"GetDeviceIngestionDiagnostics403", GetDeviceIngestionDiagnostics403> | FleetIqApiError<"GetDeviceIngestionDiagnostics404", GetDeviceIngestionDiagnostics404> | FleetIqApiError<"GetDeviceIngestionDiagnostics500", GetDeviceIngestionDiagnostics500>>;
   }
 }
 

@@ -8,6 +8,7 @@ const ICON_PATHS = {
   overview: 'M3 3h8v8H3z M13 3h8v5h-8z M13 10h8v11h-8z M3 13h8v8H3z',
   map: 'M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15',
   assets: 'M4 5h16v14H4z M4 9h16 M8 13h4 M8 16h7',
+  devices: 'M8 8h8v8H8z M4 8v8 M20 8v8 M8 4h8 M8 20h8 M3 3l3 3 M21 3l-3 3',
   alerts: 'M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6z M10 20h4',
   insights: 'M3 20h18 M5 16l4-5 4 3 6-8 M17 6h2v2',
   admin:

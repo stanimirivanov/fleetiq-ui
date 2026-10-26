@@ -8,6 +8,7 @@ import {
   FleetMapPage,
   FleetOverviewPage,
 } from '#features/assets';
+import { DevicesPage } from '#features/devices';
 import {
   BrowserWorkspace,
   MetadataAccessBoundary,
@@ -32,6 +33,14 @@ render(
         component={() => (
           <MetadataAccessBoundary>
             <AssetsPage />
+          </MetadataAccessBoundary>
+        )}
+      />
+      <Route
+        path={APP_ROUTES.devices.path}
+        component={() => (
+          <MetadataAccessBoundary>
+            <DevicesPage />
           </MetadataAccessBoundary>
         )}
       />

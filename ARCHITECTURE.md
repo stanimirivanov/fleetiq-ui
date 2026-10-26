@@ -15,6 +15,9 @@ flowchart TD
   App[App composition and persistent shell] --> Identity[Identity feature]
   App --> Assets[Assets feature]
   App --> Alerts[Alerts feature]
+  App --> Devices[Devices feature]
+  Devices --> Runtime
+  Devices --> DevicePorts[Pure commissioning and diagnostic ports]
   App --> Runtime[Shared managed browser HTTP runtime]
   Identity --> Runtime
   Assets --> Runtime
@@ -106,3 +109,11 @@ preserves ordinary interaction. Native sign-in anchors opt out of Solid Router
 with `rel="external noreferrer"` so the server receives the login request.
 
 See [executable trust controls](docs/development/security-delivery.md) for graph/AST coverage, exact adapter privileges and remaining review obligations.
+
+The devices feature owns commissioning, endpoint declarations, pinned protocol
+route commands and bounded diagnostics. App composition injects independent
+identity grant hints and the shared managed runtime; devices never imports assets
+or identity. Tenant/device/channel changes dispose old controllers. Unknown
+mutation outcomes preserve exact captured content, and current route heads are
+read again after command acknowledgement. Historical receipts and leases do not
+establish liveness. See the [device slice](docs/exec-plans/active/2026-10-device-onboarding.md).

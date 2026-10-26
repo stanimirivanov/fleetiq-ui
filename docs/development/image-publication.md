@@ -31,6 +31,15 @@ version change. The build uses local toolchains, read-only module resolution and
 verified module checksums. The final runtime scan remains authoritative: if a new high or
 critical finding appears, qualification fails until the dependency is fixed.
 
+The pinned Alpine runtime also ships curl and its libcurl/Brotli dependencies,
+which the application does not use. Health checks use BusyBox wget and proxying
+uses the statically rebuilt Caddy binary. The recipe removes curl and its orphaned
+libraries using the installed APK database with networking disabled; it asserts
+that curl, libcurl and brotli-libs are absent and wget remains available. This
+removes the affected runtime packages for CVE-2026-92392 and CVE-2026-111497 without
+introducing mutable package downloads or changing the vulnerability gate. The
+producer policy and negative fixtures require these removal/postcondition steps.
+
 Use reviewed Node 24/pnpm, a frozen install, Git, Docker's Linux daemon with
 Buildx, and Playwright Chromium. Run `pnpm security:install` and
 `pnpm exec playwright install chromium` before local qualification.

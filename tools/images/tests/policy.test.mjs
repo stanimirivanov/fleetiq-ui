@@ -84,6 +84,13 @@ test('floating tools, root images and environment-specific browser builds fail',
     recipe.replace('-mod=readonly', ''),
     recipe.replace('COPY --from=edge-builder /edge/caddy /usr/bin/caddy', ''),
     recipe.replace('test -z "$(getcap /usr/bin/caddy)"', ''),
+    recipe.replace('apk --no-network del curl', 'true'),
+    recipe.replace(
+      'for package in curl libcurl brotli-libs',
+      'for package in unrelated',
+    ),
+    recipe.replace('apk --no-network info -e "$package"', 'false'),
+    recipe.replace('command -v wget >/dev/null', 'true'),
     `${recipe}\nARG VITE_BACKEND_URL`,
   ])
     assert.throws(() => validateDockerfile(bad, tools));

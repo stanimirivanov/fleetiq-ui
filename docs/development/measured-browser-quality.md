@@ -12,9 +12,10 @@ controls, not live fleet capacity or backend latency promises.
 
 ## Critical behavior and coverage
 
-[The scope](../../tools/quality/coverage-scope.json) names ten owned modules:
+[The scope](../../tools/quality/coverage-scope.json) names fourteen owned modules:
 managed HTTP, session parsing/ownership/access, asset and semantic parsing, the live
-metadata reader, URL context and cancellable reads. Generated code is excluded.
+metadata reader, URL context and cancellable reads, plus the device adapter, evidence validation and cancellable
+read/command controllers. Generated code is excluded.
 [The policy](../../tools/quality/policy.json) records measured per-file line,
 statement, function and branch floors, rounded down to whole percentages.
 Minimum instrumentation counts prevent deleting an uncovered owned branch from

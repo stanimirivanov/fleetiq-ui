@@ -21,6 +21,15 @@ ARG SOURCE_REVISION
 LABEL org.opencontainers.image.title="FleetIQ UI" org.opencontainers.image.description="FleetIQ production static edge" org.opencontainers.image.source="https://github.com/stanimirivanov/fleetiq-ui" org.opencontainers.image.revision=$SOURCE_REVISION
 # No low ports or file capabilities are required behind the TLS gateway.
 COPY --from=edge-builder /edge/caddy /usr/bin/caddy
+# Health checks use BusyBox wget; the proxy is the statically built Caddy binary.
+# Remove unused HTTP-client libraries offline from the pinned base's package graph.
+RUN apk --no-network del curl \
+    && for package in curl libcurl brotli-libs; do \
+         if apk --no-network info -e "$package"; then \
+           printf '%s\n' "Unexpected unused runtime package: $package" >&2; exit 1; \
+         fi; \
+       done \
+    && command -v wget >/dev/null
 RUN test -z "$(getcap /usr/bin/caddy)" && mkdir -p /srv /usr/share/fleetiq
 COPY --from=builder /workspace/apps/web/dist/ /srv/
 COPY --from=builder /tmp/quality-manifest.json /usr/share/fleetiq/quality-manifest.json

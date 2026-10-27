@@ -173,6 +173,8 @@ function statusKind(status: number): RequestFailureKind {
       return 'forbidden';
     case 404:
       return 'not-found';
+    case 409:
+      return 'conflict';
     default:
       return status >= 500 ? 'unavailable' : 'invalid-response';
   }

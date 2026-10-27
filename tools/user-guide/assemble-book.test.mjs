@@ -87,6 +87,7 @@ for (const slug of [
   'connected-asset-discovery',
   'connected-registry-review',
   'connected-recovery',
+  'connected-device-onboarding',
 ]) {
   test(`rejects missing connected procedure: ${slug}`, async (context) => {
     const root = await createFixture(context);

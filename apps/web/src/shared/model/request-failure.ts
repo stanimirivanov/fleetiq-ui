@@ -5,7 +5,8 @@ export type RequestFailureKind =
   | 'not-found'
   | 'invalid-request'
   | 'invalid-response'
-  | 'unavailable';
+  | 'unavailable'
+  | 'conflict';
 
 const messages: Record<RequestFailureKind, string> = {
   unauthorized: 'Sign-in is required',
@@ -14,6 +15,7 @@ const messages: Record<RequestFailureKind, string> = {
   'invalid-request': 'The request is invalid',
   'invalid-response': 'The server response is invalid',
   unavailable: 'The service is unavailable',
+  conflict: 'The command conflicts with current state',
 };
 
 /** Retains only a trusted category, never an upstream exception or response. */

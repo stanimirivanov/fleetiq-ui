@@ -1,10 +1,13 @@
 import { spawnSync } from 'node:child_process';
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rmdir, unlink, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   checkGenerationProvenance,
   generationProvenance,
   maintenanceGeneratorUpdate,
 } from './generation-provenance.mjs';
+import { browserGenerationPatch } from './route-generation.mjs';
 
 const maxBuffer = 4 * 1024 * 1024;
 function bytes(value) {
@@ -38,6 +41,15 @@ export async function generateAssetContract({
       !/^\d+\.\d+\.\d+$/u.test(generatorVersion))
   )
     throw new Error('Invalid installed generator version.');
+  const patches = browserGenerationPatch(
+    JSON.parse(await readFile(specPath, 'utf8')),
+  );
+  const patchRoot = patches.length
+    ? await mkdtemp(join(tmpdir(), 'fleetiq-client-'))
+    : null;
+  const patchFile = patchRoot ? join(patchRoot, 'patch.json') : null;
+  if (patchFile)
+    await writeFile(patchFile, JSON.stringify(patches), { mode: 0o600 });
   let result;
   try {
     result = run(
@@ -50,13 +62,22 @@ export async function generateAssetContract({
         'FleetIqApi',
         '--format',
         'httpclient',
+        ...(patchFile ? ['--patch', patchFile] : []),
       ],
       { cwd: repositoryRoot, maxBuffer, timeout: 120_000 },
     );
   } catch {
+    if (patchFile) {
+      await unlink(patchFile);
+      await rmdir(patchRoot);
+    }
     throw new Error(
       'Effect OpenAPI generation failed: subprocess could not launch',
     );
+  }
+  if (patchFile) {
+    await unlink(patchFile);
+    await rmdir(patchRoot);
   }
   if (result.error || result.status !== 0) {
     // OS and subprocess messages may contain unexpected payloads or credentials.

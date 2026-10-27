@@ -33,6 +33,53 @@ const operations = {
   '/api/v1/auth/session': ['get', 'getOperatorSession'],
   '/api/v1/auth/logout': ['post', 'endOperatorSession'],
 };
+export const BROWSER_OPERATIONS = [
+  ...Object.entries(operations).map(([path, [method, id]]) => ({
+    path,
+    method,
+    id,
+  })),
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets',
+    method: 'post',
+    id: 'registerAsset',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/device',
+    method: 'get',
+    id: 'getCommunicationDevice',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/device',
+    method: 'post',
+    id: 'registerCommunicationDevice',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/asset-types',
+    method: 'get',
+    id: 'listAssetTypeDefinitions',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/protocol-routes/{channel_id}',
+    method: 'get',
+    id: 'getDeviceProtocolRoute',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/protocol-routes/{channel_id}',
+    method: 'put',
+    id: 'changeDeviceProtocolRoute',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/protocol-packages/{package_id}/versions/{package_version}',
+    method: 'get',
+    id: 'getProtocolPackageRelease',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/ingestion-diagnostics',
+    method: 'get',
+    id: 'getDeviceIngestionDiagnostics',
+  },
+];
 function parseJson(bytes, message) {
   try {
     return JSON.parse(bytes.toString('utf8'));
@@ -85,7 +132,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.4' ||
+    contract.info?.version !== '1.0.0-baseline.15' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||
@@ -97,7 +144,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
   ) {
     throw new Error('Unexpected asset catalogue contract revision');
   }
-  for (const [route, [method, operationId]] of Object.entries(operations)) {
+  for (const { path: route, method, id: operationId } of BROWSER_OPERATIONS) {
     if (contract.paths?.[route]?.[method]?.operationId !== operationId) {
       throw new Error(`Missing or changed published operation ${operationId}`);
     }
@@ -112,6 +159,6 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
   }
   return {
     commit: provenance.commit,
-    operations: Object.keys(operations).length,
+    operations: BROWSER_OPERATIONS.length,
   };
 }

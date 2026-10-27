@@ -11,6 +11,7 @@ const failureCopy: Record<RequestFailureKind, string> = {
   'invalid-request': 'The metadata request is invalid. Review the URL context.',
   'invalid-response':
     'The service returned an invalid response. No metadata from that response is shown.',
+  conflict: 'The request conflicts with current state',
   unavailable:
     'The metadata service is unavailable. Try again when the connection recovers.',
 };

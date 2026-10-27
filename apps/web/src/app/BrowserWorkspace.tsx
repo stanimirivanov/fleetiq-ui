@@ -1,6 +1,7 @@
 import { useLocation } from '@solidjs/router';
 import { onCleanup, type ParentProps, Show } from 'solid-js';
 import { createMetadataReader } from '#features/assets';
+import { createDeviceGateway } from '#features/devices';
 import {
   createOperatorSessionService,
   createOperatorTenantReader,
@@ -17,6 +18,7 @@ import { TenantMetadataWorkspace } from './TenantMetadataWorkspace';
 export function BrowserWorkspace(props: ParentProps) {
   const browser = createBrowserApi();
   const reader = createMetadataReader(browser);
+  const devices = createDeviceGateway(browser);
   const session = createOperatorSessionService(browser);
   const tenants = createOperatorTenantReader(browser);
   onCleanup(() => {
@@ -24,7 +26,7 @@ export function BrowserWorkspace(props: ParentProps) {
   });
   return (
     <OperatorSessionProvider service={session}>
-      <MetadataComposition reader={reader} tenants={tenants}>
+      <MetadataComposition reader={reader} tenants={tenants} devices={devices}>
         {props.children}
       </MetadataComposition>
     </OperatorSessionProvider>
@@ -33,6 +35,7 @@ export function BrowserWorkspace(props: ParentProps) {
 
 function MetadataComposition(
   props: ParentProps<{
+    readonly devices: ReturnType<typeof createDeviceGateway>;
     readonly reader: ReturnType<typeof createMetadataReader>;
     readonly tenants: ReturnType<typeof createOperatorTenantReader>;
   }>,
@@ -40,6 +43,7 @@ function MetadataComposition(
   const operator = useOperatorSession();
   return (
     <TenantMetadataWorkspace
+      devices={props.devices}
       reader={props.reader}
       tenants={props.tenants}
       onUnauthorized={operator.invalidate}

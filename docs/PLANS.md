@@ -1,5 +1,7 @@
 # Execution plans
 
+## TL;DR
+
 FleetIQ UI follows the existing numbered milestones. Scaffold, visual-language
 foundation, shell, testing, contract, and architectural hardening work belong
 to **M02 - Product Foundation**. The first complete visual workspace belongs
@@ -79,3 +81,8 @@ metadata controls, cancellation and recovery, with component and browser coverag
 and an extended connected-operator guide journey.
 
 The active [D03 immutable UX image slice](exec-plans/active/2026-10-immutable-ux-image.md) in **M02** adds source-owned static-edge packaging and publication; Kubernetes installation and real identity remain deployment-plan work.
+
+The active [device onboarding and diagnostics slice](exec-plans/active/2026-10-device-onboarding.md)
+implements product-plan PR 20 in **M03 - Extensible Device Ingestion** using the
+merged baseline.15 contract. D06 and full-profile qualification remain deferred;
+contract browser journeys do not qualify a deployed provider or live hardware.

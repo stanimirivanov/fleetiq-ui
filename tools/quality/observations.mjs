@@ -64,6 +64,7 @@ export function validateObservation(kind, value) {
             'catalogue',
             'inspector',
             'registry',
+            'device-commissioning',
             'signed-out',
             'forbidden',
           ].includes(entry.screen) &&

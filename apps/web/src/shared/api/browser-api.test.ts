@@ -99,6 +99,7 @@ describe('managed browser API', () => {
     [401, 'unauthorized'],
     [403, 'forbidden'],
     [404, 'not-found'],
+    [409, 'conflict'],
     [500, 'unavailable'],
   ] as const)(
     'classifies status %s before untrusted error body decoding',

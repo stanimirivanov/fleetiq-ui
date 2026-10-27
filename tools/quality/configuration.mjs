@@ -21,7 +21,7 @@ export function inspectQualityConfiguration(
       'Keep the canonical component coverage runner and matching provider pins.',
     );
   if (
-    scope.length !== 10 ||
+    scope.length !== 14 ||
     new Set(scope).size !== scope.length ||
     Object.keys(policy.coverage).sort().join(',') !==
       scope.slice().sort().join(',')

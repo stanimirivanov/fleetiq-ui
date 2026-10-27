@@ -25,6 +25,7 @@ export interface TenantFixture {
     | 'metadata.read'
     | 'metadata.manage'
     | 'access.manage'
+    | 'protocol.manage'
   )[];
 }
 

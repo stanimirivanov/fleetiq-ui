@@ -6,6 +6,7 @@ import {
   metadataHref,
   tenantContextChanges,
 } from '#features/assets';
+import { type DeviceGateway, DeviceProvider } from '#features/devices';
 import {
   OperatorTenantProvider,
   type OperatorTenantReader,
@@ -17,6 +18,7 @@ import { AppShell } from './AppShell';
 import { isDevelopmentSampleRoute } from './sample-route';
 
 type WorkspaceProps = ParentProps<{
+  readonly devices: DeviceGateway;
   readonly reader: ReturnType<typeof createMetadataReader>;
   readonly tenants: OperatorTenantReader;
   readonly onUnauthorized: () => void;
@@ -26,7 +28,8 @@ type WorkspaceProps = ParentProps<{
 export function TenantMetadataWorkspace(props: WorkspaceProps) {
   const location = useLocation();
   const enabled = () =>
-    location.pathname.startsWith('/assets') &&
+    (location.pathname.startsWith('/assets') ||
+      location.pathname === '/devices') &&
     !isDevelopmentSampleRoute(
       location.pathname,
       location.search,
@@ -77,7 +80,36 @@ function MetadataWorkspaceBridge(props: WorkspaceProps) {
         />
       )}
     >
-      <AppShell>{props.children}</AppShell>
+      <DeviceProvider
+        gateway={props.devices}
+        onUnauthorized={props.onUnauthorized}
+        actions={() => {
+          const s = tenants.state();
+          return s.kind === 'ready'
+            ? (s.page.tenants.find(
+                (t) =>
+                  t.id === new URLSearchParams(location.search).get('tenant'),
+              )?.actions ?? [])
+            : undefined;
+        }}
+        tenantControl={(selected) => (
+          <OperatorTenantSelector
+            selected={selected}
+            after={tenantDiscoveryCursor(location.search)}
+            select={(id) =>
+              navigate(`/devices?${new URLSearchParams({ tenant: id })}`)
+            }
+            page={(after) => {
+              const p = new URLSearchParams(location.search);
+              if (after) p.set('tenant_after', after);
+              else p.delete('tenant_after');
+              navigate(`/devices?${p}`);
+            }}
+          />
+        )}
+      >
+        <AppShell>{props.children}</AppShell>
+      </DeviceProvider>
     </MetadataReaderProvider>
   );
 }

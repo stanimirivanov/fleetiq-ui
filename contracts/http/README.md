@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.15` from merged
-`fleetiq-platform` commit `3455f923a20314fb72ff7d0090fd004047ae5ae7`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.18` from merged
+`fleetiq-platform` commit `fe8488e3ec506c610502ad2d2a6089bc0d4fc7c1`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -40,12 +40,14 @@ the connected flow. This vendored artifact remains byte-identical to upstream.
 Generated schemas check wire shape; maintained feature adapters check exact tenant,
 asset, definition version, source tuple, cutoffs, page limit, uniqueness,
 effective intervals, recorded knowledge time, and cursor advancement. Revisions are
-decimal strings to preserve u64. Signed millisecond times must be safe JS integers;
-unrepresentable values are rejected before display.
+decimal strings to preserve u64. Metadata review milliseconds must be safe JS integers. Telemetry/history timestamps
+retain the full signed-i64 range as exact strings; values outside Date
+representation are displayed as exact epoch milliseconds.
 
 Search and type filtering are local to the loaded catalogue page. There is no
-server filter/total endpoint, complete source inventory, live property
-state, position, telemetry stream, or alert lifecycle in this baseline.
+server filter/total endpoint, complete source inventory, live telemetry transport,
+position or alert lifecycle consumed by this UI. Current property snapshots and
+bounded hot history are now connected.
 
 An opaque `after` cursor is exclusive. Preserve tenant, resource/source, cutoffs,
 and limit on each corresponding next-page request. Relationship, target, and source
@@ -76,7 +78,7 @@ mock that does not match the published contract.
 ## Device commissioning and consumer generation
 
 The byte-identical bundle contains the broader backend API. The generated browser
-client includes only the 22 consumed operations registered in
+client includes only the 25 consumed operations registered in
 [the contract sensor](../../tools/sensors/asset-contract.mjs), plus their complete
 transitive schema closure. Administration operations outside this UI are retained
 in the upstream snapshot but are not added to browser code. Negative fixtures
@@ -102,3 +104,15 @@ Package lookup proves stored immutable identity, not current admission. Route
 mutation rechecks eligibility on the backend. Diagnostics exposes only safe
 persisted evidence, explicit 64-frame/64-output/128-source coverage, and
 `not_observed` worker/connection liveness. No fake operational fallback is used.
+
+## Current readings and history
+
+The three additional consumed operations require separate telemetry.read. Current
+snapshots expose committed tenant generation/revision/pending state and at most
+one exact installed property value. History is a half-open window of at most seven
+days, fifty interpretations per UI page, with an opaque exclusive cursor. Exact
+interpretation reads preserve original attribution. All integer/decimal values,
+counters and signed-i64 timestamps stay strings. Generated shape validation is
+followed by exact scope, range, kind/unit, event-time, age and ordering checks.
+Current state is independent of metadata review cutoffs. Separate snapshots/pages
+do not imply one transaction or complete unresolved/upstream coverage.

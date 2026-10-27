@@ -16,3 +16,5 @@ consequences, and alternatives.
   scope, and same-origin OIDC session ownership.
 
 - [0005: Source-owned immutable UX/static-edge delivery](0005-immutable-ux-delivery.md) (proposed in issue #71).
+
+- [0006: Connected property evidence](0006-connected-property-evidence.md): exact current snapshots, bounded history and original provenance.

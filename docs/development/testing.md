@@ -128,3 +128,14 @@ evidence and retires the route. Its responses are synthetic contract fixtures;
 D06, real provider/browser acceptance and hardware qualification remain separate.
 Device regressions additionally cover ambiguous exact retries, conflicts, independent
 grants, invalid URL context, unsafe evidence, disposal and late completions.
+
+## Connected property evidence
+
+The assets telemetry boundary/model tests exercise signed-range precision,
+source lineage, exact scope, quality/age consistency, ordering and bounded
+cursors. Solid tests prove property changes cancel old reads and ignore late
+completions. The production POM journey adds the required
+`connected-property-evidence` guide chapter: select a property, review snapshot
+quality/age/lag, inspect provenance, page history, edit its window and distinguish
+empty, denied and failed results. Guide responses are synthetic contract fixtures;
+full generation and measured/browser gates remain CI requirements.

@@ -32,3 +32,5 @@ homes rather than growing the root README.
 - [Dependency upgrade review](development/dependency-upgrades.md): reviewed pins, read-only proposals, early qualification and recovery.
 
 - [Immutable UX image delivery](development/image-publication.md): runtime routing, actual artifact qualification and maintainer publication.
+
+- [Connected property evidence decision](design-docs/0006-connected-property-evidence.md): current snapshots, exact values, bounded hot history, provenance and coverage limits.

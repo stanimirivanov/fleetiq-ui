@@ -17,3 +17,5 @@ retains the required check merge barrier.
 - [Canonical UI producer rename](2026-10-ui-producer-rename.md): M02 repository and immutable-publication identity integration.
 
 - [Device onboarding and diagnostics](2026-10-device-onboarding.md): M03 complete device commissioning slice, issue #81.
+
+- [Connected property evidence](2026-10-connected-property-evidence.md) — M04 product PR 25; full CI qualification pending.

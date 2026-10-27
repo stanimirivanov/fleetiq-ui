@@ -3,6 +3,7 @@ export type TenantAction =
   | 'access.manage'
   | 'metadata.manage'
   | 'metadata.read'
+  | 'telemetry.read'
   | 'protocol.manage';
 
 export interface OperatorTenant {

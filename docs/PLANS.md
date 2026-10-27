@@ -86,3 +86,5 @@ The active [device onboarding and diagnostics slice](exec-plans/active/2026-10-d
 implements product-plan PR 20 in **M03 - Extensible Device Ingestion** using the
 merged baseline.15 contract. D06 and full-profile qualification remain deferred;
 contract browser journeys do not qualify a deployed provider or live hardware.
+
+Product-plan PR 25 is the [connected property evidence slice](exec-plans/active/2026-10-connected-property-evidence.md): committed readings, precise history and immutable provenance. Resumable live delivery remains PR 27; D06/full-profile qualification stay deferred.

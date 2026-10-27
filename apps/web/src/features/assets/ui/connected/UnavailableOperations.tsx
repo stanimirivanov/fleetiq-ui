@@ -6,19 +6,21 @@ export function UnavailableOperations() {
   return (
     <MetadataPanel
       title="Operational evidence"
-      description="Current metadata does not expose live positions, telemetry values, asset condition, alerts, or timeline history."
+      description="Property values and hot history are separate from asset condition, connection liveness, live positions and alerts."
     >
       <div class="grid gap-3 sm:grid-cols-3">
         <Capability label="Asset condition" />
         <Capability label="Device connection" />
-        <Capability label="Telemetry freshness" />
+        <Capability label="Asset alerts" />
       </div>
       <div class="mt-4 rounded-lg border border-dashed border-outline bg-canvas p-4">
-        <p class="text-xs font-semibold">Telemetry & timeline</p>
+        <p class="text-xs font-semibold">
+          Live delivery & operational coverage
+        </p>
         <p class="mt-2 text-xs leading-5 text-muted">
-          A backend operational read model is required. Binding metadata alone
-          cannot establish observed values, freshness, anomaly status, or
-          historical measurements.
+          Current readings refresh explicitly; resumable live subscriptions are
+          not connected yet. Binding metadata and reading age cannot establish
+          device connectivity, location or asset health.
         </p>
       </div>
     </MetadataPanel>

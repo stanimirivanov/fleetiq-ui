@@ -77,7 +77,7 @@ See [ADR 0004](docs/design-docs/0004-browser-safe-semantic-metadata.md).
 The [pinned HTTP contract](contracts/http/README.md) provides bounded identities,
 exact definition versions, directed relationships, exact source/target bindings,
 and browser sessions. Generated schemas validate shape. Maintained adapter checks
-validate request scope, safe integer times, versions, decimal revisions, effective
+validate request scope, safe integer metadata times, exact string telemetry times, versions, decimal revisions, effective
 intervals, page size, uniqueness, and advancing cursors.
 
 The connected registry is a temporal metadata review, not a complete graph or a
@@ -95,9 +95,9 @@ Connected screens use the same hierarchy with honest unavailable operational dat
 Local Vite development retains the labelled sample overview, schematic map, asset
 inspector, finite signal playback, registry, and alert triage. These fixtures are
 separate from backend models and excluded from production output. The map uses
-percentage canvas positions, not observed geography. No production property state,
-telemetry stream, geodetic map SDK, tiles, alert lifecycle, or native mobile app
-exists yet. Introduce Effect Atom only with an actual shared granular-state need.
+percentage canvas positions, not observed geography. Production exact-property snapshots, bounded hot history and original provenance
+now exist. No telemetry stream, geodetic map SDK, tiles, alert lifecycle or native
+mobile app is connected yet. Introduce Effect Atom only with an actual shared granular-state need.
 
 [FRONTEND.md](docs/FRONTEND.md) details the selected stack;
 [PLANS.md](docs/PLANS.md) records sequencing and acceptance evidence.
@@ -117,3 +117,9 @@ or identity. Tenant/device/channel changes dispose old controllers. Unknown
 mutation outcomes preserve exact captured content, and current route heads are
 read again after command acknowledgement. Historical receipts and leases do not
 establish liveness. See the [device slice](docs/exec-plans/active/2026-10-device-onboarding.md).
+
+The [connected property slice](docs/design-docs/0006-connected-property-evidence.md)
+adds an independent telemetry read port on the app-composed assets reader. It
+uses the same managed runtime and account/tenant-keyed read owner. Model values,
+URL scope, exact arithmetic and adapter validation stay inward; centre-pane
+components own selection/disclosure while pages retain layout responsibility.

@@ -54,12 +54,14 @@ partial, duplicate, or invalid context blocks reads. Asset/source/cutoff changes
 reset relevant cursors. Independent relationship, target, and source pages preserve
 scope and cutoffs. Exact source means device asset + endpoint + signal, not a
 physical source inventory. Decimal revisions remain strings; unsafe JS integer
-millisecond values are rejected. Multiple page requests do not promise one database
+metadata review times are rejected. Telemetry/history signed-i64 times retain
+exact strings, with Date formatting only where representable. Multiple page requests do not promise one database
 snapshot or a whole graph.
 
 Identity, type, and property definitions appear in focused evidence panels. The
-inspector's connected scope is metadata; it does not synthesize live property values,
-health, locations, or alerts. Pinned definition reads have no global definition-list
+inspector connects exact current readings, bounded history and original provenance
+with independent telemetry.read. It does not synthesize health, locations, alerts
+or resumable live delivery. Pinned definition reads have no global definition-list
 contract. A source with no bindings is an empty exact-source result, not an inferred
 unassigned sensor.
 

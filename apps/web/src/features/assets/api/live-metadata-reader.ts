@@ -15,6 +15,8 @@ import {
   validateSnapshotRequest,
   validateSourceRequest,
 } from '../model/metadata';
+import type { TelemetryReader } from '../model/property-evidence';
+import { createTelemetryReader } from './live-telemetry-reader';
 import { parseAssetPage } from './parse-asset-page';
 import {
   parseAssetDetail,
@@ -27,7 +29,9 @@ import {
 } from './parse-metadata';
 
 /** Live read port: generated Effect client -> strict boundary -> pure feature model. */
-export function createLiveMetadataReader(api: BrowserApi): MetadataReader {
+export function createLiveMetadataReader(
+  api: BrowserApi,
+): MetadataReader & { readonly telemetry?: TelemetryReader } {
   const read = <A, W, E>(
     operation: (client: FleetIqApi) => Effect.Effect<W, E>,
     parse: (wire: W) => A,
@@ -47,6 +51,7 @@ export function createLiveMetadataReader(api: BrowserApi): MetadataReader {
       options,
     );
   return {
+    telemetry: createTelemetryReader(api),
     async listPage(request, options) {
       validateAssetPageRequest(request);
       return read(

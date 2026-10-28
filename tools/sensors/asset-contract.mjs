@@ -34,6 +34,21 @@ const operations = {
   '/api/v1/auth/logout': ['post', 'endOperatorSession'],
 };
 export const BROWSER_OPERATIONS = [
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/properties/{property_id}/versions/{version}/current',
+    method: 'get',
+    id: 'getCurrentPropertySnapshot',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/properties/{property_id}/versions/{version}/history',
+    method: 'get',
+    id: 'listPropertyHistory',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/properties/{property_id}/versions/{version}/interpretations/{interpretation}',
+    method: 'get',
+    id: 'getPropertyInterpretation',
+  },
   ...Object.entries(operations).map(([path, [method, id]]) => ({
     path,
     method,
@@ -132,7 +147,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.15' ||
+    contract.info?.version !== '1.0.0-baseline.18' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||

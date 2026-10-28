@@ -8,6 +8,7 @@ import { MetadataReadContent } from './MetadataReadContent';
 import { RelationshipEvidence } from './RelationshipEvidence';
 import { SourceBindingEvidence } from './SourceBindingEvidence';
 import { TargetBindingEvidence } from './TargetBindingEvidence';
+import { InspectorTelemetry } from './telemetry/InspectorTelemetry';
 import { UnavailableOperations } from './UnavailableOperations';
 import { useMetadataRead } from './useMetadataRead';
 import { useMetadataWorkspace } from './useMetadataWorkspace';
@@ -59,7 +60,10 @@ export function ConnectedInspectorView(props: { readonly assetId: string }) {
                   assetId={asset.id}
                   path={path()}
                 />
-                <AssetIdentityEvidence asset={asset} />
+                <div class="grid min-w-0 gap-4">
+                  <InspectorTelemetry asset={asset} workspace={workspace} />
+                  <AssetIdentityEvidence asset={asset} />
+                </div>
                 <div class="grid gap-4">
                   <TargetBindingEvidence
                     workspace={workspace}

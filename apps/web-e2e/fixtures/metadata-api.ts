@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import type { TenantAction } from '../../web/src/generated/fleetiq-api';
 import {
   catalogueRecords,
   publishedBinding,
@@ -21,12 +22,7 @@ export interface ApiRequestEvidence {
 
 export interface TenantFixture {
   readonly tenant_id: string;
-  readonly actions: readonly (
-    | 'metadata.read'
-    | 'metadata.manage'
-    | 'access.manage'
-    | 'protocol.manage'
-  )[];
+  readonly actions: readonly TenantAction[];
 }
 
 export interface MetadataMockOptions {

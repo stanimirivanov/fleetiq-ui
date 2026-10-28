@@ -1,8 +1,9 @@
 import { createContext, type JSX, useContext } from 'solid-js';
 import type { MetadataReader } from '../../model/metadata';
+import type { TelemetryReader } from '../../model/property-evidence';
 
 interface MetadataReaderContext {
-  readonly reader?: MetadataReader;
+  readonly reader?: MetadataReader & { readonly telemetry?: TelemetryReader };
   /** Advisory availability; the server always authorizes the protected request. */
   readonly accessBlock?: () => string | undefined;
   /** A changed identity invalidates retained evidence even for an unchanged URL. */

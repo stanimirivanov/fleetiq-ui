@@ -25,6 +25,7 @@ import { qualifyRemoteProbe } from './remote-probe.mjs';
 import { Resources } from './resources.mjs';
 import { qualifyRuntime } from './runtime.mjs';
 import { scanRuntime } from './scan.mjs';
+import { qualificationMode } from './security-mode.mjs';
 import { sourceIdentity } from './source.mjs';
 import {
   loadRuntime,
@@ -59,7 +60,8 @@ export function retainReports(directory, id) {
     });
   }
 }
-export async function qualify() {
+export async function qualify({ mode = 'full' } = {}) {
+  const plan = qualificationMode(mode);
   ensure(
     process.versions.node.split('.')[0] === '24',
     'Image qualification requires Node 24.',
@@ -78,7 +80,7 @@ export async function qualify() {
   plainAncestors(directory);
   mkdirSync(join(directory, 'reports'));
   const record = {
-    format: 'fleetiq-ux-image-qualification.v1',
+    format: plan.format,
     outcome: 'incomplete',
     source,
     platform: tools.platform,
@@ -97,10 +99,12 @@ export async function qualify() {
     failure;
   let stage = 'remote-manifest-probe';
   try {
-    await qualifyRemoteProbe();
-    record.checks.push('remote-manifest-probe');
+    if (!plan.securityOnly) {
+      await qualifyRemoteProbe();
+      record.checks.push('remote-manifest-probe');
+    }
     stage = 'tool-acquisition';
-    await pullToolImages(tools);
+    await pullToolImages(tools, docker, plan.roles);
     stage = 'build';
     await docker([
       'buildx',
@@ -171,22 +175,24 @@ export async function qualify() {
     }
     record.checks.push('oci-metadata');
     await r.start();
-    stage = 'registry-import';
-    loaded = await loadRuntime(tools, directory, artifact, r);
-    stage = 'runtime';
-    const runtime = await qualifyRuntime(loaded, tools, directory, r);
-    record.bundle = {
-      digest: `sha256:${hash(readFileSync(join(directory, 'reports/bundle.json')))}`,
-    };
-    record.checks.push(...runtime.checks);
-    stage = 'registry-roundtrip';
-    await roundtrip(tools, directory, artifact, r, loaded);
-    ensure(
-      inspectLayout(join(directory, 'roundtrip'), source.revision).digest ===
-        artifact.digest,
-      'Registry changed the complete OCI index.',
-    );
-    record.checks.push('registry-roundtrip');
+    if (!plan.securityOnly) {
+      stage = 'registry-import';
+      loaded = await loadRuntime(tools, directory, artifact, r);
+      stage = 'runtime';
+      const runtime = await qualifyRuntime(loaded, tools, directory, r);
+      record.bundle = {
+        digest: `sha256:${hash(readFileSync(join(directory, 'reports/bundle.json')))}`,
+      };
+      record.checks.push(...runtime.checks);
+      stage = 'registry-roundtrip';
+      await roundtrip(tools, directory, artifact, r, loaded);
+      ensure(
+        inspectLayout(join(directory, 'roundtrip'), source.revision).digest ===
+          artifact.digest,
+        'Registry changed the complete OCI index.',
+      );
+      record.checks.push('registry-roundtrip');
+    }
     stage = 'runtime-security-scan';
     console.log(`Scan original OCI runtime: ${artifact.manifest}`);
     record.scan = await scanRuntime(directory, tools, artifact, r);
@@ -228,7 +234,8 @@ export async function qualify() {
         stage = 'cleanup';
         record.checks.push('cleanup');
         ensure(
-          JSON.stringify(record.checks) === JSON.stringify(CHECKS),
+          JSON.stringify(record.checks) ===
+            JSON.stringify(plan.checks ?? CHECKS),
           'Image checks differ.',
         );
         record.outcome = 'passed';
@@ -256,7 +263,11 @@ export async function qualify() {
       process.env.GITHUB_OUTPUT,
       `directory=${directory.replaceAll('\\', '/')}\n`,
     );
-  console.log(`UX image qualified: ${record.image.digest}`);
+  console.log(
+    plan.securityOnly
+      ? `Image security preflight passed: ${record.image.digest}; full image qualification remains required.`
+      : `UX image qualified: ${record.image.digest}`,
+  );
   return directory;
 }
 if (
@@ -264,6 +275,10 @@ if (
   import.meta.url === pathToFileURL(resolve(process.argv[1])).href
 ) {
   try {
+    ensure(
+      process.argv.length === 2,
+      'Unexpected image qualification arguments.',
+    );
     await qualify();
   } catch (error) {
     console.error(error.message);

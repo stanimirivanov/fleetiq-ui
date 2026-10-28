@@ -14,8 +14,10 @@ export default defineConfig(({ mode }) => ({
     tailwindcss(),
     qualityManifest(fileURLToPath(new URL('../../', import.meta.url))),
   ],
-  // Resolve Solid's browser build when Vitest renders components in jsdom.
-  resolve: { conditions: ['development', 'browser'] },
+  // jsdom needs Solid's reactive browser build. Production retains Vite's
+  // default production conditions rather than shipping development helpers.
+  resolve:
+    mode === 'test' ? { conditions: ['development', 'browser'] } : undefined,
   test: {
     // Bound isolated jsdom/Effect workers on developer machines and CI;
     // increasing concurrency can exhaust memory and starve interaction timers.

@@ -1,7 +1,7 @@
 {
   "repository": "fleetiq-platform",
   "remote": "https://github.com/stanimirivanov/fleetiq-platform",
-  "commit": "3455f923a20314fb72ff7d0090fd004047ae5ae7",
+  "commit": "fe8488e3ec506c610502ad2d2a6089bc0d4fc7c1",
   "path": "contracts/http/dist/openapi.json",
-  "sha256": "a1888e2e885cf9e7ffe799c0c7ec00c907c6bfa5d0ca83c21184f41cc5e1b3ae"
+  "sha256": "0c013743ae1ebeb6b3d24e94805e573be2a674fcae6457dc817d23074b267539"
 }

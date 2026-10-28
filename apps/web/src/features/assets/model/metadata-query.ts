@@ -1,4 +1,5 @@
 import { isValidAssetIdentifier } from './asset-catalogue';
+import { evidenceKeys } from './evidence-query';
 import type { SignalSource } from './metadata';
 
 export const snapshotCursorKeys = [
@@ -143,7 +144,10 @@ export function tenantContextChanges(
 
 export function clearSnapshotSelection(): Record<string, null> {
   return Object.fromEntries(
-    [...snapshotCursorKeys, ...sourceQueryKeys].map((key) => [key, null]),
+    [...snapshotCursorKeys, ...sourceQueryKeys, ...evidenceKeys].map((key) => [
+      key,
+      null,
+    ]),
   );
 }
 

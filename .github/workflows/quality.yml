@@ -34,6 +34,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
   browser:
+    needs: [check, harness-windows]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -73,6 +74,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
   browser-quality:
+    needs: [check, harness-windows]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -140,6 +142,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
   image:
+    needs: [check, harness-windows]
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:

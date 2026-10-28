@@ -322,6 +322,14 @@
         "rejects a different tenant even when the wire shape is valid",
         "rejects a non-advancing cursor or cursor on an empty page"
       ]
+    },
+    {
+      "file": "src/features/assets/ui/connected/telemetry/PropertyTelemetry.test.tsx",
+      "titles": [
+        "connects a reading to exact provenance and applies a bounded URL-owned history window",
+        "property changes abort old work and ignore a late non-cooperative reading",
+        "invalid context blocks reads and telemetry denial does not become an empty/sample state"
+      ]
     }
   ]
 }

@@ -2,11 +2,17 @@ import * as Data from "effect/Data"
 import * as Effect from "effect/Effect"
 import type { SchemaError } from "effect/Schema"
 import * as Schema from "effect/Schema"
-import type * as HttpClient from "effect/http/HttpClient"
+import * as Stream from "effect/Stream"
+import * as Sse from "effect/encoding/Sse"
+import * as HttpClient from "effect/http/HttpClient"
 import * as HttpClientError from "effect/http/HttpClientError"
 import * as HttpClientRequest from "effect/http/HttpClientRequest"
 import * as HttpClientResponse from "effect/http/HttpClientResponse"
 // non-recursive definitions
+export type PropertyLiveStream = string
+export const PropertyLiveStream = Schema.String.annotate({ "description": "UTF-8 SSE wire stream with blank-line-delimited events. Event data schemas are declared in the response x-fleetiq-event-data map. Only snapshot/replace events assign an opaque id. Parse complete events independently of HTTP chunk boundaries and id/data ordering.", "identifier": "PropertyLiveStream" })
+export type Problem = { readonly "type": string, readonly "title": string, readonly "status": number } & { readonly [x: string]: Schema.Json }
+export const Problem = Schema.StructWithRest(Schema.Struct({ "type": Schema.String, "title": Schema.String, "status": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(400).annotate({ "expected": "a value greater than or equal to 400" })).check(Schema.isLessThanOrEqualTo(599).annotate({ "expected": "a value less than or equal to 599" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "Minimum application/problem+json shape. Future compatible problems may include optional fields.", "identifier": "Problem" })
 export type ProjectionCounter = string
 export const ProjectionCounter = Schema.String.annotate({ "description": "Exact nonnegative decimal counter backed by signed 64-bit storage; never a JavaScript floating-point number. Compare numerically and only inside the same tenant projection." }).check(Schema.isMaxCodePoints(19).annotate({ "expected": "a string with at most 19 code points" })).check(Schema.isPattern(new RegExp("^(0|[1-9][0-9]*)$", "u")).annotate({ "expected": "a string matching the RegExp ^(0|[1-9][0-9]*)$", "identifier": "ProjectionCounter" }))
 export type HistoryMillis = string
@@ -15,8 +21,6 @@ export type HistoryToken = string
 export const HistoryToken = Schema.String.annotate({ "description": "Versioned opaque key, not a credential. Do not decode or edit; grants and scope are rechecked on every request." }).check(Schema.isMaxCodePoints(8192).annotate({ "expected": "a string with at most 8192 code points" })).check(Schema.isPattern(new RegExp("^v1\\.[0-9a-f]+$", "u")).annotate({ "expected": "a string matching the RegExp ^v1\\.[0-9a-f]+$", "identifier": "HistoryToken" }))
 export type HistoryValue = { readonly "kind": "boolean", readonly "value": boolean } | { readonly "kind": "integer", readonly "value": string } | { readonly "kind": "decimal", readonly "value": string } | { readonly "kind": "text", readonly "value": string }
 export const HistoryValue = Schema.Union([Schema.Struct({ "kind": Schema.Literal("boolean"), "value": Schema.Boolean }), Schema.Struct({ "kind": Schema.Literal("integer"), "value": Schema.String.check(Schema.isMaxCodePoints(20).annotate({ "expected": "a string with at most 20 code points" })).check(Schema.isPattern(new RegExp("^-?(0|[1-9][0-9]*)$", "u")).annotate({ "expected": "a string matching the RegExp ^-?(0|[1-9][0-9]*)$" })) }), Schema.Struct({ "kind": Schema.Literal("decimal"), "value": Schema.String.check(Schema.isPattern(new RegExp("^-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?$", "u")).annotate({ "expected": "a string matching the RegExp ^-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?$" })) }), Schema.Struct({ "kind": Schema.Literal("text"), "value": Schema.String })], { mode: "oneOf" }).annotate({ "description": "Integer and decimal values are strings to preserve precision in browser clients. Decimal exponents are permitted. No unit conversion is performed.", "identifier": "HistoryValue" })
-export type Problem = { readonly "type": string, readonly "title": string, readonly "status": number } & { readonly [x: string]: Schema.Json }
-export const Problem = Schema.StructWithRest(Schema.Struct({ "type": Schema.String, "title": Schema.String, "status": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(400).annotate({ "expected": "a value greater than or equal to 400" })).check(Schema.isLessThanOrEqualTo(599).annotate({ "expected": "a value less than or equal to 599" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "Minimum application/problem+json shape. Future compatible problems may include optional fields.", "identifier": "Problem" })
 export type TenantAction = "access.manage" | "metadata.manage" | "metadata.read" | "protocol.manage" | "telemetry.read"
 export const TenantAction = Schema.Literals(["access.manage", "metadata.manage", "metadata.read", "protocol.manage", "telemetry.read"]).annotate({ "description": "An exact granted tenant action; no action implies another.", "identifier": "TenantAction" })
 export type ApiDescription = { readonly "service": "FleetIQ", readonly "version": "v1" } & { readonly [x: string]: Schema.Json }
@@ -112,8 +116,24 @@ export const AssetBindingSnapshot = Schema.StructWithRest(Schema.Struct({ "asset
 export type SourceBindingSnapshot = { readonly "source": SignalSource, readonly "effective_at_ms": number, readonly "known_at_ms": number, readonly "bindings": ReadonlyArray<SignalBinding>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
 export const SourceBindingSnapshot = Schema.StructWithRest(Schema.Struct({ "source": SignalSource, "effective_at_ms": Schema.Number.annotate({ "description": "Physical time used for this page.", "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })), "known_at_ms": Schema.Number.annotate({ "description": "Recorded-time cutoff used for this page.", "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })), "bindings": Schema.Array(SignalBinding).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]).annotate({ "description": "Exclusive stable binding-ID cursor; null ends traversal." }) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "description": "One bounded, bitemporal signal-binding page for an exact source signal.", "identifier": "SourceBindingSnapshot" })
 export type CurrentPropertySnapshot = { readonly "generation": ProjectionCounter, readonly "revision": ProjectionCounter, readonly "processed_count": ProjectionCounter, readonly "pending": boolean, readonly "evaluated_at_ms": HistoryMillis, readonly "stale_after_ms": 30000, readonly "items": ReadonlyArray<CurrentPropertyItem> }
-export const CurrentPropertySnapshot = Schema.Struct({ "generation": ProjectionCounter, "revision": ProjectionCounter, "processed_count": ProjectionCounter, "pending": Schema.Boolean.annotate({ "description": "At least one committed tenant interpretation remains pending in the current-state queue at this database snapshot. Not a source/semantic queue or device-health assertion." }), "evaluated_at_ms": HistoryMillis, "stale_after_ms": Schema.Literal(30000), "items": Schema.Array(CurrentPropertyItem).check(Schema.isMaxLength(1).annotate({ "expected": "a value with a length of at most 1" })) }).annotate({ "description": "Complete exact installed asset/property/version state at one repeatable database view. Empty items means no value has been materialized, including pending work; it does not claim no observations or bindings exist. Generation changes on rebuild; revision advances on each committed nonempty batch and rebuild and never resets. Counters are scoped to the tenant, not the property. No live replay or cursor continuity is promised yet.", "identifier": "CurrentPropertySnapshot" })
+export const CurrentPropertySnapshot = Schema.Struct({ "generation": ProjectionCounter, "revision": ProjectionCounter, "processed_count": ProjectionCounter, "pending": Schema.Boolean.annotate({ "description": "At least one committed tenant interpretation remains pending in the current-state queue at this database snapshot. Not a source/semantic queue or device-health assertion." }), "evaluated_at_ms": HistoryMillis, "stale_after_ms": Schema.Literal(30000), "items": Schema.Array(CurrentPropertyItem).check(Schema.isMaxLength(1).annotate({ "expected": "a value with a length of at most 1" })) }).annotate({ "description": "Complete exact installed asset/property/version state at one repeatable database view. Empty items means no value has been materialized, including pending work; it does not claim no observations or bindings exist. Generation changes on rebuild; revision advances on each committed nonempty batch and rebuild and never resets. Counters are scoped to the tenant, not the property. The REST snapshot has no SSE cursor; the live operation issues its own scope-bound position and coalesced replacement contract.", "identifier": "CurrentPropertySnapshot" })
 // schemas
+export type StreamCurrentPropertyParams = { readonly "Last-Event-ID"?: string }
+export const StreamCurrentPropertyParams = Schema.Struct({ "Last-Event-ID": Schema.optionalKey(Schema.String.check(Schema.isMaxCodePoints(110).annotate({ "expected": "a string with at most 110 code points" })).check(Schema.isPattern(new RegExp("^v1\\.[a-f0-9]{64}\\.(0|[1-9][0-9]{0,18})\\.(0|[1-9][0-9]{0,18})$", "u")).annotate({ "expected": "a string matching the RegExp ^v1\\.[a-f0-9]{64}\\.(0|[1-9][0-9]{0,18})\\.(0|[1-9][0-9]{0,18})$" }))) })
+export type StreamCurrentProperty200Sse = PropertyLiveStream
+export const StreamCurrentProperty200Sse = PropertyLiveStream
+export type StreamCurrentProperty400 = Problem
+export const StreamCurrentProperty400 = Problem
+export type StreamCurrentProperty401 = Problem
+export const StreamCurrentProperty401 = Problem
+export type StreamCurrentProperty403 = Problem
+export const StreamCurrentProperty403 = Problem
+export type StreamCurrentProperty404 = Problem
+export const StreamCurrentProperty404 = Problem
+export type StreamCurrentProperty429 = Problem
+export const StreamCurrentProperty429 = Problem
+export type StreamCurrentProperty500 = Problem
+export const StreamCurrentProperty500 = Problem
 export type GetCurrentPropertySnapshot200 = CurrentPropertySnapshot
 export const GetCurrentPropertySnapshot200 = CurrentPropertySnapshot
 export type GetCurrentPropertySnapshot400 = Problem
@@ -510,6 +530,31 @@ export const make = (
     }
     return Effect.succeed(method(path))
   })
+  const executeStreamRequest = (request: HttpClientRequest.HttpClientRequest) =>
+    Effect.suspend(() =>
+      options.transformClient
+        ? Effect.flatMap(options.transformClient(httpClient), (client) => HttpClient.filterStatusOk(client).execute(request))
+        : HttpClient.filterStatusOk(httpClient).execute(request)
+    )
+  const sseRequest = <
+     Type,
+     DecodingServices
+    >(
+      schema: Schema.ConstraintDecoder<Type, DecodingServices>
+    ) =>
+    (
+      request: HttpClientRequest.HttpClientRequest
+    ): Stream.Stream<
+      { readonly event: string; readonly id: string | undefined; readonly data: Type },
+      HttpClientError.HttpClientError | SchemaError | Sse.Retry | Sse.SseError,
+      DecodingServices
+    > =>
+      executeStreamRequest(request).pipe(
+        Effect.map((response) => response.stream),
+        Stream.unwrap,
+        Stream.decodeText(),
+        Stream.pipeThroughChannel(Sse.decodeDataSchema(schema))
+      )
   const decodeSuccess =
     <Schema extends Schema.Constraint>(schema: Schema) =>
     (response: HttpClientResponse.HttpClientResponse) =>
@@ -523,6 +568,26 @@ export const make = (
       )
   return {
     httpClient,
+    "streamCurrentProperty": (tenantId, assetId, propertyId, version, options: Parameters<FleetIqApi["streamCurrentProperty"]>[4]) => __makePathRequest(HttpClientRequest.get, [tenantId, assetId, propertyId, version], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/properties/" + __encodePathParam(propertyId) + "/versions/" + __encodePathParam(version) + "/live").pipe(
+    Effect.flatMap((request) => request.pipe(
+      HttpClientRequest.setHeaders({ "Last-Event-ID": options?.params?.["Last-Event-ID"] ?? undefined }),
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "400": decodeError("StreamCurrentProperty400", StreamCurrentProperty400),
+      "401": decodeError("StreamCurrentProperty401", StreamCurrentProperty401),
+      "403": decodeError("StreamCurrentProperty403", StreamCurrentProperty403),
+      "404": decodeError("StreamCurrentProperty404", StreamCurrentProperty404),
+      "429": decodeError("StreamCurrentProperty429", StreamCurrentProperty429),
+      "500": decodeError("StreamCurrentProperty500", StreamCurrentProperty500),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "streamCurrentPropertySse": (tenantId, assetId, propertyId, version, options) => Stream.unwrap(__makePathRequest(HttpClientRequest.get, [tenantId, assetId, propertyId, version], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/properties/" + __encodePathParam(propertyId) + "/versions/" + __encodePathParam(version) + "/live").pipe(
+    Effect.map((request) => request.pipe(
+      HttpClientRequest.setHeaders({ "Last-Event-ID": options?.params?.["Last-Event-ID"] ?? undefined }),
+      sseRequest(StreamCurrentProperty200Sse)
+    ))
+  )),
     "getCurrentPropertySnapshot": (tenantId, assetId, propertyId, version, options: Parameters<FleetIqApi["getCurrentPropertySnapshot"]>[4]) => __makePathRequest(HttpClientRequest.get, [tenantId, assetId, propertyId, version], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/assets/" + __encodePathParam(assetId) + "/properties/" + __encodePathParam(propertyId) + "/versions/" + __encodePathParam(version) + "/current").pipe(
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
@@ -847,6 +912,17 @@ export const make = (
 
 export interface FleetIqApi {
   readonly httpClient: HttpClient.HttpClient
+  /**
+* Requires fresh telemetry.read before cursor/scope discovery and again before every emitted data or heartbeat. Uses the durable consistent current projection, not a process-local broadcast buffer. Reconnect cursors bind exact scope and generation/revision; replacements safely coalesce at most 256 forward tenant revisions. Rebuilds, future positions and expired windows terminate with explicit resnapshot. Scope changes need a fresh baseline. There is no historical event replay guarantee, broker or projection write. Browser sessions, identity mappings, actor activation and grants are revalidated, never cached for the connection. Reads have an eight-second deadline; cancellation drops their futures. Connection count is capped at 64 per process and frames/lease/demand are bounded. Already serialized bytes cannot be revoked from network buffers; proxy socket-write/idle deadlines remain deployment responsibilities.
+*/
+readonly "streamCurrentProperty": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, propertyId: string, version: string, options: { readonly params?: typeof StreamCurrentPropertyParams.Encoded | undefined; readonly config: Config }): Effect.Effect<WithOptionalResponse<void, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"StreamCurrentProperty400", StreamCurrentProperty400> | FleetIqApiError<"StreamCurrentProperty401", StreamCurrentProperty401> | FleetIqApiError<"StreamCurrentProperty403", StreamCurrentProperty403> | FleetIqApiError<"StreamCurrentProperty404", StreamCurrentProperty404> | FleetIqApiError<"StreamCurrentProperty429", StreamCurrentProperty429> | FleetIqApiError<"StreamCurrentProperty500", StreamCurrentProperty500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, assetId: string, propertyId: string, version: string, options: { readonly params?: typeof StreamCurrentPropertyParams.Encoded | undefined; readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<void, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"StreamCurrentProperty400", StreamCurrentProperty400> | FleetIqApiError<"StreamCurrentProperty401", StreamCurrentProperty401> | FleetIqApiError<"StreamCurrentProperty403", StreamCurrentProperty403> | FleetIqApiError<"StreamCurrentProperty404", StreamCurrentProperty404> | FleetIqApiError<"StreamCurrentProperty429", StreamCurrentProperty429> | FleetIqApiError<"StreamCurrentProperty500", StreamCurrentProperty500>>;
+  }
+  /**
+* Requires fresh telemetry.read before cursor/scope discovery and again before every emitted data or heartbeat. Uses the durable consistent current projection, not a process-local broadcast buffer. Reconnect cursors bind exact scope and generation/revision; replacements safely coalesce at most 256 forward tenant revisions. Rebuilds, future positions and expired windows terminate with explicit resnapshot. Scope changes need a fresh baseline. There is no historical event replay guarantee, broker or projection write. Browser sessions, identity mappings, actor activation and grants are revalidated, never cached for the connection. Reads have an eight-second deadline; cancellation drops their futures. Connection count is capped at 64 per process and frames/lease/demand are bounded. Already serialized bytes cannot be revoked from network buffers; proxy socket-write/idle deadlines remain deployment responsibilities.
+*/
+readonly "streamCurrentPropertySse": (tenantId: string, assetId: string, propertyId: string, version: string, options: { readonly params?: typeof StreamCurrentPropertyParams.Encoded | undefined } | undefined) => Stream.Stream<{ readonly event: string; readonly id: string | undefined; readonly data: StreamCurrentProperty200Sse }, HttpClientError.HttpClientError | SchemaError | Sse.Retry | Sse.SseError, typeof StreamCurrentProperty200Sse.DecodingServices>
   /**
 * Requires current telemetry.read before parameter validation and metadata discovery. The exact property version must be installed on the asset (otherwise 404). Empty items is a known property without a materialized value. Current precedence is greatest event time, then full immutable interpretation identity in C byte order, with numeric output/binding revision. Quality is preserved, never filtered into last-good semantics. Corrections create interpretations without implicitly retracting other targets. A repeatable-read view pairs value with tenant generation/revision and committed pending-work indication. Eight-second request and two-second statement deadlines fail safely rather than inventing empty state. Freshness is evaluated at server response time, independently of quality.
 */

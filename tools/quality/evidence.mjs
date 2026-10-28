@@ -9,7 +9,15 @@ export function sourceIdentity(root) {
   return sourceState(root);
 }
 export function writeQualityEvidence(root, kind, source, observations) {
-  if (!['performance', 'accessibility', 'coverage', 'mutations'].includes(kind))
+  if (
+    ![
+      'performance',
+      'live-performance',
+      'accessibility',
+      'coverage',
+      'mutations',
+    ].includes(kind)
+  )
     throw new Error('Unregistered quality evidence category.');
   if (
     !source ||

@@ -50,7 +50,11 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 350,000 / 100,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 375,000 / 110,000 JS bytes and 60,000 / 16,000 CSS bytes.
+The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
+to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
+and adding a 200-replacement burst/disposal workload under unchanged latency,
+heap and DOM limits. Coverage and security gates remain unchanged.
 A new map SDK or substantial feature requires a workload and budget review, not
 an automatic increase. Real Vite fixtures qualify allowed examples, forbidden
 sample ownership, changed output bytes and a deliberately exceeded budget.

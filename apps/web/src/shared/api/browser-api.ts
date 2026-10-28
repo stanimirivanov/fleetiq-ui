@@ -13,6 +13,7 @@ import * as HttpClientError from 'effect/http/HttpClientError';
 import * as HttpClientRequest from 'effect/http/HttpClientRequest';
 import { RequestFailure, type RequestFailureKind } from '#shared/model';
 import { type FleetIqApi, make } from '../../generated/fleetiq-api';
+import { consumeSse, type SseEvent } from './sse';
 
 export interface BrowserApiOptions {
   /** Injection seam for controlled transport tests; production uses window origin. */
@@ -28,6 +29,12 @@ export interface BrowserApi {
     operation: (client: FleetIqApi) => Effect.Effect<A, E>,
     options?: { readonly signal?: AbortSignal },
   ): Promise<A>;
+  /** Bounded streaming shares the runtime, same-origin rules and disposal. */
+  stream?(
+    path: string,
+    emit: (event: SseEvent) => void,
+    options?: { readonly signal?: AbortSignal; readonly cursor?: string },
+  ): Promise<void>;
   /** Idempotently interrupts owned requests and releases the managed runtime. */
   dispose(): Promise<void>;
 }
@@ -93,6 +100,7 @@ export function createBrowserApi(options: BrowserApiOptions = {}): BrowserApi {
     // cannot erase sign-in or access-denied state with a schema failure.
     if (response.status < 200 || response.status >= 300 || !response.body)
       return response;
+    if (headers.get('accept') === 'text/event-stream') return response;
     return boundedResponse(response, init?.signal);
   };
   const layer = FetchHttpClient.layer.pipe(
@@ -122,6 +130,37 @@ export function createBrowserApi(options: BrowserApiOptions = {}): BrowserApi {
       }).pipe(Effect.scoped, Effect.timeout(timeoutMs));
       const exit = await runtime.runPromiseExit(program, runOptions);
       if (Exit.isSuccess(exit)) return exit.value;
+      if (Cause.hasInterruptsOnly(exit.cause)) throw abortError();
+      const failure = Cause.findErrorOption(exit.cause);
+      throw normalizeRequestFailure(
+        Option.isSome(failure) ? failure.value : undefined,
+      );
+    },
+    async stream(path, emit, streamOptions) {
+      if (disposed || streamOptions?.signal?.aborted) throw abortError();
+      const program = Effect.tryPromise({
+        try: async (signal) => {
+          const url = new URL(path, origin);
+          if (url.search || url.hash || !path.startsWith('/api/v1/'))
+            throw new RequestFailure('invalid-request');
+          const headers = new Headers({ accept: 'text/event-stream' });
+          if (streamOptions?.cursor)
+            headers.set('last-event-id', streamOptions.cursor);
+          const response = await secureFetch(url, { headers, signal });
+          if (response.status !== 200) {
+            await response.body?.cancel();
+            throw new RequestFailure(
+              response.status === 429
+                ? 'unavailable'
+                : statusKind(response.status),
+            );
+          }
+          await consumeSse(response, signal, emit);
+        },
+        catch: normalizeRequestFailure,
+      }).pipe(Effect.scoped, Effect.timeout(75000));
+      const exit = await runtime.runPromiseExit(program, streamOptions);
+      if (Exit.isSuccess(exit)) return;
       if (Cause.hasInterruptsOnly(exit.cause)) throw abortError();
       const failure = Cause.findErrorOption(exit.cause);
       throw normalizeRequestFailure(

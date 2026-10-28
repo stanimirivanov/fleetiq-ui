@@ -446,3 +446,39 @@ test('missing budget fields and sparse samples cannot qualify', () => {
   delete policy.coverage[coverageScope[0]].lines.minimumTotal;
   assert.throws(() => assessCoverage(summary, results, policy));
 });
+
+test('live resource receipts require the exact bounded workload and numeric-only samples', () => {
+  const value = {
+    viewport: 'desktop',
+    browser: '153.0.0.1',
+    workload: { replacements: 200, warmups: 2, samples: 5 },
+    samples: Array.from({ length: 5 }, () => ({
+      openMs: 10,
+      deliveryMs: 20,
+      leaveMs: 10,
+    })),
+    resources: { heapBefore: 1, heapAfter: 2, nodesBefore: 10, nodesAfter: 11 },
+  };
+  validateObservation('live-performance', value);
+  for (const change of [
+    { ...value, workload: 'unregistered-payload' },
+    { ...value, workload: { ...value.workload, replacements: 1 } },
+    { ...value, samples: value.samples.slice(1) },
+    {
+      ...value,
+      samples: [
+        { openMs: -1, deliveryMs: 0, leaveMs: 0 },
+        ...value.samples.slice(1),
+      ],
+    },
+    {
+      ...value,
+      samples: [
+        { ...value.samples[0], payload: 'private' },
+        ...value.samples.slice(1),
+      ],
+    },
+    { ...value, resources: { ...value.resources, dom: '<private>' } },
+  ])
+    assert.throws(() => validateObservation('live-performance', change));
+});

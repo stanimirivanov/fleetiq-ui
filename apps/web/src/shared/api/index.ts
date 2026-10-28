@@ -4,3 +4,5 @@ export {
   createBrowserApi,
   normalizeRequestFailure,
 } from './browser-api';
+
+export type { SseEvent } from './sse';

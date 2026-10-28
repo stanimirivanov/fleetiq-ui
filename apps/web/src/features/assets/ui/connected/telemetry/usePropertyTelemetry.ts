@@ -8,6 +8,7 @@ import type {
 } from '../../../model/property-evidence';
 import { useMetadataRead } from '../useMetadataRead';
 import type { useMetadataWorkspace } from '../useMetadataWorkspace';
+import { usePropertyLive } from './usePropertyLive';
 import { useTelemetryRead } from './useTelemetryRead';
 /** Request ownership, scope and cancellation stay outside panel presentation. */
 export function usePropertyTelemetry(props: {
@@ -46,6 +47,7 @@ export function usePropertyTelemetry(props: {
         }
       : null;
   });
+  const live = usePropertyLive(request);
   const current = useTelemetryRead(request, (reader, query, options) =>
     reader.current(query, options),
   );
@@ -85,6 +87,13 @@ export function usePropertyTelemetry(props: {
       });
   };
   const ready = () => {
+    if (live.blocked()) return undefined;
+    if (
+      ['unauthorized', 'forbidden', 'not-found'].includes(
+        live.state()?.failure ?? '',
+      )
+    )
+      return undefined;
     const s = selection();
     return s.kind === 'ready' ? s : undefined;
   };
@@ -94,6 +103,7 @@ export function usePropertyTelemetry(props: {
     selected,
     definition,
     current,
+    live,
     history,
     provenance,
     inspect,

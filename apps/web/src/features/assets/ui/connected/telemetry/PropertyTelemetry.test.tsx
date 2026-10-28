@@ -235,3 +235,94 @@ test('an empty continuation is not described as an empty history window', async 
     screen.queryByText(/^No stored interpretations in this window/),
   ).toBeNull();
 });
+
+test('live subscription owns cancellation and ignores late values after property change', async () => {
+  const subscriptions: {
+    receive: Parameters<NonNullable<TelemetryReader['subscribe']>>[1];
+    signal: AbortSignal;
+  }[] = [];
+  const p = ports({
+    subscribe: vi.fn(async (_q, receive, options) => {
+      subscriptions.push({ receive, signal: options.signal });
+      await new Promise<void>((resolve) =>
+        options.signal.addEventListener('abort', () => resolve(), {
+          once: true,
+        }),
+      );
+    }),
+  });
+  const view = mount(p);
+  await waitFor(() =>
+    expect(
+      screen.getByRole('button', { name: 'Start live updates' }),
+    ).toHaveProperty('disabled', false),
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Start live updates' }),
+  );
+  await waitFor(() => expect(subscriptions).toHaveLength(1));
+  const first = subscriptions[0];
+  if (!first) throw new Error('missing subscription');
+  first.receive({
+    kind: 'snapshot',
+    id: 'cursor',
+    snapshot: parseCurrentProperty(wireCurrent(), request),
+  });
+  await waitFor(() =>
+    expect(screen.getByText('Delivery: live')).not.toBeNull(),
+  );
+  await userEvent.selectOptions(
+    screen.getByLabelText('Property and definition version'),
+    JSON.stringify(['other', 2]),
+  );
+  await waitFor(() => expect(first.signal.aborted).toBe(true));
+  first.receive({
+    kind: 'snapshot',
+    id: 'late',
+    snapshot: {
+      ...parseCurrentProperty(wireCurrent(), request),
+      processedCount: '999999999',
+    },
+  });
+  expect(screen.queryByText(/999999999/)).toBeNull();
+  view.unmount();
+  expect(subscriptions.every((s) => s.signal.aborted)).toBe(true);
+});
+test('live authority denial clears current and history evidence', async () => {
+  const p = ports({
+    subscribe: async (_q, receive) => {
+      receive({
+        kind: 'snapshot',
+        id: 'cursor',
+        snapshot: parseCurrentProperty(wireCurrent(), request),
+      });
+      receive({ kind: 'stream-ended', reason: 'access_denied' });
+    },
+  });
+  mount(p);
+  await waitFor(() =>
+    expect(
+      screen.getByRole('button', { name: 'Start live updates' }),
+    ).toHaveProperty('disabled', false),
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Start live updates' }),
+  );
+  await waitFor(() =>
+    expect(
+      screen.getByText(/Access is denied.*Automatic recovery stopped/),
+    ).not.toBeNull(),
+  );
+  expect(
+    screen.queryByRole('region', { name: 'Hot property history' }),
+  ).toBeNull();
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Stop live updates' }),
+  );
+  expect(
+    screen.queryByRole('region', { name: 'Hot property history' }),
+  ).toBeNull();
+  expect(
+    screen.queryByRole('button', { name: 'Inspect reading provenance' }),
+  ).toBeNull();
+});

@@ -21,3 +21,5 @@ retains the required check merge barrier.
 - [Connected property evidence](2026-10-connected-property-evidence.md) — M04 product PR 25; full CI qualification pending.
 
 - [JOSE v4 patch and deferred v3 blocker](2026-10-jose-v4-remediation.md): M02 edge security, issue #86.
+
+- [Inspector live delivery](2026-10-inspector-live-delivery.md): M04 product PR 27, issue #88.

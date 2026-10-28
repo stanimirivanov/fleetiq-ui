@@ -88,3 +88,5 @@ merged baseline.15 contract. D06 and full-profile qualification remain deferred;
 contract browser journeys do not qualify a deployed provider or live hardware.
 
 Product-plan PR 25 is the [connected property evidence slice](exec-plans/active/2026-10-connected-property-evidence.md): committed readings, precise history and immutable provenance. Resumable live delivery remains PR 27; D06/full-profile qualification stay deferred.
+
+Product-plan PR 27 is the active [inspector live delivery slice](exec-plans/active/2026-10-inspector-live-delivery.md), with bounded SSE recovery and independent history/provenance. D06/full-profile qualification remain deferred.

@@ -250,3 +250,90 @@ describe('managed browser API', () => {
     expect(transportSignal?.aborted).toBe(true);
   });
 });
+
+test('managed SSE uses same-origin cookies, resumes through a header and disposes its body', async () => {
+  let cancelled = false;
+  const fetch = vi.fn<typeof globalThis.fetch>(
+    async () =>
+      new Response(
+        new ReadableStream({
+          start(c) {
+            c.enqueue(
+              new TextEncoder().encode('event: heartbeat\ndata: {}\n\n'),
+            );
+          },
+          cancel() {
+            cancelled = true;
+          },
+        }),
+        { headers: { 'content-type': 'text/event-stream' } },
+      ),
+  );
+  const instance = api(fetch),
+    controller = new AbortController();
+  const run = instance.stream?.('/api/v1/live', () => controller.abort(), {
+    signal: controller.signal,
+    cursor: 'last-applied',
+  });
+  await expect(run).rejects.toThrow();
+  const headers = new Headers(fetch.mock.calls[0]?.[1]?.headers);
+  expect(headers.get('last-event-id')).toBe('last-applied');
+  expect(fetch.mock.calls[0]?.[1]?.credentials).toBe('same-origin');
+  expect(cancelled).toBe(true);
+});
+test.each([401, 403, 404, 429, 500])(
+  'SSE HTTP %s retains structured failure',
+  async (status) => {
+    const instance = api(async () => json({}, status));
+    await expect(
+      instance.stream?.('/api/v1/live', () => {}),
+    ).rejects.toBeInstanceOf(RequestFailure);
+  },
+);
+test('SSE rejects URL credentials/query, wrong content and execution after disposal', async () => {
+  const instance = api(async () => json({}));
+  await expect(
+    instance.stream?.('/api/v1/live?token=x', () => {}),
+  ).rejects.toMatchObject({ kind: 'invalid-request' });
+  await expect(
+    instance.stream?.('/api/v1/live', () => {}),
+  ).rejects.toMatchObject({ kind: 'invalid-response' });
+  await instance.dispose();
+  await expect(instance.stream?.('/api/v1/live', () => {})).rejects.toThrow();
+});
+
+test('managed SSE completes without a cursor and cancels active work on disposal', async () => {
+  const completed = api(
+    async () =>
+      new Response('event: heartbeat\ndata: {}\n\n', {
+        headers: { 'content-type': 'text/event-stream' },
+      }),
+  );
+  const events: string[] = [];
+  await completed.stream?.('/api/v1/live', (e) => events.push(e.event));
+  expect(events).toEqual(['heartbeat']);
+  const aborted = new AbortController();
+  aborted.abort();
+  await expect(
+    completed.stream?.('/api/v1/live', () => {}, { signal: aborted.signal }),
+  ).rejects.toThrow();
+  let cancelled = false;
+  const fetch = vi.fn<typeof globalThis.fetch>(
+    async () =>
+      new Response(
+        new ReadableStream({
+          cancel() {
+            cancelled = true;
+          },
+        }),
+        { headers: { 'content-type': 'text/event-stream' } },
+      ),
+  );
+  const active = api(fetch),
+    started = active.stream?.('/api/v1/live', () => {});
+  const rejected = expect(started).rejects.toThrow();
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+  await active.dispose();
+  await rejected;
+  expect(cancelled).toBe(true);
+});

@@ -37,3 +37,5 @@ homes rather than growing the root README.
 
 - [Local security preflight](development/image-security.md): source/npm review and
   exact production-runtime scanning before CI.
+
+- [Live inspector delivery](design-docs/0007-inspector-live-delivery.md): bounded SSE state, continuity and operator recovery.

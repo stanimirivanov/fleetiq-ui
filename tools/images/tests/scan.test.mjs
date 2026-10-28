@@ -209,3 +209,37 @@ test('scanner findings and operational failures have distinct redacted diagnosti
     }
   }
 });
+
+test('local and CI shared scanner reject current go-jose advisory without ignoring unfixed versions', async () => {
+  const f = layoutFixture();
+  try {
+    const s = scannerFixture(f);
+    s.report.Results[1].Vulnerabilities = [
+      {
+        Severity: 'HIGH',
+        VulnerabilityID: 'CVE-2026-116587',
+        PkgName: 'github.com/go-jose/go-jose/v3',
+        InstalledVersion: 'v3.0.5',
+      },
+      {
+        Severity: 'HIGH',
+        VulnerabilityID: 'CVE-2026-116587',
+        PkgName: 'github.com/go-jose/go-jose/v4',
+        InstalledVersion: 'v4.1.5',
+        FixedVersion: '4.1.6',
+      },
+    ];
+    await assert.rejects(
+      scanRuntime(f.directory, s.tools, s.artifact, s.resources, s.execute),
+      /security-findings.*high=2.*CVE-2026-116587/u,
+    );
+    assert.equal(
+      JSON.parse(readFileSync(join(f.directory, 'reports/scan.json')))
+        .Results[1].Vulnerabilities.length,
+      2,
+    );
+    assert.ok(!existsSync(join(f.directory, 'private-scan/raw.json')));
+  } finally {
+    f.cleanup();
+  }
+});

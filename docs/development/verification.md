@@ -35,6 +35,7 @@ package scripts and required CI routes. Use pnpm verify --list to inspect groups
 | pnpm e2e | Built-production and development browser scenarios | Browser behavior and sample isolation |
 | pnpm verify --group browser-quality | Production-fixture accessibility/rendering/resource checks and actual page-error fixture qualification | Measured browser regression envelope |
 | pnpm image:qualify | Producer fixtures/policy and real OCI/runtime/browser/TLS/scan/registry checks | Source-owned D03 artifact qualification |
+| pnpm security:image | Producer fixtures/policy and exact production OCI security scan | Local image-security preflight; excludes runtime/browser/registry qualification |
 | pnpm verify --group security | Source/index/history secret scans and frozen-lock registry audit | Focused security feedback |
 
 pnpm verify defaults to acceptance. Existing individual scripts remain available

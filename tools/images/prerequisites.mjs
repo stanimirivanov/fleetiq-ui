@@ -1,4 +1,4 @@
-import { DIGEST, hash } from './policy.mjs';
+import { DIGEST, ensure, hash } from './policy.mjs';
 import { docker } from './process.mjs';
 
 export const IMAGE_ROLES = [
@@ -56,12 +56,29 @@ export async function verifyRemoteImage(role, reference, execute = docker) {
 }
 
 /** Verify every remote build input before allowing cached acquisition or a long build. */
-export async function pullToolImages(tools, execute = docker) {
-  for (const role of IMAGE_ROLES) {
+export async function pullToolImages(
+  tools,
+  execute = docker,
+  roles = IMAGE_ROLES,
+) {
+  ensure(
+    Array.isArray(roles) &&
+      roles.length > 0 &&
+      new Set(roles).size === roles.length &&
+      roles.every((role) => IMAGE_ROLES.includes(role)),
+    'Invalid image prerequisite roles.',
+  );
+  for (const role of roles) {
     console.log(`Verify remote ${role} manifest: ${tools[role]}`);
     await verifyRemoteImage(role, tools[role], execute);
   }
-  for (const role of ['transport', 'registry', 'scanner', 'node', 'edge']) {
+  for (const role of [
+    'transport',
+    'registry',
+    'scanner',
+    'node',
+    'edge',
+  ].filter((role) => roles.includes(role))) {
     console.log(`Pull pinned ${role} image: ${tools[role]}`);
     try {
       await execute(['pull', '--platform', tools.platform, tools[role]], {

@@ -8,6 +8,10 @@ pnpm guide:release --require-clean against the same source revision.
 Source, history and textual artifacts are scanned; scans never certify pixels.
 Keep policy changes reviewable and require external Code Owner protection.
 
+For a pre-push source/dependency and production-image security gate, run
+`pnpm security:preflight`; see [local security preflight](image-security.md).
+It shares the CI scan policy and cannot replace full image qualification.
+
 ## Architectural controls
 
 [The graph rules](../../.dependency-cruiser.cjs) reject runtime and type-only

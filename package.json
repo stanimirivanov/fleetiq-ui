@@ -45,7 +45,10 @@
     "image:tests": "node --test tools/images/tests/*.test.mjs",
     "image:policy": "node tools/images/check-policy.mjs",
     "image:artifact": "node tools/images/qualify.mjs",
-    "image:qualify": "node tools/verification/cli.mjs --group image"
+    "image:qualify": "node tools/verification/cli.mjs --group image",
+    "security:image": "node tools/verification/cli.mjs --group image-security",
+    "security:preflight": "pnpm verify --group security && pnpm security:image",
+    "image:security-artifact": "node tools/images/security.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",

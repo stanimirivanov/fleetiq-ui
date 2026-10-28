@@ -72,6 +72,18 @@ Type checks, 22 inspector/metadata component tests, 128 focused harness/image-po
 tests, policy validation, formatting and documentation checks pass. Full
 browser/image and remaining acceptance checks await CI.
 
+### PR revision: local security preflight
+
+Add `pnpm security:preflight` (source/history/npm checks, then production OCI
+security) and focused `pnpm security:image`. Reuse the exact build, remote-pin
+verification, scan policy and owned cleanup; give security-only evidence a distinct
+format rejected by publication. Keep the full CI image checks unchanged.
+Regression fixtures retain the reported go-jose CVE failure, including its
+unfixed v3 entry. The new gate does not remediate or waive that finding.
+Verification: 85 focused image/workflow tests, producer/harness policy, formatting,
+documentation and JavaScript syntax checks pass. Heavy Docker qualification
+remains on CI; no local clean image scan is claimed.
+
 ## Out of scope
 
 Live transport and reconnect, commissioning, geodetic positions, health/alerts,

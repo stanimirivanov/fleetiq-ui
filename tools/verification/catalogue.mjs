@@ -3,6 +3,7 @@ export const CHECKS = [
   { id: 'image-policy', script: 'image:policy' },
   { id: 'image-tests', script: 'image:tests' },
   { id: 'image-artifact', script: 'image:artifact' },
+  { id: 'image-security-artifact', script: 'image:security-artifact' },
   { id: 'harness-tests', script: 'harness:test' },
   { id: 'policy', script: 'harness:check' },
   { id: 'quality-configuration', script: 'quality:configuration' },
@@ -42,6 +43,7 @@ const structural = [
 const product = ['typecheck', 'unit-tests', 'component-tests', 'build'];
 export const GROUPS = {
   image: ['image-tests', 'image-policy', 'image-artifact'],
+  'image-security': ['image-tests', 'image-policy', 'image-security-artifact'],
   structural,
   product,
   security: ['secrets', 'dependencies'],
@@ -62,6 +64,9 @@ export const REQUIRED_SCRIPTS = {
   'image:tests': 'node --test tools/images/tests/*.test.mjs',
   'image:policy': 'node tools/images/check-policy.mjs',
   'image:artifact': 'node tools/images/qualify.mjs',
+  'image:security-artifact': 'node tools/images/security.mjs',
+  'security:image': 'node tools/verification/cli.mjs --group image-security',
+  'security:preflight': 'pnpm verify --group security && pnpm security:image',
   'image:qualify': 'node tools/verification/cli.mjs --group image',
   'dependencies:review': 'node tools/verification/upgrades-cli.mjs',
   'dependencies:qualify': 'node tools/verification/cli.mjs --candidate',

@@ -15,6 +15,8 @@ WORKDIR /edge
 COPY packaging/caddy/go.mod packaging/caddy/go.sum ./
 RUN GOTOOLCHAIN=local go mod download && GOTOOLCHAIN=local go mod verify
 COPY packaging/caddy/main.go ./
+COPY packaging/caddy/security/ ./security/
+RUN GOTOOLCHAIN=local go test -mod=readonly ./security
 RUN CGO_ENABLED=0 GOTOOLCHAIN=local go build -mod=readonly -trimpath -ldflags="-s -w" -o /edge/caddy ./main.go
 FROM caddy:2.11.7-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f AS runtime
 ARG SOURCE_REVISION

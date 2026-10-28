@@ -83,6 +83,8 @@ export function validateDockerfile(text, tools) {
     'COPY packaging/caddy/go.mod packaging/caddy/go.sum ./',
     'GOTOOLCHAIN=local go mod download && GOTOOLCHAIN=local go mod verify',
     'COPY packaging/caddy/main.go ./',
+    'COPY packaging/caddy/security/ ./security/',
+    'RUN GOTOOLCHAIN=local go test -mod=readonly ./security',
     'CGO_ENABLED=0 GOTOOLCHAIN=local go build -mod=readonly -trimpath',
     'COPY --from=edge-builder /edge/caddy /usr/bin/caddy',
     'apk --no-network del curl',

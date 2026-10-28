@@ -206,3 +206,17 @@ trusted-builder attestations. D05 must verify publisher/review evidence rather
 than infer trust from an unsigned statement. No automatic rollback or deployment
 is performed, and the workflow is not dispatched from an unmerged feature branch.
 A failed run remains incomplete; fix the cause and qualify a fresh owned run.
+
+## Deferred JOSE v3 release blocker
+
+The locked edge selects go-jose v4.1.6 for CVE-2026-116587. Its pinned Go builder
+runs `go test -mod=readonly ./security` before compiling the unchanged standard
+Caddy module set. Synthetic JWK fixtures exercise ordinary/maximum/oversized
+public RSA moduli and disproportionate private primes; no timing thresholds or
+operator credentials are used.
+
+Caddy still requires unpatched go-jose v3 through Smallstep. The owner chose to
+retain Caddy and wait for a supported upstream remediation. Runtime scanning,
+including unfixed HIGH/CRITICAL findings, continues to block qualification and
+publication. See [local security preflight](image-security.md). A merged source
+change or passing JOSE v4 test is not a clean or publishable runtime image.

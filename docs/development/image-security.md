@@ -68,6 +68,17 @@ The 28 October 2026 CI report identified CVE-2026-116587 in
 `github.com/go-jose/go-jose/v3 v3.0.5` and
 `github.com/go-jose/go-jose/v4 v4.1.5`. That report lists `4.1.6` as the fixed v4
 version and no fixed v3 version. This preflight detects and preserves that
-failure; it does not exempt it. Remediation requires reviewing the edge runtime's
-Go dependency graph and replacing/upgrading affected dependencies before another
-image qualification can pass.
+failure; it does not exempt it. The edge now selects v4.1.6; its builder runs
+synthetic public/private RSA-JWK regression tests before compiling Caddy. The upstream fix rejects moduli larger
+than 4096 bits by default; FleetIQ does not raise that limit.
+
+The owner explicitly chose to retain Caddy and defer v3 remediation until a
+supported upstream path exists. Caddy's TLS/Caddyfile code imports Smallstep's
+certificate/crypto packages; removing the umbrella standard-module import alone
+does not remove this dependency. The image gate continues to reject v3.0.5.
+This is a deferred vulnerability, not an accepted exception or clean image.
+No image publication should be attempted until full qualification passes.
+
+References: [upstream advisory](https://github.com/go-jose/go-jose/security/advisories/GHSA-mgcc-cww5-fp2q),
+[patched v4 release](https://github.com/go-jose/go-jose/releases/tag/v4.1.6),
+[Smallstep migration issue](https://github.com/smallstep/crypto/issues/441).

@@ -27,7 +27,14 @@ render(
   () => (
     <Router root={BrowserWorkspace}>
       <Route path={APP_ROUTES.overview.path} component={FleetOverviewPage} />
-      <Route path={APP_ROUTES.map.path} component={FleetMapPage} />
+      <Route
+        path={APP_ROUTES.map.path}
+        component={() => (
+          <MetadataAccessBoundary>
+            <FleetMapPage />
+          </MetadataAccessBoundary>
+        )}
+      />
       <Route
         path={APP_ROUTES.assets.path}
         component={() => (

@@ -42,6 +42,17 @@ export class BrowserRequestAudit {
       this.violations.push('browser-authorization');
     if (!['fetch', 'xhr', 'eventsource'].includes(request.resourceType()))
       return;
+    if (
+      url.origin === this.origin &&
+      url.pathname.startsWith('/maps/') &&
+      !url.search &&
+      !url.hash &&
+      !url.username &&
+      !url.password &&
+      !/%2f|%5c|%2e|%25/i.test(url.pathname) &&
+      ['GET', 'HEAD'].includes(request.method())
+    )
+      return;
     if (!url.pathname.startsWith('/api/v1/'))
       this.violations.push('unowned-api-path');
     if (!['GET', 'POST', 'PUT'].includes(request.method()))

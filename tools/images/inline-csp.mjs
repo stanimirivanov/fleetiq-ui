@@ -21,7 +21,7 @@ export function inlineScriptHashes(html) {
   }
 }
 export function cspFor(html) {
-  return `default-src 'self'; script-src 'self' ${inlineScriptHashes(html).join(' ')}; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`;
+  return `default-src 'self'; script-src 'self' ${inlineScriptHashes(html).join(' ')}; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`;
 }
 if (
   process.argv[1] &&

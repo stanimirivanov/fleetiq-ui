@@ -46,4 +46,16 @@ export function validateBundleEvidence(report) {
         report[key] <= qualityPolicy.bundle[key],
       'Built bundle exceeds reviewed budgets.',
     );
+  for (const key of [
+    'javascriptBytes',
+    'javascriptGzipBytes',
+    'cssBytes',
+    'cssGzipBytes',
+  ])
+    ensure(
+      Number.isSafeInteger(report.map?.[key]) &&
+        report.map[key] >= 0 &&
+        report.map[key] <= qualityPolicy.bundle.map[key],
+      'Lazy map bundle evidence is missing or exceeds reviewed budgets.',
+    );
 }

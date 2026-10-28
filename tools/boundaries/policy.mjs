@@ -15,6 +15,13 @@ export const BOUNDARY_POLICY = Object.freeze({
   rules: REQUIRED_BOUNDARY_RULES,
   adapters: Object.freeze([
     Object.freeze({
+      file: 'apps/web/src/features/assets/api/maplibre-adapter.ts',
+      owner: 'assets geographic renderer lifecycle',
+      rationale:
+        'Owns one local worker, a bounded public style read and same-origin deployment map resources with cancellable SDK lifecycle.',
+      allows: Object.freeze(['network-client-import', 'raw-browser-transport']),
+    }),
+    Object.freeze({
       file: 'apps/web/src/shared/api/browser-api.ts',
       owner: 'shared managed HTTP runtime',
       rationale:

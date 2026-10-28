@@ -98,3 +98,13 @@ next planned slice.
 [Contract provenance](../contracts/http/README.md) records the merged backend pin.
 Performance claims require representative asset counts, rates, pan/zoom, input
 latency, and memory measurements. Mobile remains deferred to native Android/Apple.
+
+## Geographic map ownership
+
+The connected `/map` route uses the baseline.20 fleet snapshot, explicit exact
+coordinate-property mapping and URL-owned page/filter/selection. Its lazy direct
+MapLibre adapter owns one local worker, bounded/cancelled style reads and guarded
+same-origin static raster/vector resources. Component code never imports the SDK.
+See [map architecture](design-docs/0008-connected-geodetic-map.md) and
+[deployment inputs](development/map-resources.md). Missing positions and renderer
+failure retain an accessible list; no health or connectivity is inferred.

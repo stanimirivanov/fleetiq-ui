@@ -316,3 +316,14 @@ test('policy cannot grant anonymous or model/test privileges', () => {
   ])
     assert.throws(() => assertBoundaryPolicy(invalid), /privileges require/u);
 });
+
+test('map SDK imports require the exact lifecycle adapter', (context) => {
+  const f = boundaryFixture(context);
+  f.write(
+    'apps/web/src/features/assets/ui/BadMap.tsx',
+    "import {Map} from 'maplibre-gl'; export const bad=Map;",
+  );
+  const result = f.run();
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /network-client-import/);
+});

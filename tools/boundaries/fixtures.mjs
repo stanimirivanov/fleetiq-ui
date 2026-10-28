@@ -89,6 +89,10 @@ export function boundaryFixture(context) {
     'apps/web/src/app/Navigation.tsx',
     "export const login = () => window.location.assign('/api/v1/auth/login');\nexport const focus = () => document.getElementById('content')?.focus();\n",
   );
+  write(
+    'apps/web/src/features/assets/api/maplibre-adapter.ts',
+    "import {Map} from 'maplibre-gl'; export const ownedMap=Map;",
+  );
   function run() {
     const result = spawnSync(
       process.execPath,

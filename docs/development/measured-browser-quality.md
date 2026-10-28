@@ -164,3 +164,19 @@ still checked separately; output links remain forbidden.
 [The control register](harness-controls.md) records owners, triggers and remaining
 review/deferred obligations. External required statuses and Code Owner protection
 must include browser-quality; repository text cannot configure those settings.
+
+## Geographic map workload and approved payload group
+
+Issue #90 adds a separately bounded lazy map group: 1,700,000 / 470,000 gzip bytes
+JavaScript and 75,000 / 12,000 CSS, explicitly approved by the owner after measuring
+the SDK, route and local module worker. Existing non-map limits remain unchanged.
+Every emitted `.js`, `.mjs` and CSS file is inventoried and hashed; the map group
+is derived from owned lazy chunks rather than excluding vendor assets from checks.
+
+The `geographic-map` project uses test-only software WebGL with trace/video off,
+no retries and one test worker. Two warmups/five cycles exercise local synthetic
+raster tiles, filtering, selection and disposal. The existing main-heap/DOM and
+latency thresholds remain unchanged. Active workers are exactly one, none survive
+route disposal, and bounded CDP records numeric worker-heap samples. Those samples
+are diagnostic, not a calibrated peak/GPU budget. Existing worker-free projects
+retain their worker rejection. See [the map decision](../design-docs/0008-connected-geodetic-map.md).

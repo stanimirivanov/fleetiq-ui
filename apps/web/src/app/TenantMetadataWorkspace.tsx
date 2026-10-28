@@ -29,7 +29,8 @@ export function TenantMetadataWorkspace(props: WorkspaceProps) {
   const location = useLocation();
   const enabled = () =>
     (location.pathname.startsWith('/assets') ||
-      location.pathname === '/devices') &&
+      location.pathname === '/devices' ||
+      location.pathname === '/map') &&
     !isDevelopmentSampleRoute(
       location.pathname,
       location.search,
@@ -64,7 +65,7 @@ function MetadataWorkspaceBridge(props: WorkspaceProps) {
           select={(id) =>
             navigate(
               metadataHref(
-                '/assets',
+                location.pathname === '/map' ? '/map' : '/assets',
                 location.search,
                 tenantContextChanges(id),
               ),

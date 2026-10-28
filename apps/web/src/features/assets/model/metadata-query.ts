@@ -1,5 +1,6 @@
 import { isValidAssetIdentifier } from './asset-catalogue';
 import { evidenceKeys } from './evidence-query';
+import { fleetKeys } from './fleet-query';
 import type { SignalSource } from './metadata';
 
 export const snapshotCursorKeys = [
@@ -132,6 +133,7 @@ export function tenantContextChanges(
   tenantId: string,
 ): Record<string, string | null> {
   return {
+    ...Object.fromEntries(fleetKeys.map((key) => [key, null])),
     tenant: tenantId,
     after: null,
     asset: null,

@@ -23,3 +23,5 @@ retains the required check merge barrier.
 - [JOSE v4 patch and deferred v3 blocker](2026-10-jose-v4-remediation.md): M02 edge security, issue #86.
 
 - [Inspector live delivery](2026-10-inspector-live-delivery.md): M04 product PR 27, issue #88.
+
+- [Connected geodetic map](2026-10-connected-geodetic-map.md): M04 product PR 29, issue #90.

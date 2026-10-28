@@ -39,3 +39,5 @@ homes rather than growing the root README.
   exact production-runtime scanning before CI.
 
 - [Live inspector delivery](design-docs/0007-inspector-live-delivery.md): bounded SSE state, continuity and operator recovery.
+
+- [Connected geodetic map](design-docs/0008-connected-geodetic-map.md) and [map resources](development/map-resources.md): current fleet coordinates, lifecycle and deployment inputs.

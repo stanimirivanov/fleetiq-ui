@@ -96,7 +96,7 @@ Local Vite development retains the labelled sample overview, schematic map, asse
 inspector, finite signal playback, registry, and alert triage. These fixtures are
 separate from backend models and excluded from production output. The map uses
 percentage canvas positions, not observed geography. Production exact-property snapshots, bounded hot history and original provenance
-now exist. No telemetry stream, geodetic map SDK, tiles, alert lifecycle or native
+now exist. Exact-property SSE is opt-in; no geodetic map SDK, tiles, alert lifecycle or native
 mobile app is connected yet. Introduce Effect Atom only with an actual shared granular-state need.
 
 [FRONTEND.md](docs/FRONTEND.md) details the selected stack;
@@ -123,3 +123,5 @@ adds an independent telemetry read port on the app-composed assets reader. It
 uses the same managed runtime and account/tenant-keyed read owner. Model values,
 URL scope, exact arithmetic and adapter validation stay inward; centre-pane
 components own selection/disclosure while pages retain layout responsibility.
+
+The [live inspector decision](docs/design-docs/0007-inspector-live-delivery.md) defines bounded shared-runtime SSE, validated event application and finite reconnect. Feature services own recovery; keyed Solid controllers own disposal and suppress late callbacks.

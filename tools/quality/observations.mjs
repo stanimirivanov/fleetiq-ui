@@ -49,6 +49,35 @@ export function validateObservation(kind, value) {
         'nodesAfter',
       ]) &&
       Object.values(value.resources).every(number);
+  } else if (kind === 'live-performance') {
+    valid =
+      exact(value, [
+        'viewport',
+        'browser',
+        'workload',
+        'samples',
+        'resources',
+      ]) &&
+      ['desktop', 'narrow'].includes(value.viewport) &&
+      /^\d+(?:\.\d+){1,4}$/u.test(value.browser) &&
+      exact(value.workload, ['replacements', 'warmups', 'samples']) &&
+      value.workload.replacements === 200 &&
+      value.workload.warmups === 2 &&
+      value.workload.samples === 5 &&
+      Array.isArray(value.samples) &&
+      value.samples.length === 5 &&
+      value.samples.every(
+        (sample) =>
+          exact(sample, ['openMs', 'deliveryMs', 'leaveMs']) &&
+          Object.values(sample).every(number),
+      ) &&
+      exact(value.resources, [
+        'heapBefore',
+        'heapAfter',
+        'nodesBefore',
+        'nodesAfter',
+      ]) &&
+      Object.values(value.resources).every(number);
   } else if (kind === 'accessibility') {
     valid =
       exact(value, ['viewport', 'theme', 'observations']) &&

@@ -6,9 +6,12 @@ import { repositoryRoot } from '../../../tools/quality/policy.mjs';
 import { installDevicesApi } from '../fixtures/devices-api';
 import { installMetadataApi } from '../fixtures/metadata-api';
 import { expect, test } from '../fixtures/production-test';
+import { installPropertyLiveApi } from '../fixtures/property-live-api';
+import { installTelemetryApi } from '../fixtures/telemetry-api';
 import { auditAccessibility as audit } from '../pages/accessibility-audit';
 import { ConnectedMetadataPage } from '../pages/connected-metadata.page';
 import { DevicesPage } from '../pages/devices.page';
+import { PropertyLivePage } from '../pages/property-live.page';
 import { ShellPage } from '../pages/shell.page';
 
 const viewports = [
@@ -142,6 +145,31 @@ for (const viewport of viewports) {
           () => document.documentElement.scrollWidth <= innerWidth,
         ),
       ).toBe(true);
+    });
+  }
+}
+
+for (const viewport of viewports) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`live property controls accessibility ${viewport.name} ${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await installMetadataApi(page);
+      await installTelemetryApi(page);
+      await installPropertyLiveApi(page, 200);
+      const live = new PropertyLivePage(page);
+      await live.open();
+      if (theme === 'dark') await new ShellPage(page).cycleTheme();
+      await live.start();
+      await expect(live.delivery).toContainText('revision 209');
+      expect(await audit(page)).toEqual([]);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await live.stop();
     });
   }
 }

@@ -11,6 +11,7 @@ import { CurrentReading } from './CurrentReading';
 import { EvidenceReadContent } from './EvidenceReadContent';
 import { HistoryEvidence } from './HistoryEvidence';
 import { HistoryWindow } from './HistoryWindow';
+import { LiveReading } from './LiveReading';
 import { PropertyChooser } from './PropertyChooser';
 import { ProvenanceEvidence } from './ProvenanceEvidence';
 import { usePropertyTelemetry } from './usePropertyTelemetry';
@@ -58,19 +59,24 @@ export function PropertyTelemetry(props: {
                   <p class="text-sm font-semibold">
                     {property.name} · {property.valueKind} · v{property.version}
                   </p>
-                  <EvidenceReadContent
-                    state={model.current.state()}
-                    label="current reading"
-                    retry={model.current.retry}
-                  >
-                    {(snapshot) => (
-                      <CurrentReading
-                        snapshot={snapshot}
-                        inspect={model.inspect}
-                        refresh={model.current.retry}
-                      />
-                    )}
-                  </EvidenceReadContent>
+                  <Show when={model.live.available()}>
+                    <LiveReading live={model.live} inspect={model.inspect} />
+                  </Show>
+                  <Show when={!model.live.enabled() && !model.live.blocked()}>
+                    <EvidenceReadContent
+                      state={model.current.state()}
+                      label="current reading"
+                      retry={model.current.retry}
+                    >
+                      {(snapshot) => (
+                        <CurrentReading
+                          snapshot={snapshot}
+                          inspect={model.inspect}
+                          refresh={model.current.retry}
+                        />
+                      )}
+                    </EvidenceReadContent>
+                  </Show>
                 </div>
               )}
             </MetadataReadContent>

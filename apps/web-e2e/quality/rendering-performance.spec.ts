@@ -10,7 +10,10 @@ import {
 import { measurementTest } from '../fixtures/measurement-test';
 import { installMetadataApi } from '../fixtures/metadata-api';
 import { expect } from '../fixtures/production-test';
+import { installPropertyLiveApi } from '../fixtures/property-live-api';
+import { installTelemetryApi } from '../fixtures/telemetry-api';
 import { BrowserQualityPage } from '../pages/browser-quality.page';
+import { PropertyLivePage } from '../pages/property-live.page';
 
 const viewports = [
   { name: 'desktop', width: 1365, height: 900 },
@@ -92,4 +95,87 @@ for (const viewport of viewports) {
       },
     );
   });
+}
+
+for (const viewport of viewports) {
+  measurementTest(
+    `bounded live burst and disposal ${viewport.name}`,
+    async ({ page, browser }, testInfo) => {
+      const source = sourceIdentity(repositoryRoot);
+      await page.setViewportSize(viewport);
+      await installMetadataApi(page);
+      await installTelemetryApi(page);
+      await installPropertyLiveApi(page, 200);
+      const view = new BrowserQualityPage(page),
+        live = new PropertyLivePage(page);
+      const session = await page.context().newCDPSession(page);
+      await session.send('Performance.enable');
+      const roundTrip = async () => {
+        const start = performance.now();
+        await live.open();
+        await expect(
+          live.delivery.getByRole('button', { name: 'Start live updates' }),
+        ).toBeVisible();
+        const opened = performance.now();
+        await live.start();
+        await expect(live.delivery).toContainText('revision 209');
+        await expect(live.delivery.getByText(/Committed reading/)).toHaveCount(
+          1,
+        );
+        const delivered = performance.now();
+        await live.stop();
+        await live.leave();
+        await expect(view.metadata.catalogue).toBeVisible();
+        return {
+          openMs: opened - start,
+          deliveryMs: delivered - opened,
+          leaveMs: performance.now() - delivered,
+        };
+      };
+      try {
+        for (let i = 0; i < qualityPolicy.performance.warmups; i++)
+          await roundTrip();
+        const before = await view.resources(session);
+        const samples = [];
+        for (let i = 0; i < qualityPolicy.performance.samples; i++)
+          samples.push(await roundTrip());
+        const after = await view.resources(session);
+        const resources = {
+          heapBefore: before.heap,
+          heapAfter: after.heap,
+          nodesBefore: before.nodes,
+          nodesAfter: after.nodes,
+        };
+        const file = writeQualityEvidence(
+          repositoryRoot,
+          'live-performance',
+          source,
+          {
+            viewport: viewport.name,
+            browser: browser.version(),
+            workload: {
+              replacements: 200,
+              warmups: qualityPolicy.performance.warmups,
+              samples: qualityPolicy.performance.samples,
+            },
+            samples,
+            resources,
+          },
+        );
+        await testInfo.attach('bounded-live-delivery-measurements', {
+          path: file,
+          contentType: 'application/json',
+        });
+        assessPerformance(
+          samples.map((sample) => ({
+            navigationMs: Math.max(sample.openMs, sample.leaveMs),
+            filterMs: sample.deliveryMs,
+          })),
+          resources,
+        );
+      } finally {
+        await session.detach();
+      }
+    },
+  );
 }

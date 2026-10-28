@@ -14,6 +14,7 @@ import {
   parsePropertyEvidence,
   parsePropertyHistory,
 } from './parse-property-evidence';
+import { propertySubscription } from './property-subscription';
 /** Three independently authorized reads, sharing the app-owned managed runtime. */
 export function createTelemetryReader(api: BrowserApi): TelemetryReader {
   const read = <A, W, E>(
@@ -32,6 +33,7 @@ export function createTelemetryReader(api: BrowserApi): TelemetryReader {
       options,
     );
   return {
+    subscribe: propertySubscription(api),
     async current(request, options) {
       validProperty(request);
       return read(

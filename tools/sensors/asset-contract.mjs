@@ -35,6 +35,11 @@ const operations = {
 };
 export const BROWSER_OPERATIONS = [
   {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/properties/{property_id}/versions/{version}/live',
+    method: 'get',
+    id: 'streamCurrentProperty',
+  },
+  {
     path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/properties/{property_id}/versions/{version}/current',
     method: 'get',
     id: 'getCurrentPropertySnapshot',
@@ -147,7 +152,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.18' ||
+    contract.info?.version !== '1.0.0-baseline.19' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||

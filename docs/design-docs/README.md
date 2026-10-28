@@ -18,3 +18,5 @@ consequences, and alternatives.
 - [0005: Source-owned immutable UX/static-edge delivery](0005-immutable-ux-delivery.md) (proposed in issue #71).
 
 - [0006: Connected property evidence](0006-connected-property-evidence.md): exact current snapshots, bounded history and original provenance.
+
+- [0007: Inspector live delivery](0007-inspector-live-delivery.md): exact-property SSE, finite reconnect and account-scoped disposal.

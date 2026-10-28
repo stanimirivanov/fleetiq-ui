@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.18` from merged
-`fleetiq-platform` commit `fe8488e3ec506c610502ad2d2a6089bc0d4fc7c1`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.19` from merged
+`fleetiq-platform` commit `7e1f322430d7c927486a9b8b7674d32e8e7ccae3`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -45,7 +45,7 @@ retain the full signed-i64 range as exact strings; values outside Date
 representation are displayed as exact epoch milliseconds.
 
 Search and type filtering are local to the loaded catalogue page. There is no
-server filter/total endpoint, complete source inventory, live telemetry transport,
+server filter/total endpoint, complete source inventory, fleet-wide telemetry stream,
 position or alert lifecycle consumed by this UI. Current property snapshots and
 bounded hot history are now connected.
 
@@ -78,7 +78,7 @@ mock that does not match the published contract.
 ## Device commissioning and consumer generation
 
 The byte-identical bundle contains the broader backend API. The generated browser
-client includes only the 25 consumed operations registered in
+client includes only the 26 consumed operations registered in
 [the contract sensor](../../tools/sensors/asset-contract.mjs), plus their complete
 transitive schema closure. Administration operations outside this UI are retained
 in the upstream snapshot but are not added to browser code. Negative fixtures
@@ -116,3 +116,11 @@ counters and signed-i64 timestamps stay strings. Generated shape validation is
 followed by exact scope, range, kind/unit, event-time, age and ordering checks.
 Current state is independent of metadata review cutoffs. Separate snapshots/pages
 do not imply one transaction or complete unresolved/upstream coverage.
+
+## Live property delivery
+
+The exact-property `/live` sibling is consumed by the managed SSE adapter.
+Generated current/scalar schemas and maintained small event envelopes validate
+the response extension metadata. Full replacements may coalesce revisions;
+Last-Event-ID retains only the last successfully applied position. A reset
+clears it. See [the live design](../../docs/design-docs/0007-inspector-live-delivery.md) for cancellation, limits, finite retry and operator recovery.

@@ -10,6 +10,7 @@ export function CurrentReading(props: {
   readonly snapshot: CurrentProperty;
   readonly inspect: (token: string) => void;
   readonly refresh: () => void;
+  readonly live?: boolean;
 }) {
   return (
     <div class="grid gap-3">
@@ -77,8 +78,10 @@ export function CurrentReading(props: {
       </Show>
       <p class="text-xs text-muted">
         Evaluated {evidenceTime(props.snapshot.evaluatedAt)} · fresh for at most
-        30 seconds at that evaluation. Refresh to reassess age; this is not a
-        live subscription.
+        30 seconds at that evaluation.{' '}
+        {props.live
+          ? 'Heartbeat evaluations reassess age; source quality is independent.'
+          : 'Refresh to reassess age; this is not a live subscription.'}
       </p>
       <p role="status" class="text-xs text-muted">
         {props.snapshot.pending

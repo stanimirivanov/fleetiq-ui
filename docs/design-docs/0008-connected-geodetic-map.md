@@ -65,8 +65,9 @@ excludes the initial static-import closure, and hashes all JS/CSS including raw
 The browser verifies an unconfigured map does not download the SDK/worker.
 
 A dedicated unrecorded geographic quality project exercises real software WebGL,
-one owned worker, synthetic same-origin raster tiles, two warmups/five route
-cycles, loaded-page filters and accessibility. Existing 2s navigation/1s filter,
+one owned worker, synthetic same-origin raster tiles, two complete SPA warmups/five route
+cycles and loaded-page filters. Map accessibility runs in separate fresh test
+contexts; it never injects Axe between the resource baselines. Existing 2s navigation/1s filter,
 16-MiB retained-main-heap and 400-node recovery limits remain enforced. Worker
 heap samples are recorded through bounded CDP sessions; worker count is exactly
 one while active and zero after disposal. Worker peak heap, GPU memory and

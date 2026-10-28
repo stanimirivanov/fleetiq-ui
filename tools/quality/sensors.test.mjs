@@ -394,6 +394,7 @@ test('provider and source scope cannot bypass the measured component gate', () =
 for (const defect of [
   'missing-project',
   'missing-sensor',
+  'missing-map-accessibility',
   'trace',
   'video',
   'gc',
@@ -407,6 +408,10 @@ for (const defect of [
     );
     if (defect === 'missing-project') browser.projects.pop();
     if (defect === 'missing-sensor') profile.testMatch.pop();
+    if (defect === 'missing-map-accessibility')
+      browser.projects
+        .find((project) => project.name === 'rendered-accessibility')
+        .testMatch.pop();
     if (defect === 'trace') profile.use.trace = 'retain-on-failure';
     if (defect === 'video') profile.use.video = 'on';
     if (defect === 'gc') profile.use.launchOptions.args = [];

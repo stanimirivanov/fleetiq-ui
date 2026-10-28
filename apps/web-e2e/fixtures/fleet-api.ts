@@ -126,7 +126,7 @@ export async function installFleetApi(page: Page) {
     return route.fulfill({
       contentType: 'image/png',
       body: Buffer.from(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==',
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGO4/+L1fwAJDgOyop5ypAAAAABJRU5ErkJggg==',
         'base64',
       ),
     });

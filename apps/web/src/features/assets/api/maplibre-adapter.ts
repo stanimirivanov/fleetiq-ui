@@ -54,8 +54,8 @@ export function mountFleetMap(
   let disposed = false,
     rows: readonly FleetAsset[] = [],
     selectedId: string | null = null;
-  let basemap = false,
-    unavailable = false;
+  let phase: 'initial' | 'loading' | 'applying' | 'ready' | 'unavailable' =
+    'initial';
   let styleRequest: AbortController | undefined;
   const paint = () => {
     if (disposed || !map.isStyleLoaded()) return;
@@ -121,9 +121,7 @@ export function mountFleetMap(
   const style = () => {
     if (disposed) return;
     const dark = document.documentElement.dataset.theme === 'dark';
-    basemap = false;
-    unavailable = false;
-    let styleRequest: AbortController | undefined;
+    phase = 'loading';
     status('Loading deployment basemap…');
     styleRequest?.abort();
     const controller = new AbortController();
@@ -133,7 +131,10 @@ export function mountFleetMap(
       controller.signal,
     ).then(
       (value) => {
-        if (!disposed && !controller.signal.aborted) map.setStyle(value);
+        if (!disposed && !controller.signal.aborted) {
+          phase = 'applying';
+          map.setStyle(value);
+        }
       },
       () => {
         if (!disposed && !controller.signal.aborted) failed();
@@ -141,19 +142,30 @@ export function mountFleetMap(
     );
   };
   const loaded = () => {
-    if (disposed) return;
-    basemap = true;
+    if (disposed || (phase !== 'applying' && phase !== 'unavailable')) return;
+    const fallback = phase === 'unavailable';
     map.setProjection({ type: 'globe' });
     paint();
-    if (!unavailable) status('Geodetic map · observed points only');
+    if (!fallback) phase = 'ready';
+  };
+  // A style-load event precedes tile/GeoJSON worker completion. Announce ready
+  // only after the actual SDK idle boundary, never for the initial blank style.
+  const idle = () => {
+    if (disposed || phase !== 'ready' || !map.isStyleLoaded()) return;
+    if (!map.getSource('fleet')) {
+      paint();
+      return;
+    }
+    status('Geodetic map · observed points only');
   };
   const failed = () => {
     if (disposed) return;
-    unavailable = true;
+    const needsBackground = phase === 'loading' || phase === 'applying';
+    phase = 'unavailable';
     status(
       'Basemap unavailable. Positions and the accessible list remain available.',
     );
-    if (!basemap)
+    if (needsBackground)
       map.setStyle({
         version: 8,
         sources: {},
@@ -169,6 +181,7 @@ export function mountFleetMap(
   map.addControl(new NavigationControl({ showCompass: false }), 'top-right');
   map.on('load', style);
   map.on('style.load', loaded);
+  map.on('idle', idle);
   map.on('error', failed);
   const click = (e: { point: { x: number; y: number } }) => {
     const id = map.queryRenderedFeatures([e.point.x, e.point.y], {
@@ -211,6 +224,7 @@ export function mountFleetMap(
       theme.disconnect();
       map.off('load', style);
       map.off('style.load', loaded);
+      map.off('idle', idle);
       map.off('error', failed);
       map.off('click', click);
       map.remove();

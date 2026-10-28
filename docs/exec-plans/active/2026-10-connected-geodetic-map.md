@@ -52,6 +52,19 @@ The full resource/browser/image suites remain CI work, not claimed local passes.
 Synthetic map/HTTP fixtures do not qualify a live provider or deployment. The
 known inherited go-jose v3 image-scan blocker remains without an exception.
 
+### Resource gate correction
+
+The initial CI geographic resource failure was reproduced locally. The workload
+mixed an after-baseline accessibility scan with incomplete full-document warmups.
+It now uses equivalent complete SPA cycles, separate fresh-context accessibility
+and a contamination guard, with unchanged budgets. The corrupt synthetic PNG and
+premature renderer-ready signal were corrected. A failing cancellation regression
+also exposed a shadowed style controller, which is now fixed.
+
+The corrected local resource run passed: 1,383 nodes before/after (zero growth),
+877,760 heap-byte growth, maximum navigation 1,448 ms and filter 496 ms. Adapter
+cancellation/readiness unit tests pass. Full acceptance/image suites remain on CI.
+
 ## Out of scope
 
 Overview connection (PR 30), geofences/routes/commands, direct PMTiles protocol,

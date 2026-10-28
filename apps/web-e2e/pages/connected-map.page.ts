@@ -1,11 +1,13 @@
 import type { Page } from '@playwright/test';
 export class ConnectedMapPage {
+  readonly summary;
   readonly list;
   readonly evidence;
   readonly canvas;
   readonly filter;
   readonly mapStatus;
   constructor(readonly page: Page) {
+    this.summary = page.getByRole('region', { name: 'Fleet snapshot summary' });
     this.list = page.getByRole('region', { name: 'Loaded fleet page' });
     this.evidence = page.getByRole('complementary', {
       name: 'Selected location evidence',
@@ -20,7 +22,7 @@ export class ConnectedMapPage {
     await this.page.goto(
       '/map?tenant=tenant-a&latitude_property=position.latitude&latitude_version=1&longitude_property=position.longitude&longitude_version=1&encoding=e7',
     );
-    await this.list.waitFor();
+    await this.summary.waitFor();
   }
   async rendererReady() {
     await this.mapStatus.waitFor();
@@ -38,7 +40,7 @@ export class ConnectedMapPage {
   }
   async returnToMap() {
     await this.page.goBack();
-    await this.list.waitFor();
+    await this.summary.waitFor();
     await this.rendererReady();
   }
 }

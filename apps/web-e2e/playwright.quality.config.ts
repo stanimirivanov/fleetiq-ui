@@ -49,7 +49,10 @@ export default defineConfig({
     },
     {
       name: 'rendered-accessibility',
-      testMatch: ['**/measured-browser.spec.ts'],
+      testMatch: [
+        '**/measured-browser.spec.ts',
+        '**/geographic-map-accessibility.spec.ts',
+      ],
     },
     {
       name: 'rendering-performance',

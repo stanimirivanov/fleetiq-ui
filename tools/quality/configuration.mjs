@@ -67,7 +67,10 @@ export function inspectQualityConfiguration(
     !accessibility ||
     !performance ||
     JSON.stringify(accessibility.testMatch) !==
-      JSON.stringify(['**/measured-browser.spec.ts']) ||
+      JSON.stringify([
+        '**/measured-browser.spec.ts',
+        '**/geographic-map-accessibility.spec.ts',
+      ]) ||
     JSON.stringify(performance.testMatch) !==
       JSON.stringify([
         '**/rendering-performance.spec.ts',

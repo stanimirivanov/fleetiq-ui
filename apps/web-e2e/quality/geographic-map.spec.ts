@@ -6,10 +6,13 @@ import { installFleetApi } from '../fixtures/fleet-api';
 import { measurementTest as test } from '../fixtures/measurement-test';
 import { installMetadataApi } from '../fixtures/metadata-api';
 import { expect } from '../fixtures/production-test';
-import { auditAccessibility } from '../pages/accessibility-audit';
 import { BrowserQualityPage } from '../pages/browser-quality.page';
 import { ConnectedMapPage } from '../pages/connected-map.page';
-import { mapWorkerCount, mapWorkerHeap } from '../pages/map-resources';
+import {
+  mapWorkerCount,
+  mapWorkerHeap,
+  requireMapMeasurementIsolation,
+} from '../pages/map-resources';
 
 test('real geographic renderer releases workers, WebGL canvas and protected evidence across bounded route cycles', async ({
   page,
@@ -22,16 +25,13 @@ test('real geographic renderer releases workers, WebGL canvas and protected evid
     session = await page.context().newCDPSession(page);
   await session.send('Performance.enable');
   try {
-    for (let i = 0; i < qualityPolicy.performance.warmups; i++) {
-      await map.open();
-      await map.rendererReady();
-      await map.leave();
-      await expect.poll(() => mapWorkerCount(session)).toBe(0);
-    }
-    const before = await resources.resources(session),
-      samples: { navigationMs: number; filterMs: number }[] = [],
-      workerHeaps: number[] = [];
-    for (let i = 0; i < qualityPolicy.performance.samples; i++) {
+    // Establish one document and exercise the identical complete SPA workload
+    // during warmup. Reloading here would discard the caches we intend to warm.
+    await map.open();
+    await map.rendererReady();
+    await map.leave();
+    await expect.poll(() => mapWorkerCount(session)).toBe(0);
+    const cycle = async () => {
       const started = Date.now();
       await map.returnToMap();
       const navigationMs = Date.now() - started;
@@ -41,15 +41,29 @@ test('real geographic renderer releases workers, WebGL canvas and protected evid
       await map.filter.fill('');
       await expect(map.asset('Positioned equipment')).toBeVisible();
       const filterMs = Date.now() - filterStarted;
-      workerHeaps.push(await mapWorkerHeap(session));
+      await expect.poll(() => mapWorkerCount(session)).toBe(1);
+      const workerHeap = await mapWorkerHeap(session);
       await map.asset('Positioned equipment').click();
       await expect(map.evidence).toContainText('51.5, -0.12');
-      if (i === 0) expect(await auditAccessibility(page)).toEqual([]);
       await map.leave();
       await expect.poll(() => mapWorkerCount(session)).toBe(0);
       await expect(page.getByTestId('geodetic-canvas')).toHaveCount(0);
-      samples.push({ navigationMs, filterMs });
+      return { navigationMs, filterMs, workerHeap };
+    };
+    for (let i = 0; i < qualityPolicy.performance.warmups; i++) await cycle();
+    await requireMapMeasurementIsolation(page);
+    const before = await resources.resources(session),
+      samples: { navigationMs: number; filterMs: number }[] = [],
+      workerHeaps: number[] = [];
+    for (let i = 0; i < qualityPolicy.performance.samples; i++) {
+      const sample = await cycle();
+      samples.push({
+        navigationMs: sample.navigationMs,
+        filterMs: sample.filterMs,
+      });
+      workerHeaps.push(sample.workerHeap);
     }
+    await requireMapMeasurementIsolation(page);
     const after = await resources.resources(session),
       measurement = {
         heapBefore: before.heap,

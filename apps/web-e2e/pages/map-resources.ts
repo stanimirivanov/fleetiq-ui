@@ -1,4 +1,4 @@
-import type { CDPSession } from '@playwright/test';
+import type { CDPSession, Page } from '@playwright/test';
 /** Inspect only the owned local worker. Protocol failure cannot become a zero sample. */
 export async function mapWorkerHeap(session: CDPSession): Promise<number> {
   const result = await session.send('Target.getTargets');
@@ -55,4 +55,16 @@ export async function mapWorkerCount(session: CDPSession): Promise<number> {
   return targets.targetInfos.filter((t: { type: string }) =>
     ['worker', 'shared_worker', 'service_worker'].includes(t.type),
   ).length;
+}
+
+/** Accessibility scans inject a separate runtime/cache into the page under test.
+ * Use a fresh Playwright context for those scans, outside retained-node samples.
+ */
+export async function requireMapMeasurementIsolation(
+  page: Page,
+): Promise<void> {
+  if (await page.evaluate(() => 'axe' in window))
+    throw new Error(
+      'Map resource measurements require an accessibility-free page context.',
+    );
 }

@@ -103,15 +103,21 @@ export const REQUIRED_SCRIPTS = {
     'pnpm exec playwright test --config apps/web-e2e/playwright.development.config.ts',
 };
 export const REQUIRED_JOBS = {
-  image: { platform: 'ubuntu-24.04', command: 'pnpm image:qualify' },
+  image: {
+    platform: 'ubuntu-24.04',
+    command: 'pnpm image:qualify',
+    needs: ['check', 'harness-windows'],
+  },
   check: { platform: 'ubuntu-latest', command: 'pnpm check' },
   browser: {
     platform: 'ubuntu-latest',
     command: 'pnpm dependencies:qualify --group browser',
+    needs: ['check', 'harness-windows'],
   },
   'browser-quality': {
     platform: 'ubuntu-latest',
     command: 'pnpm dependencies:qualify --group browser-quality',
+    needs: ['check', 'harness-windows'],
   },
   'harness-windows': {
     platform: 'windows-latest',

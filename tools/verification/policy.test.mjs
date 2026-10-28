@@ -168,3 +168,41 @@ test('expression skips, event filters and execution overrides cannot weaken requ
   for (const edit of edits)
     assert.ok(mutated(({ workflow: config }) => edit(config)).length);
 });
+
+// Exact reviewed edges keep roots independent and expensive jobs success-gated.
+test('acceptance and Windows roots precede parallel browser and image gates', () => {
+  for (const name of ['check', 'harness-windows'])
+    assert.equal(workflow.jobs[name].needs, undefined);
+  for (const name of ['browser', 'browser-quality', 'image']) {
+    assert.deepEqual(workflow.jobs[name].needs, ['check', 'harness-windows']);
+    for (const needs of [
+      undefined,
+      [],
+      ['check'],
+      ['harness-windows'],
+      [name],
+      ['missing'],
+      ['check', 'harness-windows', 'image'],
+    ])
+      assert.ok(
+        mutated(({ workflow: config }) => {
+          config.jobs[name].needs = needs;
+        }).length,
+      );
+    for (const condition of [
+      'always()',
+      'failure()',
+      "needs.check.result != 'cancelled'",
+    ])
+      assert.ok(
+        mutated(({ workflow: config }) => {
+          config.jobs[name].if = condition;
+        }).length,
+      );
+  }
+  assert.ok(
+    mutated(({ workflow: config }) => {
+      config.jobs['harness-windows'].needs = ['check'];
+    }).length,
+  );
+});

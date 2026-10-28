@@ -21,6 +21,11 @@ export function MetadataReadContent<T>(props: {
   readonly state: MetadataReadState<T>;
   readonly label: string;
   readonly retry: () => void;
+  readonly messages?: {
+    readonly failures: Readonly<Record<RequestFailureKind, string>>;
+    readonly idle: string;
+    readonly unconfigured: string;
+  };
   readonly children: (value: T) => JSX.Element;
 }) {
   const ready = () => {
@@ -39,12 +44,14 @@ export function MetadataReadContent<T>(props: {
     <Switch>
       <Match when={props.state.kind === 'idle'}>
         <p class="text-xs text-muted">
-          Choose the required context to review {props.label}.
+          {props.messages?.idle ??
+            `Choose the required context to review ${props.label}.`}
         </p>
       </Match>
       <Match when={props.state.kind === 'unconfigured'}>
         <p role="status" class="text-sm text-muted">
-          The metadata connection is not configured.
+          {props.messages?.unconfigured ??
+            'The metadata connection is not configured.'}
         </p>
       </Match>
       <Match when={props.state.kind === 'loading'}>
@@ -62,7 +69,7 @@ export function MetadataReadContent<T>(props: {
       <Match when={failure()}>
         {(error) => (
           <div role="alert" class="grid gap-3 text-sm">
-            <p>{failureCopy[error().failure]}</p>
+            <p>{(props.messages?.failures ?? failureCopy)[error().failure]}</p>
             <Switch>
               <Match when={error().failure === 'unauthorized'}>
                 <a

@@ -51,6 +51,21 @@ actual tool versions and selected canonical commands before execution. Missing
 prerequisites produce not-run evidence. Install Playwright Chromium and use the
 documented [port overrides](testing.md) if a browser port is occupied.
 
+## CI scheduling
+
+Acceptance (`check`) and Windows structural verification (`harness-windows`)
+start independently. Browser behavior, measured browser quality and image
+qualification each require both roots to succeed, then run in parallel. A failed,
+cancelled or skipped prerequisite skips its dependants; no job-level `always()`
+or failure override is allowed. Artifact inspection/retention still runs for
+jobs that started. The catalogue owns the exact edges, with negative fixtures
+rejecting removed dependencies, cycles and success-condition bypasses.
+
+Acceptance includes the production build and unchanged aggregate output budgets,
+so a bundle rejection stops the expensive dependent browser/image work. Each
+job keeps its frozen installation, canonical checks and source-bound evidence;
+no outputs from another job substitute for its own qualification.
+
 ## Dependency upgrade preflight
 
 All groups first validate registered declarations against the

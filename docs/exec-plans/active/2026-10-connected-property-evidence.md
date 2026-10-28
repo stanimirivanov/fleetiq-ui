@@ -52,9 +52,25 @@ only the selected exact declared property; no per-property eager read fan-out.
 ## Acceptance evidence
 
 Focused checks are recorded in the PR. Full browser, measured quality, coverage,
-production build/image and guide execution are intentionally delegated to CI
+image and guide execution are intentionally delegated to CI
 because the development host is busy. An implemented scenario is not an executed
 browser pass. No D06 or infrastructure resources are changed.
+
+### PR revision: production build and CI ordering
+
+CI exposed a JavaScript budget rejection, shared by acceptance, browser builds
+and the image build. Vite had forced development dependency conditions in every
+mode. Scope that override to jsdom tests and reuse the existing typed read-state
+renderer for telemetry-specific messages. Focused production build now passes
+unchanged budgets (349871 raw / 99326 gzip JavaScript bytes). Configuration tests
+load the real Vite config for production, staging, development and test modes.
+
+Run acceptance and Windows structural gates first, followed by parallel browser,
+measured quality and image jobs only on prerequisite success. Exact DAG policy
+and negative fixtures prevent dependency removal or failure-condition bypasses.
+Type checks, 22 inspector/metadata component tests, 128 focused harness/image-policy
+tests, policy validation, formatting and documentation checks pass. Full
+browser/image and remaining acceptance checks await CI.
 
 ## Out of scope
 

@@ -107,7 +107,9 @@ export function inspectPolicy(
   ) {
     fail('Quality workflow permissions must be contents: read only.');
   }
-  for (const [name, { platform, command }] of Object.entries(REQUIRED_JOBS)) {
+  for (const [name, { platform, command, needs }] of Object.entries(
+    REQUIRED_JOBS,
+  )) {
     const job = workflow.jobs?.[name];
     if (!job || job['runs-on'] !== platform) {
       fail(`Required job absent or wrong platform: ${name}`);
@@ -118,7 +120,7 @@ export function inspectPolicy(
       (job['continue-on-error'] !== undefined &&
         job['continue-on-error'] !== false) ||
       job.permissions !== undefined ||
-      job.needs !== undefined ||
+      JSON.stringify(job.needs) !== JSON.stringify(needs) ||
       job.defaults !== undefined ||
       job.env !== undefined ||
       job.container !== undefined ||

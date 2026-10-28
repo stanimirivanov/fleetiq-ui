@@ -91,6 +91,8 @@ if (mode === 'http') {
   }
   for (const path of [
     '/assets/absent.js',
+    '/maps/absent.json',
+    '/maps/light/style.json',
     '/.env',
     '/.git/config',
     '/quality-manifest.json',
@@ -98,6 +100,10 @@ if (mode === 'http') {
   ])
     assert.equal((await request(path)).status, 404);
   assert.equal((await request('/', { method: 'POST' })).status, 405);
+  assert.equal(
+    (await request('/maps/absent.json', { method: 'POST' })).status,
+    405,
+  );
   checks++;
   assert.equal(
     (await request('/', { headers: { Host: 'evil.test' } })).status,

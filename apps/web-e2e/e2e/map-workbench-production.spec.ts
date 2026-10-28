@@ -14,7 +14,9 @@ test('production map cannot activate sample positions or selected asset evidence
   ]) {
     await shell.open(path);
     await expect(map.heading).toBeVisible();
-    await expect(map.connectionNotice).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'Sign-in unavailable' }),
+    ).toBeVisible();
     await expect(page.getByRole('banner')).toContainText('Sign-in unavailable');
     await expect(map.assetList).toHaveCount(0);
     await expect(map.siteMap).toHaveCount(0);

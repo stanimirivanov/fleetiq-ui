@@ -43,14 +43,34 @@ export function inspectQualityConfiguration(
   const performance = projects.find(
     (project) => project.name === 'rendering-performance',
   );
+  const map = projects.find((p) => p.name === 'geographic-map');
+  if (
+    !map ||
+    JSON.stringify(map.testMatch) !==
+      JSON.stringify(['**/geographic-map.spec.ts']) ||
+    map.use?.trace !== 'off' ||
+    map.use?.video !== 'off' ||
+    JSON.stringify(map.use?.launchOptions?.args) !==
+      JSON.stringify([
+        '--js-flags=--expose-gc',
+        '--use-angle=swiftshader',
+        '--enable-unsafe-swiftshader',
+      ])
+  )
+    throw new Error(
+      'Keep the owned unrecorded geographic worker lifecycle project.',
+    );
   if (
     browser.workers !== 1 ||
     browser.retries !== 0 ||
-    projects.length !== 2 ||
+    projects.length !== 3 ||
     !accessibility ||
     !performance ||
     JSON.stringify(accessibility.testMatch) !==
-      JSON.stringify(['**/measured-browser.spec.ts']) ||
+      JSON.stringify([
+        '**/measured-browser.spec.ts',
+        '**/geographic-map-accessibility.spec.ts',
+      ]) ||
     JSON.stringify(performance.testMatch) !==
       JSON.stringify([
         '**/rendering-performance.spec.ts',

@@ -36,6 +36,9 @@ Privileges belong to one exact file with an owner and rationale:
 
 - The shared managed browser HTTP adapter owns validated same-origin reads,
   structured failure, cancellation and runtime disposal.
+- The exact map lifecycle adapter owns the SDK, local worker and bounded public
+  same-origin style read. Static raster/vector resources stay under `/maps/`;
+  alternative style transports are rejected before SDK execution.
 - Synthetic signal playback owns a joined cancellable fiber, with execution
   permission only. It has no transport permission.
 - The exact backend-pinned generated client has a separate import allowance,

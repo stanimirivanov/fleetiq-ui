@@ -26,10 +26,13 @@ export function inspectBundle(root, limits = qualityPolicy.bundle) {
     readFileSync(ownedFile(root, 'quality-manifest.json'), 'utf8'),
   );
   if (
-    manifest.schemaVersion !== 1 ||
+    manifest.schemaVersion !== 2 ||
     !Array.isArray(manifest.modules) ||
     !manifest.modules.length ||
-    !Array.isArray(manifest.files)
+    !Array.isArray(manifest.files) ||
+    !Array.isArray(manifest.mapFiles) ||
+    new Set(manifest.mapFiles).size !== manifest.mapFiles.length ||
+    !limits.map
   )
     throw new Error('Production module manifest is unavailable.');
   if (
@@ -43,7 +46,7 @@ export function inspectBundle(root, limits = qualityPolicy.bundle) {
     )
   )
     throw new Error('Production bundle contains forbidden sample modules.');
-  const outputs = inventory.filter((name) => /\.(?:js|css)$/u.test(name));
+  const outputs = inventory.filter((name) => /\.(?:m?js|css)$/u.test(name));
   if (
     !outputs.length ||
     outputs.length !== manifest.files.length ||
@@ -56,6 +59,9 @@ export function inspectBundle(root, limits = qualityPolicy.bundle) {
     cssBytes: 0,
     cssGzipBytes: 0,
   };
+  const mapSizes = { ...sizes };
+  if (manifest.mapFiles.some((name) => !outputs.includes(name)))
+    throw new Error('Map output inventory is stale.');
   for (const entry of manifest.files) {
     if (!outputs.includes(entry.name))
       throw new Error('Production output registration is stale.');
@@ -67,13 +73,24 @@ export function inspectBundle(root, limits = qualityPolicy.bundle) {
       throw new Error(
         'Production output bytes changed after graph extraction.',
       );
-    const type = entry.name.endsWith('.js') ? 'javascript' : 'css';
-    sizes[`${type}Bytes`] += bytes.length;
-    sizes[`${type}GzipBytes`] += gzipSync(bytes).length;
+    const type = /\.m?js$/.test(entry.name) ? 'javascript' : 'css';
+    const group = manifest.mapFiles.includes(entry.name) ? mapSizes : sizes;
+    group[`${type}Bytes`] += bytes.length;
+    group[`${type}GzipBytes`] += gzipSync(bytes).length;
   }
   if (Object.entries(sizes).some(([key, value]) => value > limits[key]))
     throw new Error('Production bundle exceeds the reviewed byte budget.');
+  if (
+    Object.entries(mapSizes).some(
+      ([key, value]) =>
+        !Number.isSafeInteger(limits.map[key]) ||
+        limits.map[key] <= 0 ||
+        value > limits.map[key],
+    )
+  )
+    throw new Error('Lazy map bundle exceeds the reviewed byte budget.');
   return {
+    map: mapSizes,
     passed: true,
     modules: manifest.modules.length,
     files: outputs.length,

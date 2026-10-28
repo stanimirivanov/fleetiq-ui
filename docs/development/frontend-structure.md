@@ -103,3 +103,12 @@ refresh that discovers a different account disposes the previous account's reads
 and metadata before mounting the new account's views; same-actor expiry refresh
 preserves ordinary interaction. Native sign-in anchors opt out of Solid Router
 with `rel="external noreferrer"` so the server receives the login request.
+
+## Geographic renderer boundary
+
+Import MapLibre only in `features/assets/api/maplibre-adapter.ts`. That exact
+adapter owns SDK resource requests, the bounded public style read, local module
+worker and cleanup. Models remain dependency-free; views consume the lifecycle
+port. Keep geodetic coordinate validation and resource/style restrictions pure.
+New renderer sources/protocols require URL, lifecycle, byte and browser fixtures;
+never add SDK imports or transport calls to a component to bypass the boundary.

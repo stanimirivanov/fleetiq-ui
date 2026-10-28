@@ -10,7 +10,13 @@
       "apps/web/src/features/alerts/demo/",
       "apps/web/src/features/assets/api/fixture-asset-reader.ts",
       "apps/web/src/features/assets/api/sample-live-signal-service.ts"
-    ]
+    ],
+    "map": {
+      "javascriptBytes": 1700000,
+      "javascriptGzipBytes": 470000,
+      "cssBytes": 75000,
+      "cssGzipBytes": 12000
+    }
   },
   "performance": {
     "warmups": 2,

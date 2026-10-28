@@ -33,8 +33,26 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'geographic-map',
+      testMatch: ['**/geographic-map.spec.ts'],
+      use: {
+        trace: 'off',
+        video: 'off',
+        launchOptions: {
+          args: [
+            '--js-flags=--expose-gc',
+            '--use-angle=swiftshader',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
+      },
+    },
+    {
       name: 'rendered-accessibility',
-      testMatch: ['**/measured-browser.spec.ts'],
+      testMatch: [
+        '**/measured-browser.spec.ts',
+        '**/geographic-map-accessibility.spec.ts',
+      ],
     },
     {
       name: 'rendering-performance',

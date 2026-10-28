@@ -1,8 +1,9 @@
 import { useLocation } from '@solidjs/router';
 import { lazy, Show, Suspense } from 'solid-js';
-import { ConnectionNotice, TextLink } from '#shared/ui';
+import { TextLink } from '#shared/ui';
 import { isMapSamplePreview } from '../model/asset-preview-url';
 
+const ConnectedMapContent = lazy(() => import('./ConnectedMapContent'));
 const DevelopmentMapContent = import.meta.env.DEV
   ? lazy(() => import('./DevelopmentMapContent'))
   : undefined;
@@ -37,18 +38,14 @@ export function FleetMapPage() {
       <Show
         when={showingSample()}
         fallback={
-          <div class="grid max-w-3xl gap-4">
-            <ConnectionNotice heading="Fleet locations are not connected">
-              A browser-safe location read model and map service are not
-              configured. A last telemetry event is not a position update, so
-              this view cannot infer an asset's location.
-            </ConnectionNotice>
+          <Suspense fallback={<p role="status">Opening connected map…</p>}>
+            <ConnectedMapContent />
             {DevelopmentMapContent && (
               <TextLink href="/map?preview=sample">
                 View illustrative map
               </TextLink>
             )}
-          </div>
+          </Suspense>
         }
       >
         <Suspense fallback={<p role="status">Opening illustrative map…</p>}>

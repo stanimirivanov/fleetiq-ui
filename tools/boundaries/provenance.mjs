@@ -49,6 +49,7 @@ export function isNetworkImport(specifier) {
     : specifier.split('/')[0];
   return (
     new Set([
+      'maplibre-gl',
       'axios',
       'ky',
       'ofetch',

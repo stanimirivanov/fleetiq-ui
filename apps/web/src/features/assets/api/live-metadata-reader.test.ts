@@ -6,6 +6,7 @@ import type {
   SourceSnapshotRequest,
 } from '../model/metadata';
 import { createLiveMetadataReader } from './live-metadata-reader';
+import { fleetRequest, observedFleetWire } from './tests/fleet-fixture';
 
 const owned: BrowserApi[] = [];
 afterEach(async () => {
@@ -342,4 +343,23 @@ test('checks every binding against the returned target or exact source scope', a
       ],
     }).reader.listSourceBindings(sourceRequest),
   ).rejects.toMatchObject({ kind: 'invalid-response' });
+});
+
+test('lazy fleet composition uses the managed same-origin reader and validates the complete mapping', async () => {
+  const { reader, fetch } = setup(observedFleetWire());
+  const fleet = reader.fleet;
+  if (!fleet) throw new Error('Fleet port missing');
+  expect((await fleet.snapshot(fleetRequest)).assets[0]?.location.status).toBe(
+    'observed',
+  );
+  const first = fetch.mock.calls[0];
+  if (!first) throw new Error('Expected one request');
+  const url = new URL(String(first[0]));
+  expect(url.pathname).toBe('/api/v1/tenants/tenant-a/fleet');
+  expect(url.searchParams.get('latitude_property')).toBe('position.latitude');
+  expect(url.searchParams.get('encoding')).toBe('e7');
+  await expect(
+    fleet.snapshot({ ...fleetRequest, limit: 100 }),
+  ).rejects.toMatchObject({ kind: 'invalid-request' });
+  expect(fetch).toHaveBeenCalledTimes(1);
 });

@@ -198,6 +198,9 @@ test('inline CSP hashes preserve bootstrap behavior without unsafe script execut
   const [hash] = inlineScriptHashes(html);
   assert.match(hash, /^'sha256-[a-zA-Z0-9+/=]+'$/u);
   assert.ok(cspFor(html).includes(hash));
+  assert.ok(cspFor(html).includes("worker-src 'self'"));
+  assert.ok(!cspFor(html).includes('blob:'));
+  assert.ok(!cspFor(html).includes('unsafe-eval'));
   assert.ok(!cspFor(html).includes("script-src 'self' 'unsafe-inline'"));
   assert.notDeepEqual(inlineScriptHashes(`${html}<script>other()</script>`), [
     hash,
@@ -291,4 +294,52 @@ test('import preserves active config and ordered filesystem hashes across daemon
       expected,
     ),
   );
+});
+
+test('runtime bundle evidence requires independently bounded lazy map bytes', () => {
+  const report = {
+    passed: true,
+    files: 1,
+    modules: 1,
+    graphDigest: digest,
+    javascriptBytes: 1,
+    javascriptGzipBytes: 1,
+    cssBytes: 1,
+    cssGzipBytes: 1,
+    map: {
+      javascriptBytes: 1,
+      javascriptGzipBytes: 1,
+      cssBytes: 1,
+      cssGzipBytes: 1,
+    },
+  };
+  validateBundleEvidence(report);
+  assert.throws(
+    () => validateBundleEvidence({ ...report, map: undefined }),
+    /map bundle/,
+  );
+  assert.throws(
+    () =>
+      validateBundleEvidence({
+        ...report,
+        map: { ...report.map, javascriptBytes: 1700001 },
+      }),
+    /map bundle/,
+  );
+});
+
+test('owned map resources are handled before SPA fallback without rewriting missing files', () => {
+  const caddy = readFileSync('packaging/Caddyfile', 'utf8').replaceAll(
+    '\r\n',
+    '\n',
+  );
+  const map = caddy.indexOf('handle /maps/* {'),
+    assets = caddy.indexOf('handle /assets/* {'),
+    fallback = caddy.indexOf('try_files {path} /index.html');
+  assert.ok(map >= 0 && map < assets && assets < fallback);
+  const block = caddy.slice(map, assets);
+  assert.ok(block.includes('not method GET HEAD'));
+  assert.ok(block.includes('respond @mapNotRead 405'));
+  assert.ok(block.includes('file_server'));
+  assert.ok(!block.includes('try_files'));
 });

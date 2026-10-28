@@ -7,6 +7,7 @@ import {
   type AssetReadOptions,
   validateAssetPageRequest,
 } from '../model/asset-catalogue';
+import type { FleetReader } from '../model/fleet';
 import {
   type MetadataReader,
   type SnapshotRequest,
@@ -29,9 +30,10 @@ import {
 } from './parse-metadata';
 
 /** Live read port: generated Effect client -> strict boundary -> pure feature model. */
-export function createLiveMetadataReader(
-  api: BrowserApi,
-): MetadataReader & { readonly telemetry?: TelemetryReader } {
+export function createLiveMetadataReader(api: BrowserApi): MetadataReader & {
+  readonly fleet?: FleetReader;
+  readonly telemetry?: TelemetryReader;
+} {
   const read = <A, W, E>(
     operation: (client: FleetIqApi) => Effect.Effect<W, E>,
     parse: (wire: W) => A,
@@ -51,6 +53,12 @@ export function createLiveMetadataReader(
       options,
     );
   return {
+    fleet: {
+      snapshot: async (request, options) =>
+        (await import('./live-fleet-reader'))
+          .createFleetReader(api)
+          .snapshot(request, options),
+    },
     telemetry: createTelemetryReader(api),
     async listPage(request, options) {
       validateAssetPageRequest(request);

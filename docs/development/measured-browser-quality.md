@@ -164,3 +164,48 @@ still checked separately; output links remain forbidden.
 [The control register](harness-controls.md) records owners, triggers and remaining
 review/deferred obligations. External required statuses and Code Owner protection
 must include browser-quality; repository text cannot configure those settings.
+
+## Geographic map workload and approved payload group
+
+Issue #90 adds a separately bounded lazy map group: 1,700,000 / 470,000 gzip bytes
+JavaScript and 75,000 / 12,000 CSS, explicitly approved by the owner after measuring
+the SDK, route and local module worker. Existing non-map limits remain unchanged.
+Every emitted `.js`, `.mjs` and CSS file is inventoried and hashed; the map group
+is derived from owned lazy chunks rather than excluding vendor assets from checks.
+
+The `geographic-map` project uses test-only software WebGL with trace/video off,
+no retries and one test worker. Two warmups/five cycles exercise local synthetic
+raster tiles, filtering, selection and disposal. The existing main-heap/DOM and
+latency thresholds remain unchanged. Active workers are exactly one, none survive
+route disposal, and bounded CDP records numeric worker-heap samples. Those samples
+are diagnostic, not a calibrated peak/GPU budget. Existing worker-free projects
+retain their worker rejection. See [the map decision](../design-docs/0008-connected-geodetic-map.md).
+
+### Geographic measurement isolation and complete warmup
+
+PR #91's first CI resource trial reported 773 retained nodes against the unchanged
+400-node limit. A controlled local reproduction retained 604 nodes; omitting only
+the in-loop Axe scan reduced that to 391. Accessibility instrumentation had been
+introduced after the memory baseline, and each warmup reloaded the document while
+omitting the measured filter/selection/worker-inspection work. Those states were
+not equivalent before and after the measured window.
+
+The geographic resource workload now keeps one document, warms two identical
+complete SPA round trips, and measures five such cycles. Baselines compare the
+same returned asset page. An explicit guard rejects an Axe-instrumented page;
+a real-browser negative control proves that guard. Desktop/narrow light/dark map
+accessibility runs in fresh contexts in `rendered-accessibility`, which the
+configuration sensor requires. No accessibility check was removed.
+
+The synthetic raster fixture was repaired after checksum/decompression inspection
+found corrupt IDAT data. Renderer readiness now follows the reviewed style,
+created point source and SDK idle boundary rather than initial blank style-load.
+The resource scenario waits for one actual worker before inspecting it and zero
+workers after disposal. These are bounded readiness waits, not resource-sample
+retries. A separate unit regression verifies cancellation of superseded/disposed
+style reads; it exposed and fixed a shadowed controller variable.
+
+The corrected local five-cycle trial retained **0 nodes** (1,383 before/after),
+877,760 heap bytes, and had a maximum navigation of 1,448 ms and filter of 496 ms.
+The 400-node, 16-MiB, 2-second and 1-second caps are unchanged. Full CI qualification
+remains authoritative; these bounded local results are not capacity certification.

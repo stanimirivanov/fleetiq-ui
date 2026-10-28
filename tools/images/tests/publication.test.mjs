@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
+import { qualityPolicy } from '../../quality/policy.mjs';
 import { inspectLayout } from '../oci.mjs';
 import { CHECKS, hash, REPOSITORY } from '../policy.mjs';
 import { requirePublishedTag, validateEvidence } from '../publication.mjs';
@@ -38,6 +39,12 @@ function evidence() {
       javascriptGzipBytes: 50,
       cssBytes: 50,
       cssGzipBytes: 25,
+      map: {
+        javascriptBytes: 200,
+        javascriptGzipBytes: 100,
+        cssBytes: 100,
+        cssGzipBytes: 50,
+      },
     },
     scan: {
       SchemaVersion: 2,
@@ -132,6 +139,53 @@ test('rehashing a scan finding or excessive bundle does not bypass semantic gate
     f.record.bundle.digest = `sha256:${hash(readFileSync(join(f.directory, 'reports/bundle.json')))}`;
     f.save('qualification', f.record);
     assert.throws(() => validateEvidence(f.directory, f.source, f.now));
+  } finally {
+    f.cleanup();
+  }
+});
+
+for (const key of Object.keys(qualityPolicy.bundle.map)) {
+  for (const defect of ['missing', 'over-budget']) {
+    test(`publication rejects rehashed lazy map ${key} ${defect}`, () => {
+      const f = evidence();
+      try {
+        // Establish a valid receipt first so an unrelated stale fixture cannot
+        // make this negative control pass before the map check is exercised.
+        assert.equal(
+          validateEvidence(f.directory, f.source, f.now).artifact.digest,
+          f.record.image.digest,
+        );
+        if (defect === 'missing') delete f.values.bundle.map[key];
+        else f.values.bundle.map[key] = qualityPolicy.bundle.map[key] + 1;
+        f.save('bundle', f.values.bundle);
+        f.record.bundle.digest = `sha256:${hash(readFileSync(join(f.directory, 'reports/bundle.json')))}`;
+        f.save('qualification', f.record);
+        assert.throws(
+          () => validateEvidence(f.directory, f.source, f.now),
+          /Lazy map bundle evidence/,
+        );
+      } finally {
+        f.cleanup();
+      }
+    });
+  }
+}
+
+test('publication rejects a rehashed receipt with the entire map group omitted', () => {
+  const f = evidence();
+  try {
+    assert.equal(
+      validateEvidence(f.directory, f.source, f.now).artifact.digest,
+      f.record.image.digest,
+    );
+    delete f.values.bundle.map;
+    f.save('bundle', f.values.bundle);
+    f.record.bundle.digest = `sha256:${hash(readFileSync(join(f.directory, 'reports/bundle.json')))}`;
+    f.save('qualification', f.record);
+    assert.throws(
+      () => validateEvidence(f.directory, f.source, f.now),
+      /Lazy map bundle evidence/,
+    );
   } finally {
     f.cleanup();
   }

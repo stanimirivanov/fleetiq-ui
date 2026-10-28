@@ -20,3 +20,5 @@ consequences, and alternatives.
 - [0006: Connected property evidence](0006-connected-property-evidence.md): exact current snapshots, bounded history and original provenance.
 
 - [0007: Inspector live delivery](0007-inspector-live-delivery.md): exact-property SSE, finite reconnect and account-scoped disposal.
+
+- [0008: Connected geodetic map](0008-connected-geodetic-map.md): explicit coordinate mapping, owned MapLibre lifecycle and self-hosted map resources.

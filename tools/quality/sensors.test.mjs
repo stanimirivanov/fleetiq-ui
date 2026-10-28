@@ -394,6 +394,7 @@ test('provider and source scope cannot bypass the measured component gate', () =
 for (const defect of [
   'missing-project',
   'missing-sensor',
+  'missing-map-accessibility',
   'trace',
   'video',
   'gc',
@@ -402,9 +403,15 @@ for (const defect of [
 ]) {
   test(`quality project registration rejects ${defect}`, () => {
     const browser = structuredClone(browserConfiguration);
-    const profile = browser.projects[1];
+    const profile = browser.projects.find(
+      (project) => project.name === 'rendering-performance',
+    );
     if (defect === 'missing-project') browser.projects.pop();
     if (defect === 'missing-sensor') profile.testMatch.pop();
+    if (defect === 'missing-map-accessibility')
+      browser.projects
+        .find((project) => project.name === 'rendered-accessibility')
+        .testMatch.pop();
     if (defect === 'trace') profile.use.trace = 'retain-on-failure';
     if (defect === 'video') profile.use.video = 'on';
     if (defect === 'gc') profile.use.launchOptions.args = [];
@@ -481,4 +488,94 @@ test('live resource receipts require the exact bounded workload and numeric-only
     { ...value, resources: { ...value.resources, dom: '<private>' } },
   ])
     assert.throws(() => validateObservation('live-performance', change));
+});
+
+test('a raw module worker cannot disappear from final byte inventory', async (context) => {
+  const root = fixture(context),
+    source = path.join(root, 'apps/web/src');
+  mkdirSync(source, { recursive: true });
+  writeFileSync(
+    path.join(root, 'index.html'),
+    '<script type="module" src="/apps/web/src/main.js"></script>',
+  );
+  writeFileSync(
+    path.join(source, 'main.js'),
+    "import worker from './worker.mjs?url'; document.body.dataset.worker=worker;",
+  );
+  writeFileSync(
+    path.join(source, 'worker.mjs'),
+    'self.postMessage("owned-worker-byte-sensor");',
+  );
+  await build({
+    root,
+    configFile: false,
+    logLevel: 'silent',
+    plugins: [qualityManifest(root)],
+    build: { outDir: 'dist', assetsInlineLimit: 0 },
+  });
+  const output = path.join(root, 'dist');
+  assert.equal(inspectBundle(output).passed, true);
+  const manifestPath = path.join(output, 'quality-manifest.json'),
+    manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  const worker = manifest.files.find((e) => e.name.endsWith('.mjs'));
+  assert.ok(worker, 'module worker must be hashed and counted');
+  manifest.files = manifest.files.filter((e) => e !== worker);
+  writeFileSync(manifestPath, JSON.stringify(manifest));
+  assert.throws(() => inspectBundle(output), /inventory/);
+});
+
+test('real graph separates lazy map bytes but cannot move an eager SDK out of the non-map budget', async (context) => {
+  const root = fixture(context),
+    source = path.join(root, 'apps/web/src'),
+    api = path.join(source, 'features/assets/api');
+  mkdirSync(api, { recursive: true });
+  writeFileSync(
+    path.join(root, 'index.html'),
+    '<script type="module" src="/apps/web/src/main.js"></script>',
+  );
+  writeFileSync(
+    path.join(api, 'maplibre-adapter.ts'),
+    "import worker from './worker.mjs?url';export const workerPath=worker;",
+  );
+  writeFileSync(
+    path.join(api, 'worker.mjs'),
+    'self.postMessage("bounded-map-worker");',
+  );
+  const main = path.join(source, 'main.js');
+  writeFileSync(
+    main,
+    "document.body.onclick=()=>import('./features/assets/api/maplibre-adapter.ts').then(m=>document.body.dataset.worker=m.workerPath);",
+  );
+  const compile = () =>
+    build({
+      root,
+      configFile: false,
+      logLevel: 'silent',
+      plugins: [qualityManifest(root)],
+      build: { outDir: 'dist', assetsInlineLimit: 0, minify: false },
+    });
+  await compile();
+  const output = path.join(root, 'dist'),
+    report = inspectBundle(output);
+  assert.ok(report.map.javascriptBytes > 0);
+  assert.ok(report.javascriptBytes > 0);
+  assert.throws(
+    () =>
+      inspectBundle(output, {
+        ...qualityPolicy.bundle,
+        map: { ...qualityPolicy.bundle.map, javascriptBytes: 1 },
+      }),
+    /map bundle/,
+  );
+  writeFileSync(
+    main,
+    "import {workerPath} from './features/assets/api/maplibre-adapter.ts';document.body.dataset.worker=workerPath;",
+  );
+  await compile();
+  assert.equal(inspectBundle(output).map.javascriptBytes, 0);
+  assert.throws(
+    () =>
+      inspectBundle(output, { ...qualityPolicy.bundle, javascriptBytes: 1 }),
+    /budget/,
+  );
 });

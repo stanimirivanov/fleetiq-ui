@@ -204,10 +204,7 @@ export function inspectUpgradeInventory(inputs) {
   );
   let workflowSteps = 0;
   for (const [input, expectedJobs] of [
-    [
-      'qualityWorkflow',
-      ['check', 'browser', 'browser-quality', 'harness-windows', 'image'],
-    ],
+    ['qualityWorkflow', ['check', 'browser', 'browser-quality', 'image']],
     ['guideWorkflow', ['build', 'deploy']],
   ]) {
     const workflow = inputs[input];

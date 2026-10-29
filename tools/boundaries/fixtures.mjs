@@ -52,7 +52,7 @@ export function boundaryFixture(context) {
   symlinkSync(
     path.join(repositoryRoot, 'node_modules'),
     path.join(root, 'node_modules'),
-    process.platform === 'win32' ? 'junction' : 'dir',
+    'dir',
   );
   write(
     'package.json',

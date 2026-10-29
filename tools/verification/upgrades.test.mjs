@@ -98,7 +98,6 @@ const execute = (root, extra = []) =>
   spawnSync(process.execPath, [cli, '--root', root, '--json', ...extra], {
     encoding: 'utf8',
     timeout: 15_000,
-    windowsHide: true,
   });
 
 test('actual inventory permits consistent maintenance without claiming acceptance', () => {
@@ -558,7 +557,7 @@ test('actual entrypoint handles a malformed real registry without raw setup erro
   const result = spawnSync(
     process.execPath,
     [path.join(owned.root, 'tools/verification/upgrades-cli.mjs'), '--json'],
-    { encoding: 'utf8', timeout: 15_000, windowsHide: true },
+    { encoding: 'utf8', timeout: 15_000 },
   );
   assert.equal(result.status, 1);
   assert.equal(result.stdout, '');

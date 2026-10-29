@@ -163,11 +163,7 @@ test('linked artifacts are not followed to content outside owner', async (contex
   const root = await ownedFixture(context);
   const external = await ownedFixture(context);
   writeFileSync(path.join(external, 'private.txt'), secret());
-  symlinkSync(
-    external,
-    path.join(root, 'outside'),
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(external, path.join(root, 'outside'), 'dir');
   await assert.rejects(() => inspectArtifact(root));
 });
 test('retention scans exact JSON evidence glob plus actual output roots; absent outputs explicit', async (context) => {
@@ -213,11 +209,7 @@ test('parent junction does not redirect artifact root', async (context) => {
   const external = await ownedFixture(context);
   mkdirSync(path.join(external, 'guide'));
   writeFileSync(path.join(external, 'guide/index.html'), 'outside');
-  symlinkSync(
-    external,
-    path.join(root, 'dist'),
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(external, path.join(root, 'dist'), 'dir');
   await assert.rejects(() =>
     inspectArtifact(path.join(root, 'dist/guide'), {
       scan: () => assert.fail('redirected data scanned'),

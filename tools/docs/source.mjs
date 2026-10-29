@@ -10,7 +10,7 @@ export function gitEnvironment(base = process.env) {
     ),
   );
   Object.assign(env, {
-    GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null',
+    GIT_CONFIG_GLOBAL: '/dev/null',
     GIT_CONFIG_NOSYSTEM: '1',
     GIT_ATTR_NOSYSTEM: '1',
   });

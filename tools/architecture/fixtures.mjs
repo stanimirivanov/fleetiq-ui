@@ -83,12 +83,12 @@ export function architectureFixture(context, options = {}) {
   symlinkSync(
     path.join(repositoryRoot, 'node_modules'),
     path.join(root, 'node_modules'),
-    process.platform === 'win32' ? 'junction' : 'dir',
+    'dir',
   );
   symlinkSync(
     path.join(repositoryRoot, 'apps/web/node_modules'),
     path.join(root, 'apps/web/node_modules'),
-    process.platform === 'win32' ? 'junction' : 'dir',
+    'dir',
   );
   for (const [file, contents] of Object.entries(sourceFiles))
     write(file, contents);

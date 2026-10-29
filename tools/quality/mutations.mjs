@@ -113,7 +113,6 @@ export default {
             encoding: 'utf8',
             timeout: 120000,
             maxBuffer: 2 * 1024 * 1024,
-            windowsHide: true,
           },
         );
         if (

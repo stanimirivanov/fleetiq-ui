@@ -191,7 +191,7 @@ test('source links cannot redirect registered architecture inventory', (context)
   symlinkSync(
     path.dirname(fixture.root),
     path.join(fixture.root, 'apps/web/src/escape'),
-    process.platform === 'win32' ? 'junction' : 'dir',
+    'dir',
   );
   assert.throws(
     () => architectureSources(fixture.root),

@@ -279,7 +279,7 @@ test('directory links cannot redirect the reviewed registry', (context) => {
   symlinkSync(
     path.join(owner.root, 'target'),
     path.join(owner.root, 'tools'),
-    process.platform === 'win32' ? 'junction' : 'dir',
+    'dir',
   );
   assert.throws(
     () => readReviewedDependencies(owner.root),

@@ -73,10 +73,7 @@ function packageMetadata(root, owner, name) {
 }
 
 function resolveMetadata(origin, allowed, name) {
-  const scopeKey = (directory) =>
-    process.platform === 'win32'
-      ? path.resolve(directory).toLowerCase()
-      : path.resolve(directory);
+  const scopeKey = (directory) => path.resolve(directory);
   const scopes = new Set([...allowed].map(scopeKey));
   const candidates = createRequire(origin).resolve.paths(name) ?? [];
   for (const lookup of candidates) {
@@ -130,9 +127,7 @@ function architectureParser(root, pins) {
   // that happens to share the alias version declared at the repository root.
   let parent = path.dirname(cruiser.file);
   const isContainer = (directory) =>
-    process.platform === 'win32'
-      ? path.basename(directory).toLowerCase() === 'node_modules'
-      : path.basename(directory) === 'node_modules';
+    path.basename(directory) === 'node_modules';
   while (!isContainer(parent)) {
     const next = path.dirname(parent);
     if (next === parent) break;

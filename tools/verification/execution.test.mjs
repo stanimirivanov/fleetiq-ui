@@ -86,26 +86,11 @@ test('PATH Corepack links resolve to the real JavaScript entry', async (context)
     entry,
     "if(process.argv[2] === '--version') process.stdout.write('12.5.1\\n'); else require('node:fs').writeFileSync('executed.json', JSON.stringify(process.argv.slice(2)));\n",
   );
-  if (process.platform === 'win32') {
-    const parent = path.join(bin, 'node_modules');
-    mkdirSync(parent);
-    symlinkSync(
-      path.dirname(library),
-      path.join(parent, 'corepack'),
-      'junction',
-    );
-    // The Windows Corepack distribution calls this file pnpm.js.
-    copyFileSync(entry, path.join(library, 'pnpm.js'));
-  } else {
-    symlinkSync(entry, path.join(bin, 'pnpm'));
-  }
+  symlinkSync(entry, path.join(bin, 'pnpm'));
   const qualified = qualifyTools(root, manifest, runLauncher, { environment });
   assert.equal(qualified.blocker, null);
   assert.equal(qualified.launcher.command, process.execPath);
-  assert.equal(
-    qualified.launcher.args[0],
-    path.join(library, process.platform === 'win32' ? 'pnpm.js' : 'pnpm.cjs'),
-  );
+  assert.equal(qualified.launcher.args[0], path.join(library, 'pnpm.cjs'));
   assert.equal(
     (await executeCheck(root, qualified.launcher, 'fixture')).status,
     'passed',
@@ -114,11 +99,8 @@ test('PATH Corepack links resolve to the real JavaScript entry', async (context)
 
 test('a native PATH launcher runs directly with an argument array', async (context) => {
   const { root, bin, environment } = fixture(context);
-  const executable = path.join(
-    bin,
-    process.platform === 'win32' ? 'pnpm.exe' : 'pnpm',
-  );
-  // A real PE/ELF binary proves shell-free dispatch, not pnpm's implementation.
+  const executable = path.join(bin, 'pnpm');
+  // A real ELF binary proves shell-free dispatch, not pnpm's implementation.
   // Only the version response is substituted to isolate qualification policy.
   copyFileSync(process.execPath, executable);
   const probes = [];
@@ -175,7 +157,7 @@ for (const [label, version, exitCode] of [
 
 test('missing files, directory entries and shell shims cannot qualify', (context) => {
   const { root, bin, environment } = fixture(context);
-  mkdirSync(path.join(bin, process.platform === 'win32' ? 'pnpm.exe' : 'pnpm'));
+  mkdirSync(path.join(bin, 'pnpm'));
   for (const extension of ['cmd', 'bat', 'ps1']) {
     const shim = path.join(bin, `pnpm.${extension}`);
     writeFileSync(shim, 'do not execute\n');
@@ -195,13 +177,13 @@ test('missing files, directory entries and shell shims cannot qualify', (context
   assert.equal(qualified.blocker, 'pinned-pnpm-unavailable');
 });
 
-test('Windows command shim installs qualify the adjacent Corepack JavaScript entry', (context) => {
+test('Corepack installs qualify the adjacent Corepack JavaScript entry', (context) => {
   const { root, bin, environment } = fixture(context);
   writeFileSync(path.join(bin, 'pnpm.cmd'), 'do not execute\n');
   const entry = path.join(bin, 'node_modules', 'corepack', 'dist', 'pnpm.js');
   mkdirSync(path.dirname(entry), { recursive: true });
   writeFileSync(entry, "process.stdout.write('12.5.1\\n');\n");
-  const launchers = pnpmLaunchers(root, { environment, platform: 'win32' });
+  const launchers = pnpmLaunchers(root, { environment });
   assert.deepEqual(launchers, [{ command: process.execPath, args: [entry] }]);
 });
 
@@ -209,7 +191,7 @@ test('an unavailable child is not-run, never a passing check', async (context) =
   const { root } = fixture(context);
   const result = await executeCheck(
     root,
-    { command: path.join(root, 'missing-pnpm.exe'), args: [] },
+    { command: path.join(root, 'missing-pnpm'), args: [] },
     'fixture',
   );
   assert.deepEqual(result, {

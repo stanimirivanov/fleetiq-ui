@@ -1,5 +1,8 @@
 # FleetIQ UI
 
+Development and repository verification are supported on Linux.
+
+
 ## TL;DR
 
 FleetIQ's SolidJS operator console connects asset identities, pinned definitions,
@@ -12,7 +15,7 @@ location, telemetry, and alert contracts are developed.
 
 Use Node.js 24 or newer and pnpm 12.5.1.
 
-```powershell
+```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```

@@ -95,11 +95,7 @@ test('coverage cleanup preserves unrelated outputs and rejects redirected parent
   );
   const second = fixture(context);
   mkdirSync(path.join(second, 'apps'));
-  symlinkSync(
-    external,
-    path.join(second, 'apps/web'),
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(external, path.join(second, 'apps/web'), 'dir');
   assert.throws(() => prepareCoverage(second));
 });
 test('real Vite graph and final bytes distinguish sample owners from legitimate example text', async (context) => {
@@ -152,7 +148,7 @@ test('real Vite graph canonicalizes directory aliases without hiding sample owne
   const root = fixture(context);
   const aliasParent = fixture(context);
   const alias = path.join(aliasParent, 'checkout');
-  symlinkSync(root, alias, process.platform === 'win32' ? 'junction' : 'dir');
+  symlinkSync(root, alias, 'dir');
   const source = path.join(root, 'apps/web/src');
   mkdirSync(path.join(source, 'features/assets/demo'), { recursive: true });
   writeFileSync(
@@ -221,11 +217,7 @@ test('unavailable source paths and an empty owned graph cannot emit a valid mani
 test('linked output and fabricated inventory never qualify as production bytes', (context) => {
   const root = fixture(context);
   const external = fixture(context);
-  symlinkSync(
-    external,
-    path.join(root, 'linked'),
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(external, path.join(root, 'linked'), 'dir');
   assert.throws(() => inspectBundle(root));
 });
 test('critical mutants must hit one exact anchor and fail the actual assertion', () => {

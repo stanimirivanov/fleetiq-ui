@@ -43,7 +43,6 @@ test('owned error observer rejects uncaught errors',async({page})=>{await page.s
       shell: false,
       timeout: 90000,
       maxBuffer: 2 * 1024 * 1024,
-      windowsHide: true,
     });
     if (result.error || result.signal || result.status !== 1)
       throw new Error(

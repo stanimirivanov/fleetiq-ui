@@ -30,7 +30,6 @@ export function command(
     input,
     timeout: 150_000,
     maxBuffer,
-    windowsHide: true,
   });
   if (result.error || !accepted.includes(result.status))
     throw new Error(

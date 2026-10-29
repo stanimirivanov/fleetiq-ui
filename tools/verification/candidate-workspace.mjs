@@ -99,12 +99,7 @@ function indexEntries(root, identity) {
   return names;
 }
 
-/**
- * Git may retain a Windows DOS 8.3 spelling while Node reports the long path.
- * Resolve native directory names only after rejecting linked ancestors. Compare
- * directory identity too: case-insensitive path comparison alone is insufficient
- * on Windows volumes with case-sensitive directories.
- */
+/** Compare canonical directory names and filesystem identity after rejecting links. */
 function samePlainDirectory(root, reported) {
   if (!path.isAbsolute(reported) || reported.length > 4096) throw failure();
   plainAncestors(root);

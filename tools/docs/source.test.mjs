@@ -68,15 +68,12 @@ test('source discovery excludes ambient Git directory and index overrides', (con
     assert.equal(options.env.GIT_DIR, undefined);
     assert.equal(options.env.GIT_INDEX_FILE, undefined);
     assert.equal(options.env.GIT_CONFIG_NOSYSTEM, '1');
-    assert.equal(
-      options.env.GIT_CONFIG_GLOBAL,
-      process.platform === 'win32' ? 'NUL' : '/dev/null',
-    );
+    assert.equal(options.env.GIT_CONFIG_GLOBAL, '/dev/null');
     return { status: 0, stdout: 'README.md\0' };
   });
 });
 
-test('Git isolation treats Windows environment keys case-insensitively', () => {
+test('Git isolation rejects ambient environment keys regardless of casing', () => {
   const environment = gitEnvironment({
     Path: 'synthetic',
     git_dir: 'outside',

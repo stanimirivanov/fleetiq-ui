@@ -102,7 +102,7 @@ test('security CLI rejects bypass flags before any Docker work', () => {
   const result = spawnSync(
     process.execPath,
     [fileURLToPath(new URL('../security.mjs', import.meta.url)), '--skip-scan'],
-    { encoding: 'utf8', timeout: 10000, windowsHide: true },
+    { encoding: 'utf8', timeout: 10000 },
   );
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Unexpected security preflight arguments/u);

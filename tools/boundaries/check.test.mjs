@@ -256,7 +256,7 @@ test('source junction or symlink escapes never enter AST extraction', (context) 
   symlinkSync(
     path.dirname(fixture.root),
     path.join(fixture.root, 'apps/web/src/escape'),
-    process.platform === 'win32' ? 'junction' : 'dir',
+    'dir',
   );
   const result = fixture.run();
   assert.equal(result.status, 1);

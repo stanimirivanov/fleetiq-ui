@@ -198,11 +198,7 @@ test('intentional package-manager directory links qualify by exact target identi
   const source = owner.package('', 'typescript-parser');
   const target = path.join(owner.owner, 'parser-store');
   renameSync(source, target);
-  symlinkSync(
-    target,
-    source,
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(target, source, 'dir');
   assert.deepEqual(inspectInstalledTools(owner.root), []);
 });
 
@@ -289,7 +285,6 @@ test('NODE_PATH packages outside repository lookup scope cannot qualify a missin
       timeout: 30_000,
       maxBuffer: 16_384,
       shell: false,
-      windowsHide: true,
     },
   );
   assert.equal(result.error, undefined);
@@ -393,22 +388,14 @@ test('a linked cruiser package resolves its own private parser without ambient l
   const source = owner.package('', 'dependency-cruiser');
   const target = path.join(owner.owner, 'cruiser-store');
   renameSync(source, target);
-  symlinkSync(
-    target,
-    source,
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(target, source, 'dir');
   assert.deepEqual(inspectInstalledTools(owner.root), []);
 });
 
 test('pnpm-style cruiser package links use the parser beside the resolved package', (context) => {
   const owner = fixture(context);
   const source = owner.package('', 'dependency-cruiser');
-  const container = path.join(
-    owner.owner,
-    'private-cruiser',
-    process.platform === 'win32' ? 'NODE_MODULES' : 'node_modules',
-  );
+  const container = path.join(owner.owner, 'private-cruiser', 'node_modules');
   mkdirSync(container, { recursive: true });
   renameSync(
     path.join(source, 'node_modules/typescript'),
@@ -416,11 +403,7 @@ test('pnpm-style cruiser package links use the parser beside the resolved packag
   );
   const target = path.join(container, 'dependency-cruiser');
   renameSync(source, target);
-  symlinkSync(
-    target,
-    source,
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(target, source, 'dir');
   assert.deepEqual(inspectInstalledTools(owner.root), []);
 });
 
@@ -445,11 +428,7 @@ function sharedStoreFixture(context, external = false) {
   );
   mkdirSync(path.dirname(target), { recursive: true });
   renameSync(source, target);
-  symlinkSync(
-    target,
-    source,
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(target, source, 'dir');
   return {
     ...owner,
     shared,
@@ -474,11 +453,7 @@ for (const invalid of ['wrong-version', 'malformed', 'broken-link']) {
       );
     } else {
       renameSync(owner.shared, path.join(owner.owner, 'removed-shared-parser'));
-      symlinkSync(
-        path.join(owner.owner, 'absent-parser'),
-        owner.shared,
-        process.platform === 'win32' ? 'junction' : 'dir',
-      );
+      symlinkSync(path.join(owner.owner, 'absent-parser'), owner.shared, 'dir');
     }
     assert.deepEqual(inspectInstalledTools(owner.root), [
       {

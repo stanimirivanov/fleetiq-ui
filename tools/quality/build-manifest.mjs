@@ -3,7 +3,7 @@ import { readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 /** Resolve sample ownership from Vite's graph, then hash final bytes after CSS emission. */
 export function qualityManifest(repositoryRoot) {
-  // Native realpath expands Windows 8.3 names and canonicalizes drive casing.
+  // Resolve the canonical source path before comparing manifest entries.
   // Vite/Rolldown may resolve imports differently from the configured temp root.
   const prefix = `${realpathSync.native(repositoryRoot).replaceAll('\\', '/')}/`;
   let modules;

@@ -48,7 +48,7 @@ test('current policy and every catalogue group have valid explicit commands', ()
   }
   assert.throws(() => selectedChecks('unknown'), /Unknown/);
 });
-for (const name of ['check', 'browser', 'browser-quality', 'harness-windows']) {
+for (const name of ['check', 'browser', 'browser-quality']) {
   test(`missing required ${name} job is rejected`, () => {
     assert.ok(
       mutated(({ workflow: config }) => {
@@ -170,19 +170,17 @@ test('expression skips, event filters and execution overrides cannot weaken requ
 });
 
 // Exact reviewed edges keep roots independent and expensive jobs success-gated.
-test('acceptance and Windows roots precede parallel browser and image gates', () => {
-  for (const name of ['check', 'harness-windows'])
+test('Linux acceptance precedes parallel browser and image gates', () => {
+  for (const name of ['check'])
     assert.equal(workflow.jobs[name].needs, undefined);
   for (const name of ['browser', 'browser-quality', 'image']) {
-    assert.deepEqual(workflow.jobs[name].needs, ['check', 'harness-windows']);
+    assert.deepEqual(workflow.jobs[name].needs, ['check']);
     for (const needs of [
       undefined,
       [],
-      ['check'],
-      ['harness-windows'],
       [name],
       ['missing'],
-      ['check', 'harness-windows', 'image'],
+      ['check', 'image'],
     ])
       assert.ok(
         mutated(({ workflow: config }) => {
@@ -200,9 +198,4 @@ test('acceptance and Windows roots precede parallel browser and image gates', ()
         }).length,
       );
   }
-  assert.ok(
-    mutated(({ workflow: config }) => {
-      config.jobs['harness-windows'].needs = ['check'];
-    }).length,
-  );
 });

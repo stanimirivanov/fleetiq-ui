@@ -98,3 +98,6 @@ Product-plan PR 30 is the completed [connected fleet overview](exec-plans/comple
 Product-plan PR 31 is the completed [registry commissioning slice](exec-plans/completed/2026-10-registry-commissioning.md): asset registration, temporal relationship corrections and an operator guide. PR 30 is complete (merged PR #93). D06 and full-profile qualification remain deferred.
 
 Product-plan PR 32 is the active [binding authoring and attribution review](exec-plans/active/2026-10-binding-authoring.md) slice. PR 31 is complete (merged PR #95). D06, full-profile qualification and the installed end-to-end qualification remain deferred.
+
+The [Linux development cleanup](exec-plans/active/2026-10-linux-development.md)
+in **M02** removes Windows host support and CI lanes while retaining Linux gates.

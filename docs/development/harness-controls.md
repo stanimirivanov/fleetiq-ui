@@ -40,7 +40,7 @@ and [secure delivery](security-delivery.md) for commands and recovery.
   responses and redirect fixtures do not qualify HTTPS/proxy/provider permissions.
   Trigger: deployment configuration and provider-backed pilot journeys.
 - **External protections — repository administrator:** require check, browser,
-  browser-quality and harness-windows statuses, Code Owner review and stale-review
+  browser-quality statuses, Code Owner review and stale-review
   dismissal. Local YAML checks do not prove GitHub rulesets or host permissions.
   Trigger: repository setup, policy ownership changes and release review.
 

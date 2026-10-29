@@ -141,7 +141,6 @@ export function inspectDelivery(quality, guide, fail) {
       'browser',
       'browser-quality',
       'check',
-      'harness-windows',
       'image',
     ])
   )

@@ -28,7 +28,7 @@ export class OverviewPage {
       name: 'Fleet overview',
     });
     this.connectionNotice = page.getByRole('region', {
-      name: 'Fleet data is not connected yet',
+      name: 'Sign-in unavailable',
     });
     this.metrics = page.getByRole('region', { name: 'Fleet metrics' });
     this.map = page.getByRole('region', { name: 'Fleet map' });
@@ -75,7 +75,7 @@ export class OverviewPage {
   async document(): Promise<void> {
     await documentResult(this.narrator, this.connectionNotice, {
       title: 'Know when fleet evidence is unavailable',
-      body: 'The production overview identifies its unconfigured data source instead of inventing asset counts, locations, or alerts.',
+      body: 'The overview requires an operator session before showing authorized inventory and evidence. Sign-in failures do not create sample counts, locations or alerts.',
     });
   }
 }

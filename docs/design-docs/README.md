@@ -22,3 +22,5 @@ consequences, and alternatives.
 - [0007: Inspector live delivery](0007-inspector-live-delivery.md): exact-property SSE, finite reconnect and account-scoped disposal.
 
 - [0008: Connected geodetic map](0008-connected-geodetic-map.md): explicit coordinate mapping, owned MapLibre lifecycle and self-hosted map resources.
+
+- [0009: Connected fleet overview](0009-connected-fleet-overview.md): authoritative inventory, scoped coverage and optional geographic context.

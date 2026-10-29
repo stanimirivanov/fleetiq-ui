@@ -14,6 +14,7 @@
     "src/features/devices/api/device-gateway.ts",
     "src/features/devices/api/validation.ts",
     "src/features/devices/ui/useDeviceCommand.ts",
-    "src/features/devices/ui/useDeviceRead.ts"
+    "src/features/devices/ui/useDeviceRead.ts",
+    "src/features/assets/ui/connected/useFleetWorkspace.ts"
   ]
 }

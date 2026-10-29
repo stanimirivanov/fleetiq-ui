@@ -25,7 +25,7 @@ test('explore the sample fleet overview and bounded asset catalogue', {
     const assets = new AssetsPage(page, guide);
 
     await test.step('Recognize the sample overview and its evidence panels', async () => {
-      await shell.open();
+      await shell.open('/?preview=sample');
       await expect(overview.heading).toBeVisible();
       await expect(page.getByRole('banner')).toContainText('Sample data');
       for (const panel of [

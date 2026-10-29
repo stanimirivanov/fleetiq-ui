@@ -41,3 +41,5 @@ homes rather than growing the root README.
 - [Live inspector delivery](design-docs/0007-inspector-live-delivery.md): bounded SSE state, continuity and operator recovery.
 
 - [Connected geodetic map](design-docs/0008-connected-geodetic-map.md) and [map resources](development/map-resources.md): current fleet coordinates, lifecycle and deployment inputs.
+
+- [Connected fleet overview](design-docs/0009-connected-fleet-overview.md): inventory/coverage scopes, navigation and owned preview.

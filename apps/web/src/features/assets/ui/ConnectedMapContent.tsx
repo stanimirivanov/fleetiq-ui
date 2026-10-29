@@ -1,77 +1,51 @@
-import { useLocation, useNavigate } from '@solidjs/router';
-import { createMemo, Match, Switch } from 'solid-js';
-import { RequestFailure } from '#shared/model';
-import { readFleetQuery } from '../model/fleet-query';
-import { metadataHref } from '../model/metadata-query';
-import { useMetadataReader } from './connected/MetadataReaderProvider';
-import { useMetadataRead } from './connected/useMetadataRead';
+import { Match, Switch } from 'solid-js';
+import { FleetReadNotice } from './connected/FleetReadNotice';
+import { useFleetWorkspace } from './connected/useFleetWorkspace';
 import { ConnectedMapWorkspace } from './map/ConnectedMapWorkspace';
 import { CoordinateMappingForm } from './map/CoordinateMappingForm';
-import { MapNotice } from './map/MapNotice';
 export default function ConnectedMapContent() {
-  const location = useLocation(),
-    navigate = useNavigate(),
-    context = useMetadataReader();
-  const query = createMemo(() => readFleetQuery(location.search));
-  const request = createMemo(() => {
-    const q = query();
-    return q.kind === 'ready' ? q.request : null;
-  });
-  const read = useMetadataRead(request, (_reader, r, options) => {
-    if (!context.reader?.fleet)
-      return Promise.reject(new RequestFailure('unavailable'));
-    return context.reader.fleet.snapshot(r, options);
-  });
-  const ready = createMemo(() => {
-    const s = read.state(),
-      q = query();
-    return s.kind === 'ready' && q.kind === 'ready'
-      ? { page: s.value, query: q }
-      : null;
-  });
-  const change = (values: Record<string, string | null>) =>
-    navigate(metadataHref('/map', location.search, values));
+  const workspace = useFleetWorkspace('/map');
+  const { context, query, request, read, ready, change } = workspace;
   return (
     <>
       <div class="flex flex-wrap items-center gap-3">
         {context.tenantControl?.({
-          tenantId: () =>
-            new URLSearchParams(location.search).get('tenant') ?? '',
+          tenantId: () => workspace.tenant(),
         })}
       </div>
       <CoordinateMappingForm
         request={request()}
-        tenant={new URLSearchParams(location.search).get('tenant') ?? ''}
+        tenant={workspace.tenant()}
         apply={(values) =>
           change({ ...values, fleet_after: null, asset: null })
         }
       />
       <Switch>
         <Match when={query().kind === 'invalid'}>
-          <MapNotice
+          <FleetReadNotice
             heading="Invalid map scope"
             label="Invalid context"
             tone="warning"
           >
             Use one valid tenant and an exact latitude/longitude mapping.
-          </MapNotice>
+          </FleetReadNotice>
         </Match>
         <Match when={!request()}>
-          <MapNotice
+          <FleetReadNotice
             heading="Choose coordinate properties"
             label="Setup required"
             tone="unknown"
           >
             Select a tenant and apply a coordinate mapping to read observed
             fleet locations.
-          </MapNotice>
+          </FleetReadNotice>
         </Match>
         <Match when={ready()}>
           {(result) => (
             <ConnectedMapWorkspace
               page={result().page}
               query={result().query}
-              search={location.search}
+              search={workspace.search()}
               change={change}
               refresh={read.retry}
             />
@@ -81,13 +55,13 @@ export default function ConnectedMapContent() {
           <p role="status">Loading fleet snapshot…</p>
         </Match>
         <Match when={read.state().kind === 'blocked'}>
-          <MapNotice
+          <FleetReadNotice
             heading="Fleet access unavailable"
             label="Access unavailable"
             tone="warning"
           >
             The selected tenant is not available to this operator.
-          </MapNotice>
+          </FleetReadNotice>
         </Match>
         <Match
           when={
@@ -95,14 +69,14 @@ export default function ConnectedMapContent() {
             read.state().kind === 'unconfigured'
           }
         >
-          <MapNotice
+          <FleetReadNotice
             heading="Fleet snapshot unavailable"
             label="Read failed"
             tone="warning"
           >
             Metadata and telemetry read permission are both required. Invalid or
             unavailable evidence is never replaced with sample positions.
-          </MapNotice>
+          </FleetReadNotice>
           <button type="button" onClick={read.retry}>
             Retry fleet snapshot
           </button>

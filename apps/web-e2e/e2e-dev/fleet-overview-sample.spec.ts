@@ -11,7 +11,7 @@ test('development overview discloses every sample panel and supports local disco
   const overview = new OverviewPage(page);
   const assets = new AssetsPage(page);
 
-  await shell.open();
+  await shell.open('/?preview=sample');
   await expect(overview.heading).toBeVisible();
   await expect(shell.assetsLink).toHaveAttribute(
     'href',
@@ -93,7 +93,7 @@ test('sample overview preserves a usable stacked layout at narrow width', async 
   await page.setViewportSize({ width: 390, height: 844 });
   const shell = new ShellPage(page);
   const overview = new OverviewPage(page);
-  await shell.open();
+  await shell.open('/?preview=sample');
 
   await expect(overview.heading).toBeVisible();
   await expect(overview.map).toBeVisible();

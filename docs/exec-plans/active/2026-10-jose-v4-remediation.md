@@ -51,3 +51,15 @@ readiness. D06 and full-profile qualification remain deferred.
 
 Proxy replacement, cryptographic forks/backports, v3 exceptions, Caddy feature
 removal, unrelated dependency updates, product UI changes or infrastructure work.
+
+## Upstream recheck: 2026-10-29
+
+The [upstream advisory](https://github.com/go-jose/go-jose/security/advisories/GHSA-mgcc-cww5-fp2q)
+still lists no patched v3 release; the supported v4 fix is 4.1.6, already selected
+in `packaging/caddy/go.mod`. Both Smallstep
+[crypto](https://github.com/smallstep/crypto/blob/master/go.mod) and
+[certificates](https://github.com/smallstep/certificates/blob/master/go.mod)
+still depend on v3.0.5. The remaining image finding therefore has no supported
+dependency-only update on this graph. Retain the owner decision to defer v3;
+do not suppress the finding or claim image/publication qualification. Replacing
+the edge or maintaining a cryptographic fork requires a separate review.

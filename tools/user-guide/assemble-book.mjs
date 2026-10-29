@@ -51,6 +51,7 @@ export const requiredChapters = new Map([
   ['connected-recovery', 'connected-contract'],
   ['connected-device-onboarding', 'connected-contract'],
   ['connected-property-evidence', 'connected-contract'],
+  ['connected-fleet-overview', 'connected-contract'],
   ['fleet-overview', 'development-sample'],
   ['map-workbench', 'development-sample'],
   ['asset-inspector', 'development-sample'],

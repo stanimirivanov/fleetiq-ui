@@ -67,8 +67,9 @@ unassigned sensor.
 
 ## Development previews and visual rules
 
-Vite development shows a labelled sample overview by default. Its sidebar remains
-in the sample workspace; **Connected metadata** opens the real flow. Explicit
+Vite development uses the connected overview. `/?preview=sample` explicitly opens
+the labelled sample, whose sidebar stays in the sample workspace; **Connected
+metadata** returns to the real flow. Explicit
 `?preview=sample` routes cover catalogue, inspector, schematic map, registry, and
 Alerts. Ordinary metadata routes remain connected in development too. Preview mode
 never becomes an authentication or transport-failure fallback, and production output
@@ -77,8 +78,8 @@ excludes sample payloads.
 Sample operational evidence lives outside backend identity models. Quiet borders,
 tints, and visible source labels identify synthetic sections. The schematic map
 uses percentage canvas coordinates; signal playback is a finite deterministic
-example. Production overview, map, and Alerts remain unavailable until their own
-contracts exist.
+example. Production overview and map use authorized backend evidence; Alerts remains
+unavailable until its backend contract exists.
 
 The [visual-language decision](design-docs/0001-operational-visual-language.md) and
 [shell decision](design-docs/0002-persistent-shell-theme.md) define hierarchy and
@@ -108,3 +109,11 @@ same-origin static raster/vector resources. Component code never imports the SDK
 See [map architecture](design-docs/0008-connected-geodetic-map.md) and
 [deployment inputs](development/map-resources.md). Missing positions and renderer
 failure retain an accessible list; no health or connectivity is inferred.
+
+## Connected overview
+
+The root route shares the validated fleet snapshot with the map. Whole-tenant
+counts, loaded-page location coverage and browser-clock review age are labelled
+separately. Geographic preview loads only after operator demand. M05 health,
+alerts and utilization remain unavailable. See [0009](design-docs/0009-connected-fleet-overview.md)
+and its active execution plan. Connected URLs never silently opt into samples.

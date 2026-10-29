@@ -17,8 +17,9 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Vite development opens a labelled sample overview. The sidebar follows that
-sample workspace; **Connected metadata** opens the actual sign-in/tenant flow.
+Vite development opens the connected overview and its sign-in/tenant flow. Use
+`/?preview=sample` for the labelled sample overview; its sidebar stays in that
+explicit sample workspace. **Connected metadata** returns to connected access.
 There is no separate mock server to start. Direct preview URLs are:
 
 - `/map?preview=sample` — schematic site canvas and paired asset list.
@@ -29,8 +30,8 @@ There is no separate mock server to start. Direct preview URLs are:
 - `/design-system` — synthetic light/dark design specimen.
 
 A production build never activates these sample previews or includes their
-fixture payloads. The ordinary overview, map, and Alerts routes show their
-unavailable data state until the corresponding backend contracts exist.
+fixture payloads. The ordinary overview and map use authorized backend evidence; Alerts remains
+unavailable until its backend contract exists.
 
 ## Connect metadata
 

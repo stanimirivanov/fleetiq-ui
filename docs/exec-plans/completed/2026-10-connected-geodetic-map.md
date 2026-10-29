@@ -1,6 +1,6 @@
 # Connected geodetic map workbench
 
-Status: active
+Status: completed
 Milestone: M04 - Semantic Twin and Live UI
 Issue: #90
 
@@ -41,9 +41,12 @@ approved only the separately counted lazy-map byte budgets documented there.
 - [x] Own/cancel requests, renderer, local worker, listeners and observers.
 - [x] Reject external map resources and alternate style transports.
 - [x] Account for module-worker bytes and preserve non-map budget limits.
-- [ ] Full CI acceptance, browser, worker-aware quality and image qualification.
+- [x] Full CI acceptance, browser, worker-aware quality and image qualification.
 
 ## Acceptance evidence
+
+The owner confirmed PR #91 merged with all checks passing before PR 30 began.
+The following local records describe implementation-time evidence.
 
 Local TypeScript, focused model/Solid tests, dependency audit, contract regeneration, architecture/boundary/style/docs/image-policy checks and targeted harness fixtures pass; exact commands are recorded in the PR.
 The focused five-case production browser suite passed (connected selection/filter/narrow/access loss, lazy SDK exclusion, external-style rejection, unsupported WebGL and signed-out sample exclusion). A production-renderer smoke scenario caught and corrected a stale Solid

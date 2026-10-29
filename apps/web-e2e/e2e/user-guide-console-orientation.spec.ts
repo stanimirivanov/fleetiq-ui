@@ -36,7 +36,7 @@ test('orient in the FleetIQ console and choose appearance', {
       await shell.open();
       await expect(overview.heading).toBeVisible();
       await expect(overview.connectionNotice).toContainText(
-        'no tenant or telemetry API configured',
+        'sign-in service is unavailable',
       );
       await expect(shell.overviewLink).toHaveAttribute('aria-current', 'page');
       await expect(documentRoot).toHaveAttribute('data-theme', 'light');

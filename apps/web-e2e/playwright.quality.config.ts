@@ -52,6 +52,7 @@ export default defineConfig({
       testMatch: [
         '**/measured-browser.spec.ts',
         '**/geographic-map-accessibility.spec.ts',
+        '**/overview-accessibility.spec.ts',
       ],
     },
     {
@@ -59,6 +60,7 @@ export default defineConfig({
       testMatch: [
         '**/rendering-performance.spec.ts',
         '**/resource-sensors.spec.ts',
+        '**/overview-performance.spec.ts',
       ],
       use: {
         trace: 'off',

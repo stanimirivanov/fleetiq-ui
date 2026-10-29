@@ -7,7 +7,7 @@ test('production overview does not present sample operations as live evidence', 
 }) => {
   const shell = new ShellPage(page);
   const overview = new OverviewPage(page);
-  await shell.open('/?q=Power%20system&condition=critical');
+  await shell.open('/?preview=sample&q=Power%20system&condition=critical');
 
   await expect(overview.heading).toBeVisible();
   await expect(overview.connectionNotice).toBeVisible();

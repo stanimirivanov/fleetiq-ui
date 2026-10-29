@@ -26,7 +26,14 @@ if (!root) {
 render(
   () => (
     <Router root={BrowserWorkspace}>
-      <Route path={APP_ROUTES.overview.path} component={FleetOverviewPage} />
+      <Route
+        path={APP_ROUTES.overview.path}
+        component={() => (
+          <MetadataAccessBoundary>
+            <FleetOverviewPage />
+          </MetadataAccessBoundary>
+        )}
+      />
       <Route
         path={APP_ROUTES.map.path}
         component={() => (

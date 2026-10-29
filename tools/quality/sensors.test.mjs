@@ -395,6 +395,8 @@ for (const defect of [
   'missing-project',
   'missing-sensor',
   'missing-map-accessibility',
+  'missing-overview-performance',
+  'missing-overview-accessibility',
   'trace',
   'video',
   'gc',
@@ -408,6 +410,16 @@ for (const defect of [
     );
     if (defect === 'missing-project') browser.projects.pop();
     if (defect === 'missing-sensor') profile.testMatch.pop();
+    if (defect === 'missing-overview-performance')
+      profile.testMatch = profile.testMatch.filter(
+        (name) => !name.includes('overview-performance'),
+      );
+    if (defect === 'missing-overview-accessibility')
+      browser.projects.find(
+        (p) => p.name === 'rendered-accessibility',
+      ).testMatch = browser.projects
+        .find((p) => p.name === 'rendered-accessibility')
+        .testMatch.filter((name) => !name.includes('overview-accessibility'));
     if (defect === 'missing-map-accessibility')
       browser.projects
         .find((project) => project.name === 'rendered-accessibility')

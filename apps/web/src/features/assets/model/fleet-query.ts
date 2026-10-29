@@ -93,3 +93,12 @@ export function readFleetQuery(search: string): FleetQuery {
     },
   };
 }
+
+/** Safe public navigation projection: no tokens, arbitrary params or preview opt-in. */
+export function fleetWorkspaceHref(path: '/' | '/map', search: string): string {
+  const source = new URLSearchParams(search),
+    target = new URLSearchParams();
+  for (const key of ['tenant', 'tenant_after', 'asset', ...fleetKeys])
+    for (const value of source.getAll(key)) target.append(key, value);
+  return `${path}${target.size ? `?${target}` : ''}`;
+}

@@ -5,8 +5,10 @@ export {
   isAssetInspectorSamplePreview,
   isAssetSamplePreview,
   isMapSamplePreview,
+  isOverviewSamplePreview,
   isRegistrySamplePreview,
 } from './model/asset-preview-url';
+export { fleetWorkspaceHref } from './model/fleet-query';
 export { metadataHref, tenantContextChanges } from './model/metadata-query';
 export { AssetInspectorPage } from './ui/AssetInspectorPage';
 export { AssetRegistryPage } from './ui/AssetRegistryPage';

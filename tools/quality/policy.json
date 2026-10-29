@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "bundle": {
-    "javascriptBytes": 375000,
-    "javascriptGzipBytes": 110000,
+    "javascriptBytes": 400000,
+    "javascriptGzipBytes": 120000,
     "cssBytes": 60000,
     "cssGzipBytes": 16000,
     "forbiddenModules": [
@@ -280,6 +280,24 @@
         "percent": 64,
         "minimumTotal": 14
       }
+    },
+    "src/features/assets/ui/connected/useFleetWorkspace.ts": {
+      "lines": {
+        "percent": 100,
+        "minimumTotal": 17
+      },
+      "statements": {
+        "percent": 100,
+        "minimumTotal": 18
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 8
+      },
+      "branches": {
+        "percent": 90,
+        "minimumTotal": 10
+      }
     }
   },
   "obligations": [
@@ -335,6 +353,14 @@
         "connects a reading to exact provenance and applies a bounded URL-owned history window",
         "property changes abort old work and ignore a late non-cooperative reading",
         "invalid context blocks reads and telemetry denial does not become an empty/sample state"
+      ]
+    },
+    {
+      "file": "src/features/assets/ui/ConnectedOverviewContent.test.tsx",
+      "titles": [
+        "tenant changes abort reads and non-cooperative late evidence cannot replace the new scope",
+        "overview preview is explicitly owned and authorization loss disposes it before retry",
+        "a metadata reader without its fleet capability fails explicitly rather than fabricating totals"
       ]
     }
   ]

@@ -57,3 +57,15 @@ acceptance. Contract fixtures do not qualify real providers, devices, capacity o
 
 New APIs, source inventory inference, value transformations, unit conversion,
 definition editing, automatic semantic reprocessing, D06 and full-profile qualification.
+
+## Coverage follow-up
+
+The focused metadata-query suite initially measured 52/57 branches (91.22%),
+below the unchanged 95% floor. Add direct invalid-filter, Unicode-length boundary,
+control-character, empty-navigation and explicit revision-pair regressions.
+The focused suite now measures 55/57 branches (96.49%) and 100% lines, statements
+and functions, independent of incidental coverage from other suites. Existing
+percentage floors remain unchanged; minimum denominators increase to 47 lines,
+53 statements, 16 functions and 57 branches. New assertions are mandatory in the
+coverage harness. jsdom timing output is informational; pool/isolation settings
+are unchanged. Complete acceptance remains for CI.

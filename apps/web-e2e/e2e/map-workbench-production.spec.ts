@@ -8,10 +8,13 @@ test('production map cannot activate sample positions or selected asset evidence
   const shell = new ShellPage(page);
   const map = new MapPage(page);
 
-  for (const path of [
-    '/map',
-    '/map?preview=sample&asset=asset-004&position=recent',
-  ]) {
+  for (const [path, expectedMapHref] of [
+    ['/map', '/map'],
+    [
+      '/map?preview=sample&asset=asset-004&position=recent',
+      '/map?asset=asset-004',
+    ],
+  ] as const) {
     await shell.open(path);
     await expect(map.heading).toBeVisible();
     await expect(
@@ -29,9 +32,8 @@ test('production map cannot activate sample positions or selected asset evidence
     ]) {
       await expect(page.getByText(synthetic, { exact: true })).toHaveCount(0);
     }
+    await expect(
+      shell.primaryNavigation.getByRole('link', { name: 'Map', exact: true }),
+    ).toHaveAttribute('href', expectedMapHref);
   }
-
-  await expect(
-    shell.primaryNavigation.getByRole('link', { name: 'Map', exact: true }),
-  ).toHaveAttribute('href', '/map');
 });

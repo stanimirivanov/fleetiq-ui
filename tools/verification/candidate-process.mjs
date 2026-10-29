@@ -11,7 +11,7 @@ export function candidateCommand(root, launcher, args, { signal } = {}) {
       cwd: root,
       stdio: 'inherit',
       shell: false,
-      windowsHide: true,
+
       signal,
     });
     let launchError;

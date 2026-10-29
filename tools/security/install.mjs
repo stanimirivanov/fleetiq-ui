@@ -78,10 +78,7 @@ export function qualifyDetector(root) {
     command('tar', ['-xf', archive, '-C', temporaryRoot.root], {
       cwd: temporaryRoot.root,
     });
-    const executable = ownedFile(
-      temporaryRoot.root,
-      process.platform === 'win32' ? 'gitleaks.exe' : 'gitleaks',
-    );
+    const executable = ownedFile(temporaryRoot.root, 'gitleaks');
     chmodSync(executable, 0o755);
     const version = command(executable, ['version'], {
       cwd: temporaryRoot.root,

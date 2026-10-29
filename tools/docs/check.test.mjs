@@ -157,18 +157,14 @@ test('long documents need a parsed summary immediately after the title', (contex
   assert.ok(codes(check(owned)).includes('docs.summary'));
 });
 
-test('a real Windows junction or Unix symlink escape fails without exposing target content', (context) => {
+test('a real symlink escape fails without exposing target content', (context) => {
   const owned = fixture(context, {
     'README.md': '# Fixture\n\n[Escape](redirect/private.md)\n',
   });
   const outside = path.join(owned.parent, 'outside');
   owned.write('../outside/private.md', '# Synthetic private content\n');
   const redirect = path.join(owned.root, 'redirect');
-  symlinkSync(
-    outside,
-    redirect,
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(outside, redirect, 'dir');
   try {
     const result = check(owned);
     assert.match(result.diagnostics[0].message, /junction target escapes/u);

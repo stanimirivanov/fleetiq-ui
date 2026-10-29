@@ -153,11 +153,7 @@ for (const parent of [
     const linked = path.join(root, parent);
     const saved = `${linked}-saved`;
     await rename(linked, saved);
-    await symlink(
-      target,
-      linked,
-      process.platform === 'win32' ? 'junction' : 'dir',
-    );
+    await symlink(target, linked, 'dir');
     try {
       assert.throws(() => resetGuideOutput(root), /symlink|junction/u);
       assert.throws(() => discardGuideOutput(root), /symlink|junction/u);
@@ -213,11 +209,7 @@ test('direct chapter capture cannot trust a redirected output root', async (cont
   );
   const saved = `${output}-saved`;
   await rename(output, saved);
-  await symlink(
-    outside,
-    output,
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  await symlink(outside, output, 'dir');
   try {
     assert.throws(
       () => resetChapter(output, 'fleet-overview'),

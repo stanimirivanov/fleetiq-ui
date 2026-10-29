@@ -111,22 +111,18 @@ export const REQUIRED_JOBS = {
   image: {
     platform: 'ubuntu-24.04',
     command: 'pnpm image:qualify',
-    needs: ['check', 'harness-windows'],
+    needs: ['check'],
   },
   check: { platform: 'ubuntu-latest', command: 'pnpm check' },
   browser: {
     platform: 'ubuntu-latest',
     command: 'pnpm dependencies:qualify --group browser',
-    needs: ['check', 'harness-windows'],
+    needs: ['check'],
   },
   'browser-quality': {
     platform: 'ubuntu-latest',
     command: 'pnpm dependencies:qualify --group browser-quality',
-    needs: ['check', 'harness-windows'],
-  },
-  'harness-windows': {
-    platform: 'windows-latest',
-    command: 'pnpm dependencies:qualify --group structural',
+    needs: ['check'],
   },
 };
 export function selectedChecks(group) {

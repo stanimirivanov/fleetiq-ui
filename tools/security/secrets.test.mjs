@@ -166,11 +166,7 @@ test('linked artifact/source directories are rejected before target bytes are re
   const root = await ownedFixture(context);
   const external = await ownedFixture(context);
   writeFileSync(path.join(external, 'secret.txt'), token());
-  symlinkSync(
-    external,
-    path.join(root, 'linked'),
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(external, path.join(root, 'linked'), 'dir');
   assert.throws(
     () => scanDirectory(root, { detector: { executable: 'not-run' } }),
     /links/u,
@@ -223,11 +219,7 @@ test('installer rejects parent redirection before any network or overwrite', asy
   const root = await ownedFixture(context);
   const external = await ownedFixture(context);
   writeFileSync(path.join(external, 'sentinel.txt'), 'preserve');
-  symlinkSync(
-    external,
-    path.join(root, '.verification'),
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
+  symlinkSync(external, path.join(root, '.verification'), 'dir');
   const { installDetector } = await import('./install.mjs');
   await assert.rejects(() =>
     installDetector(root, () => assert.fail('redirected download invoked')),

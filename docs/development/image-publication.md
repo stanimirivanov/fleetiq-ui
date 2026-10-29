@@ -33,7 +33,7 @@ mounted by exact subpath and removed after checked cleanup. No host trust change
 Use reviewed Node 24/pnpm, a frozen install, Git, Docker's Linux daemon with
 Buildx, and Playwright Chromium. Run `pnpm security:install` and
 `pnpm exec playwright install chromium` before local qualification.
-On Windows, set FLEETIQ_DOCKER to Docker Desktop's executable if it is not on PATH.
+Set FLEETIQ_DOCKER to the Docker executable if it is not on PATH.
 All fixture ports are allocated loopback ports; no PostgreSQL or cluster is used.
 The image job has a bounded deadline. No skipped scan or missing browser is a pass.
 Qualification first exercises the actual Buildx CLI against an owned loopback

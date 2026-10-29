@@ -41,7 +41,7 @@ await runEntrypoint(import.meta.url, () => {
       'run',
       '--coverage',
     ],
-    { cwd: repositoryRoot, stdio: 'inherit', shell: false, windowsHide: true },
+    { cwd: repositoryRoot, stdio: 'inherit', shell: false },
   );
   if (result.error || result.status !== 0 || result.signal)
     throw new Error('Component coverage did not complete successfully.');

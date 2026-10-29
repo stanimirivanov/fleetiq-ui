@@ -45,18 +45,16 @@ production readiness, real-provider OIDC behavior or live-fleet performance.
 The browser-quality group qualifies only the calibrated rendering envelope.
 
 Use the reviewed Node major, pinned pnpm, Git and a frozen install. The runner launches pnpm's
-native executable directly or its resolved JavaScript entry through Node, avoiding
-Windows shell-shim quoting. PATH symlinks and .mjs entries are supported; cmd, bat
-and PowerShell shims are never executed through a shell. It qualifies
+native executable directly or its resolved JavaScript entry through Node.
+PATH symlinks and .mjs entries are supported; shell shims are rejected. It qualifies
 actual tool versions and selected canonical commands before execution. Missing
 prerequisites produce not-run evidence. Install Playwright Chromium and use the
 documented [port overrides](testing.md) if a browser port is occupied.
 
 ## CI scheduling
 
-Acceptance (`check`) and Windows structural verification (`harness-windows`)
-start independently. Browser behavior, measured browser quality and image
-qualification each require both roots to succeed, then run in parallel. A failed,
+Linux acceptance (`check`) runs first. Browser behavior, measured browser quality
+and image qualification require acceptance to succeed, then run in parallel. A failed,
 cancelled or skipped prerequisite skips its dependants; no job-level `always()`
 or failure override is allowed. Artifact inspection/retention still runs for
 jobs that started. The catalogue owns the exact edges, with negative fixtures
@@ -157,7 +155,7 @@ unselected group passed.
 
 Temporary roots remain owned. Evidence is created exclusively, and its directory
 cannot be replaced by a link. Source/link sensors inspect exact casing and
-canonical containment, including Windows junctions, before reading targets.
+canonical containment, including symlinks, before reading targets.
 Quality CI retains bounded JSON and inspected synthetic browser artifacts for seven days. Every upload requires successful textual/archive inspection under the [capture and delivery policy](security-delivery.md). Scanning does not certify pixels.
 
 Evidence is an observation, not a signed independent attestation against an actor
@@ -210,16 +208,16 @@ Cohesion and appropriate abstractions remain review responsibilities.
 
 ## CI and external administration
 
-Quality CI requires Linux acceptance, functional and measured browser scenarios,
-and Windows structural qualification from frozen installs. The check job retains
-original-source acceptance; eligible maintenance updates need no second registry edit. Browser, browser-quality
-and harness-windows use explicit candidate qualification routes so eligible
+Quality CI requires Linux acceptance and functional and measured browser scenarios
+from frozen installs. The check job retains
+original-source acceptance; eligible maintenance updates need no second registry edit. Browser and browser-quality
+use explicit candidate qualification routes so eligible
 dependency proposals expose behavioral results before review. Parsed policy
 verifies these exact routes, the required check barrier and read-only permissions.
 CODEOWNERS assigns harness/configuration changes to the current maintainer.
 
 A GitHub administrator must separately require successful check, browser, browser-quality and
-harness-windows and image jobs on main; code-owner review; stale-review dismissal; suitable
+image jobs on main; code-owner review; stale-review dismissal; suitable
 bypass restrictions; least-privilege workflow permissions; and publication
 approvals. These external settings have not been verified locally. CODEOWNERS and
 a passing sensor cannot attest they are enabled.

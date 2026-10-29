@@ -141,7 +141,7 @@ substitute for final-source handoff evidence.
 
 The production manifest canonicalizes the configured repository root and real
 absolute module paths with native filesystem resolution before checking owned
-source prefixes. This expands Windows 8.3 temporary-directory aliases and avoids
+source prefixes. This canonicalizes temporary-directory paths and avoids
 comparing equivalent filesystem locations as unrelated strings. Virtual module
 IDs remain excluded; missing real paths or an empty owned graph still fail.
 Actual Vite builds exercise an aliased root and confirm that development sample

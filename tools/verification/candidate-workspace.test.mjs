@@ -1,11 +1,9 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
 import {
   existsSync,
   lstatSync,
   mkdirSync,
   readFileSync,
-  realpathSync,
   renameSync,
   rmSync,
   symlinkSync,
@@ -17,7 +15,7 @@ import test from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parse, stringify } from 'yaml';
 import { temporary } from '../security/owned.mjs';
-import { command, git, securityEnvironment } from '../security/process.mjs';
+import { git } from '../security/process.mjs';
 import { prepareCandidateWorkspace } from './candidate-workspace.mjs';
 import {
   REVIEWED_PATH,
@@ -263,7 +261,7 @@ for (const [label, mutate] of [
 ]) {
   test(`late ${label} drift cannot qualify an isolated candidate`, (t) => {
     const root = fixture(t);
-    // Start with a known policy value so the mutation differs on Windows too.
+    // Start with a known policy value so the mutation always differs.
     fixtureGit(root, ['config', 'core.filemode', 'true']);
     const workspace = prepared(t, root);
     mutate(root);
@@ -570,172 +568,4 @@ for (const [label, mutate] of [
     assert.deepEqual(sourceState(root), original);
     workspace.assertSourceStable();
   });
-}
-
-const SHORT_TEMP_WORKER = 'FLEETIQ_CANDIDATE_SHORT_TEMP_WORKER';
-const SHORT_TEMP_OWNER = 'FLEETIQ_CANDIDATE_SHORT_TEMP_OWNER';
-const SHORT_TEMP_TEST = 'DOS8.3 candidate fixture worker';
-const shortPathScript =
-  "Add-Type -TypeDefinition @'\nusing System;\nusing System.Text;\nusing System.Runtime.InteropServices;\npublic class FleetIQShortPathControl {\n  [DllImport(\"kernel32.dll\", CharSet=CharSet.Unicode)]\n  public static extern uint GetShortPathName(string longPath, StringBuilder shortPath, uint capacity);\n}\n'@\n$buffer = [System.Text.StringBuilder]::new(32768)\n$length = [FleetIQShortPathControl]::GetShortPathName($env:FLEETIQ_SHORT_PATH_INPUT, $buffer, 32768)\nif ($length -eq 0 -or $length -ge 32768) { throw 'DOS8.3 control prerequisite unavailable.' }\n[Console]::Write($buffer.ToString())";
-
-if (process.platform === 'win32') {
-  if (process.env[SHORT_TEMP_WORKER] === '1') {
-    test(SHORT_TEMP_TEST, (t) => {
-      const owner = process.env[SHORT_TEMP_OWNER];
-      assert.equal(typeof owner, 'string');
-      assert.equal(
-        path.relative(
-          realpathSync.native(process.env.TEMP),
-          realpathSync.native(owner),
-        ),
-        '',
-      );
-      const root = fixture(t);
-      const canonical = realpathSync.native(root);
-      assert.notEqual(
-        path.relative(root, canonical),
-        '',
-        'Worker must exercise a real DOS8.3 source spelling.',
-      );
-      const reported = fixtureGit(root, [
-        'rev-parse',
-        '--show-toplevel',
-      ]).trim();
-      assert.equal(path.relative(realpathSync.native(reported), canonical), '');
-      const expectedDirectory = lstatSync(canonical, { bigint: true });
-      const reportedDirectory = lstatSync(reported, { bigint: true });
-      assert.equal(reportedDirectory.dev, expectedDirectory.dev);
-      assert.equal(reportedDirectory.ino, expectedDirectory.ino);
-
-      const trusted = fixtureGit(root, ['rev-parse', 'HEAD~1']).trim();
-      fixtureGit(root, [
-        'update-ref',
-        'refs/remotes/fixture/trusted-only',
-        trusted,
-      ]);
-      write(root, 'state.txt', 'DOS8.3 staged state\n');
-      fixtureGit(root, ['add', 'state.txt']);
-      write(root, 'state.txt', 'DOS8.3 raw unstaged bytes\r\n');
-      write(root, 'new-file.txt', 'DOS8.3 untracked bytes\r\n');
-      const original = sourceState(root);
-      const staged = fixtureGit(root, ['ls-files', '--stage', '-z']);
-      const registryBytes = readFileSync(path.join(root, REVIEWED_PATH));
-      const workspace = prepared(t, root);
-      assert.deepEqual(workspace.source, original);
-      assert.deepEqual(sourceState(root), original);
-      assert.deepEqual(
-        readFileSync(path.join(root, REVIEWED_PATH)),
-        registryBytes,
-      );
-      assert.equal(
-        fixtureGit(workspace.directory, ['ls-files', '--stage', '-z']),
-        staged,
-      );
-      assert.equal(
-        fixtureGit(workspace.directory, ['show', ':state.txt']),
-        'DOS8.3 staged state\n',
-      );
-      for (const name of ['state.txt', 'new-file.txt'])
-        assert.deepEqual(
-          readFileSync(path.join(workspace.directory, name)),
-          readFileSync(path.join(root, name)),
-        );
-      assert.equal(
-        fixtureGit(workspace.directory, ['rev-parse', 'HEAD']).trim(),
-        original.revision,
-      );
-      assert.equal(
-        fixtureGit(workspace.directory, [
-          'rev-parse',
-          'refs/remotes/fixture/trusted-only',
-        ]).trim(),
-        trusted,
-      );
-      assert.equal(
-        fixtureGit(workspace.directory, [
-          'rev-list',
-          '--all',
-          '--count',
-        ]).trim(),
-        '2',
-      );
-      assert.equal(reviewUpgrades(workspace.directory).status, 'current');
-      workspace.assertSourceStable();
-      workspace.assertCandidateStable();
-      workspace.cleanup();
-      assert.equal(existsSync(workspace.directory), false);
-      assert.equal(existsSync(root), true);
-      assert.deepEqual(sourceState(root), original);
-    });
-  } else {
-    test('actual Windows DOS8.3 TEMP preserves source ownership, staging and cleanup', (t) => {
-      const owned = temporary('fleetiq-candidate-long-temp-control-');
-      t.after(() => owned.dispose());
-      const nativeOwner = realpathSync.native(owned.root);
-      const alias = command(
-        'powershell.exe',
-        [
-          '-NoLogo',
-          '-NoProfile',
-          '-NonInteractive',
-          '-Command',
-          shortPathScript,
-        ],
-        {
-          cwd: repository,
-          maxBuffer: 4096,
-          environment: {
-            ...process.env,
-            FLEETIQ_SHORT_PATH_INPUT: nativeOwner,
-          },
-        },
-      ).stdout.trim();
-      assert.ok(
-        path.isAbsolute(alias),
-        'DOS8.3 control requires an absolute owned alias.',
-      );
-      assert.notEqual(
-        path.relative(alias, nativeOwner),
-        '',
-        'DOS8.3 control prerequisite unavailable: this volume did not provide a short alias.',
-      );
-      assert.equal(path.relative(realpathSync.native(alias), nativeOwner), '');
-      const workerEnvironment = securityEnvironment({
-        ...process.env,
-        TEMP: alias,
-        TMP: alias,
-        [SHORT_TEMP_WORKER]: '1',
-        [SHORT_TEMP_OWNER]: nativeOwner,
-      });
-      // A fresh runner must not inherit the parent's internal IPC test context.
-      delete workerEnvironment.NODE_TEST_CONTEXT;
-      const result = spawnSync(
-        process.execPath,
-        [
-          '--test',
-          '--test-reporter=tap',
-          `--test-name-pattern=^${SHORT_TEMP_TEST}$`,
-          fileURLToPath(import.meta.url),
-        ],
-        {
-          cwd: repository,
-          env: workerEnvironment,
-          encoding: 'utf8',
-          timeout: 120_000,
-          maxBuffer: 64 * 1024,
-          windowsHide: true,
-          shell: false,
-        },
-      );
-      assert.equal(
-        result.error,
-        undefined,
-        'DOS8.3 worker prerequisite or execution failed.',
-      );
-      assert.equal(result.status, 0, result.stdout);
-      assert.match(result.stdout, /^# tests 1$/mu);
-      assert.match(result.stdout, /^# pass 1$/mu);
-      assert.match(result.stdout, /^# fail 0$/mu);
-    });
-  }
 }

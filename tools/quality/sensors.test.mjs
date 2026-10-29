@@ -397,6 +397,7 @@ for (const defect of [
   'missing-map-accessibility',
   'missing-overview-performance',
   'missing-overview-accessibility',
+  'missing-commissioning-accessibility',
   'trace',
   'video',
   'gc',
@@ -414,6 +415,14 @@ for (const defect of [
       profile.testMatch = profile.testMatch.filter(
         (name) => !name.includes('overview-performance'),
       );
+    if (defect === 'missing-commissioning-accessibility')
+      browser.projects.find(
+        (p) => p.name === 'rendered-accessibility',
+      ).testMatch = [
+        '**/measured-browser.spec.ts',
+        '**/geographic-map-accessibility.spec.ts',
+        '**/overview-accessibility.spec.ts',
+      ];
     if (defect === 'missing-overview-accessibility')
       browser.projects.find(
         (p) => p.name === 'rendered-accessibility',

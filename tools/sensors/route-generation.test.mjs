@@ -25,6 +25,12 @@ test('consumer generation preserves every selected operation and referenced sche
   for (const { path, method } of BROWSER_OPERATIONS)
     assert.deepEqual(paths[path][method], spec.paths[path][method]);
   assert.equal(components.schemas.PublishPropertyDefinitionRequest, undefined);
+  assert.ok(
+    paths[
+      '/api/v1/tenants/{tenant_id}/relationships/{relationship_id}/revisions/{revision}'
+    ].post,
+  );
+  assert.ok(components.schemas.AppendRelationshipRevisionRequest);
   assert.ok(components.schemas.IngestionDiagnostics);
   assert.equal(components.schemas.ProtocolDeviceRoute.anyOf.length, 2);
 });

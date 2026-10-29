@@ -1,6 +1,9 @@
 import { useLocation, useNavigate } from '@solidjs/router';
 import type { ParentProps } from 'solid-js';
-import type { createMetadataReader } from '#features/assets';
+import type {
+  CommissioningGateway,
+  createMetadataReader,
+} from '#features/assets';
 import {
   MetadataReaderProvider,
   metadataHref,
@@ -19,6 +22,7 @@ import { isDevelopmentSampleRoute } from './sample-route';
 
 type WorkspaceProps = ParentProps<{
   readonly devices: DeviceGateway;
+  readonly commissioning: CommissioningGateway;
   readonly reader: ReturnType<typeof createMetadataReader>;
   readonly tenants: OperatorTenantReader;
   readonly onUnauthorized: () => void;
@@ -56,6 +60,16 @@ function MetadataWorkspaceBridge(props: WorkspaceProps) {
   return (
     <MetadataReaderProvider
       reader={props.reader}
+      commissioning={props.commissioning}
+      actions={() => {
+        const s = tenants.state();
+        return s.kind === 'ready'
+          ? s.page.tenants.find(
+              (t) =>
+                t.id === new URLSearchParams(location.search).get('tenant'),
+            )?.actions
+          : undefined;
+      }}
       onUnauthorized={props.onUnauthorized}
       accessBlock={tenants.metadataBlock}
       accessRevision={tenants.state}

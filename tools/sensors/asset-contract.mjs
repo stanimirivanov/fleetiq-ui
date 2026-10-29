@@ -35,6 +35,16 @@ const operations = {
 };
 export const BROWSER_OPERATIONS = [
   {
+    path: '/api/v1/tenants/{tenant_id}/relationship-types',
+    method: 'get',
+    id: 'listRelationshipTypeDefinitions',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/relationships/{relationship_id}/revisions/{revision}',
+    method: 'post',
+    id: 'appendRelationshipRevision',
+  },
+  {
     path: '/api/v1/tenants/{tenant_id}/fleet',
     method: 'get',
     id: 'getFleetSnapshot',

@@ -124,3 +124,8 @@ Generated current/scalar schemas and maintained small event envelopes validate
 the response extension metadata. Full replacements may coalesce revisions;
 Last-Event-ID retains only the last successfully applied position. A reset
 clears it. See [the live design](../../docs/design-docs/0007-inspector-live-delivery.md) for cancellation, limits, finite retry and operator recovery.
+
+Registry commissioning consumes the already-published relationship-type catalogue
+and exact relationship revision append operations. Browser selection/generation now
+includes those routes; the pinned specification and its upstream revision remain
+unchanged. Actor and recorded time remain server-owned.

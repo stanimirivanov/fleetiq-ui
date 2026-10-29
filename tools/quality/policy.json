@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "bundle": {
-    "javascriptBytes": 400000,
+    "javascriptBytes": 425000,
     "javascriptGzipBytes": 120000,
     "cssBytes": 60000,
     "cssGzipBytes": 16000,
@@ -298,6 +298,24 @@
         "percent": 90,
         "minimumTotal": 10
       }
+    },
+    "src/features/assets/ui/commissioning/useRegistryCommand.ts": {
+      "lines": {
+        "percent": 100,
+        "minimumTotal": 34
+      },
+      "statements": {
+        "percent": 97,
+        "minimumTotal": 39
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 7
+      },
+      "branches": {
+        "percent": 96,
+        "minimumTotal": 31
+      }
     }
   },
   "obligations": [
@@ -361,6 +379,14 @@
         "tenant changes abort reads and non-cooperative late evidence cannot replace the new scope",
         "overview preview is explicitly owned and authorization loss disposes it before retry",
         "a metadata reader without its fleet capability fails explicitly rather than fabricating totals"
+      ]
+    },
+    {
+      "file": "src/features/assets/ui/commissioning/useRegistryCommand.test.tsx",
+      "titles": [
+        "double submission is blocked and unknown outcomes replay only the frozen command",
+        "scope disposal aborts pending commands and suppresses non-cooperative late receipts",
+        "definite conflict stays editable and unauthorized completion invalidates the operator"
       ]
     }
   ]

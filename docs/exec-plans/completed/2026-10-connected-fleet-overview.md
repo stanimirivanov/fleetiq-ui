@@ -1,6 +1,6 @@
 # Connected fleet overview
 
-Status: active
+Status: completed
 Milestone: M04 - Semantic Twin and Live UI
 Issue: #92
 
@@ -41,7 +41,7 @@ budgets and security checks are unchanged.
 - [x] Dispose owned preview and age clock on scope loss/unmount.
 - [x] Add required connected overview guide and bounded quality scenarios.
 - [x] Record approval of the measured feature byte-budget increase.
-- [ ] Complete CI acceptance, browser, browser-quality and image qualification.
+- [x] Complete CI acceptance, browser, browser-quality and image qualification (owner confirmed merged PR #93 and all checks passed).
 
 ## Acceptance evidence
 
@@ -57,3 +57,5 @@ production fleet capacity or a persistent installation.
 
 M05 health/alerts/energy analytics, new APIs, history/archive, new map providers,
 mobile, automatic polling, D06 and full-profile qualification.
+
+Closure: the owner confirmed PR #93 merged with all checks passing on 2026-10-29.

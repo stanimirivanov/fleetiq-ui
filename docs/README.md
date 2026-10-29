@@ -43,3 +43,5 @@ homes rather than growing the root README.
 - [Connected geodetic map](design-docs/0008-connected-geodetic-map.md) and [map resources](development/map-resources.md): current fleet coordinates, lifecycle and deployment inputs.
 
 - [Connected fleet overview](design-docs/0009-connected-fleet-overview.md): inventory/coverage scopes, navigation and owned preview.
+
+- [Registry commissioning](design-docs/0010-registry-commissioning.md): command boundaries, exact versions, temporal corrections and ambiguous-outcome recovery.

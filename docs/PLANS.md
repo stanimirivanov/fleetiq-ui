@@ -93,4 +93,6 @@ Product-plan PR 27 is the active [inspector live delivery slice](exec-plans/acti
 
 Product-plan PR 29 is the completed [connected geodetic map slice](exec-plans/completed/2026-10-connected-geodetic-map.md), merged as PR #91 with all checks passing. D06 and full-profile qualification remain deferred.
 
-Product-plan PR 30 is the active [connected fleet overview](exec-plans/active/2026-10-connected-fleet-overview.md) slice, including a connected overview guide chapter. D06 and full-profile qualification remain deferred.
+Product-plan PR 30 is the completed [connected fleet overview](exec-plans/completed/2026-10-connected-fleet-overview.md) slice, including a connected overview guide chapter. D06 and full-profile qualification remain deferred.
+
+Product-plan PR 31 is the active [registry commissioning slice](exec-plans/active/2026-10-registry-commissioning.md): asset registration, temporal relationship corrections and an operator guide. PR 30 is complete (merged PR #93). D06 and full-profile qualification remain deferred.

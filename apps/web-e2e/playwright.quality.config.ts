@@ -53,6 +53,7 @@ export default defineConfig({
         '**/measured-browser.spec.ts',
         '**/geographic-map-accessibility.spec.ts',
         '**/overview-accessibility.spec.ts',
+        '**/commissioning-accessibility.spec.ts',
       ],
     },
     {

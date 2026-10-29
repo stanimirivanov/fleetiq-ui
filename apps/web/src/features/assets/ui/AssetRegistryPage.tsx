@@ -8,7 +8,7 @@ const DevelopmentRegistryContent = import.meta.env.DEV
   : undefined;
 const SampleContent = DevelopmentRegistryContent ?? (() => null);
 
-/** Read-only registry route; illustrative commissioning scenes remain dev-only. */
+/** Connected registry commissioning and evidence; sample scenes remain dev-only. */
 export function AssetRegistryPage() {
   const location = useLocation();
   const showingSample = () =>
@@ -27,7 +27,7 @@ export function AssetRegistryPage() {
           Asset registry & signal mapping
         </h1>
         <p class="mt-1 text-sm text-muted">
-          Review directed relationships, exact-source candidates, and pinned
+          Create assets, commission directed relationships, and review pinned
           metadata revisions.
         </p>
       </header>

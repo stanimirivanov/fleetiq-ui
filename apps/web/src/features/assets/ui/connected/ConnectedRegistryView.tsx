@@ -1,6 +1,8 @@
 import { A } from '@solidjs/router';
-import { createMemo, Show } from 'solid-js';
+import { createMemo, createSignal, Show } from 'solid-js';
 import type { AssetRequest } from '../../model/metadata';
+import { clearSnapshotSelection } from '../../model/metadata-query';
+import { RegistryCommissioning } from '../commissioning/RegistryCommissioning';
 import { AssetIdentityEvidence } from './AssetIdentityEvidence';
 import { ConnectedAssetCatalogue } from './ConnectedAssetCatalogue';
 import { MetadataContextControls } from './MetadataContextControls';
@@ -13,7 +15,7 @@ import { useMetadataRead } from './useMetadataRead';
 import { useMetadataWorkspace } from './useMetadataWorkspace';
 
 /** Three-zone read-only review: paged identities, directed structure, binding evidence. */
-export function ConnectedRegistryView() {
+function RegistryEvidence() {
   const workspace = useMetadataWorkspace();
   const request = createMemo<AssetRequest | null>(() => {
     const query = workspace.query();
@@ -94,6 +96,38 @@ export function ConnectedRegistryView() {
           <SourceBindingEvidence workspace={workspace} path={path} />
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Commissioning stays mounted while acknowledged commands remount authoritative review reads. */
+export function ConnectedRegistryView() {
+  const workspace = useMetadataWorkspace(),
+    [revision, setRevision] = createSignal(1);
+  return (
+    <div class="grid min-w-0 gap-4">
+      <Show when={workspace.query()?.tenantId}>
+        {(tenant) => (
+          <RegistryCommissioning
+            tenant={tenant()}
+            committed={(receipt, id, effectiveAt) => {
+              workspace.update({
+                ...clearSnapshotSelection(),
+                after: null,
+                q: null,
+                type: null,
+                asset: id,
+                effective_at_ms: String(effectiveAt),
+                known_at_ms: String(receipt.recordedAt),
+              });
+              setRevision((v) => v + 1);
+            }}
+          />
+        )}
+      </Show>
+      <Show when={revision()} keyed>
+        {(_revision) => <RegistryEvidence />}
+      </Show>
     </div>
   );
 }

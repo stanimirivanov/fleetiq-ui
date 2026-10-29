@@ -21,7 +21,7 @@ export function inspectQualityConfiguration(
       'Keep the canonical component coverage runner and matching provider pins.',
     );
   if (
-    scope.length !== 15 ||
+    scope.length !== 16 ||
     new Set(scope).size !== scope.length ||
     Object.keys(policy.coverage).sort().join(',') !==
       scope.slice().sort().join(',')
@@ -71,6 +71,7 @@ export function inspectQualityConfiguration(
         '**/measured-browser.spec.ts',
         '**/geographic-map-accessibility.spec.ts',
         '**/overview-accessibility.spec.ts',
+        '**/commissioning-accessibility.spec.ts',
       ]) ||
     JSON.stringify(performance.testMatch) !==
       JSON.stringify([

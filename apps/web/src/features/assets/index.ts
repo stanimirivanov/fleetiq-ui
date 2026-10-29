@@ -1,5 +1,6 @@
 /** Public asset feature surface for application composition. */
 
+export { createCommissioningGateway } from './api/commissioning-gateway';
 export { createMetadataReader } from './api/live-metadata-reader';
 export {
   isAssetInspectorSamplePreview,
@@ -8,6 +9,7 @@ export {
   isOverviewSamplePreview,
   isRegistrySamplePreview,
 } from './model/asset-preview-url';
+export type { CommissioningGateway } from './model/commissioning';
 export { fleetWorkspaceHref } from './model/fleet-query';
 export { metadataHref, tenantContextChanges } from './model/metadata-query';
 export { AssetInspectorPage } from './ui/AssetInspectorPage';

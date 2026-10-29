@@ -24,4 +24,5 @@ retains the required check merge barrier.
 
 - [Inspector live delivery](2026-10-inspector-live-delivery.md): M04 product PR 27, issue #88.
 
-- [Connected fleet overview](2026-10-connected-fleet-overview.md): M04 product PR 30, issue #92.
+
+- [Asset and temporal relationship commissioning](2026-10-registry-commissioning.md).

@@ -117,3 +117,10 @@ counts, loaded-page location coverage and browser-clock review age are labelled
 separately. Geographic preview loads only after operator demand. M05 health,
 alerts and utilization remain unavailable. See [0009](design-docs/0009-connected-fleet-overview.md)
 and its active execution plan. Connected URLs never silently opt into samples.
+
+## Registry commissioning
+
+The connected registry composes create-only asset registration and explicit directed
+relationship revisions beside authoritative evidence. Forms require both read and
+manage hints. Read-only review is retained. Exact definition discovery, frozen
+ambiguous replay and receipt-scoped refresh follow [decision 0010](design-docs/0010-registry-commissioning.md).

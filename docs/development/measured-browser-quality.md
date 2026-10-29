@@ -12,7 +12,7 @@ controls, not live fleet capacity or backend latency promises.
 
 ## Critical behavior and coverage
 
-[The scope](../../tools/quality/coverage-scope.json) names fifteen owned modules:
+[The scope](../../tools/quality/coverage-scope.json) names sixteen owned modules:
 managed HTTP, session parsing/ownership/access, asset and semantic parsing, the live
 metadata reader, URL context and cancellable reads, plus the device adapter, evidence validation and cancellable
 read/command controllers. Generated code is excluded.
@@ -50,7 +50,7 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 400,000 / 120,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 425,000 / 120,000 JS bytes and 60,000 / 16,000 CSS bytes.
 The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
 to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
 and adding a 200-replacement burst/disposal workload under unchanged latency,
@@ -231,3 +231,21 @@ On 2026-10-29 the owner approved 400,000 raw / 120,000 gzip non-map JavaScript
 bytes for the connected overview, measured at 391,941 / 112,391. This replaces
 the previous 375,000 / 110,000 limits. Map/worker, CSS, latency, retained-node,
 heap, coverage and security gates remain unchanged.
+
+## Registry commissioning qualification
+
+Product-plan PR 31 adds a dedicated desktop/narrow, light/dark commissioning
+accessibility scenario, including a conflict state. The quality configuration
+sensor rejects omission of that scenario. It remains separate from unrecorded
+resource measurements.
+
+The new command owner is ratcheted at 100% lines/functions, 97% statements and
+96% branches, with minimum totals 34/7/39/31 respectively. Focused measured results
+are 100/100/97.43/96.77. Mandatory obligations retain duplicate/frozen replay,
+non-cooperative scope cancellation and conflict/session-invalidation tests. All
+previous fifteen source floors remain unchanged; full group coverage runs on CI.
+
+On 2026-10-29 the owner approved increasing only non-map raw JS from 400,000 to
+425,000 bytes for the complete commissioning slice. The final measured output is
+410,739 raw / 116,750 gzip bytes; the 120,000 gzip limit and all map/worker, CSS,
+latency, heap, node and security limits are unchanged.

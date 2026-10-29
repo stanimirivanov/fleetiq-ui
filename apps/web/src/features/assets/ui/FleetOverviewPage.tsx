@@ -1,12 +1,21 @@
-import { lazy, Suspense } from 'solid-js';
-import { ConnectionNotice } from '#shared/ui';
+import { useLocation } from '@solidjs/router';
+import { lazy, Show, Suspense } from 'solid-js';
+import { TextLink } from '#shared/ui';
+import { isOverviewSamplePreview } from '../model/asset-preview-url';
 
+const ConnectedOverviewContent = lazy(
+  () => import('./ConnectedOverviewContent'),
+);
 const DevelopmentOverviewContent = import.meta.env.DEV
   ? lazy(() => import('./DevelopmentOverviewContent'))
   : undefined;
-
-/** Feature route composition keeps demo operations out of the production bundle. */
+const SampleContent = DevelopmentOverviewContent ?? (() => null);
+/** Route orchestration separates connected inventory from explicit development samples. */
 export function FleetOverviewPage() {
+  const location = useLocation();
+  const showingSample = () =>
+    Boolean(DevelopmentOverviewContent) &&
+    isOverviewSamplePreview(location.pathname, location.search);
   return (
     <div class="grid min-w-0 gap-3">
       <header class="flex flex-wrap items-end justify-between gap-3">
@@ -18,34 +27,23 @@ export function FleetOverviewPage() {
             Fleet overview
           </h1>
           <p class="mt-1 text-sm text-muted">
-            Fleet condition, evidence coverage, and assets needing attention.
+            Inventory, evidence coverage and observed location context.
           </p>
         </div>
-        {DevelopmentOverviewContent && (
+        <Show when={showingSample()}>
           <p class="rounded-md border border-outline bg-surface px-3 py-1.5 text-xs text-muted">
             Fixed sample snapshot · 6 Oct 2026, 10:00 UTC
           </p>
-        )}
+        </Show>
       </header>
-      {DevelopmentOverviewContent ? (
-        <Suspense
-          fallback={
-            <p role="status" class="text-sm text-muted">
-              Opening sample overview…
-            </p>
-          }
-        >
-          <DevelopmentOverviewContent />
-        </Suspense>
-      ) : (
-        <div class="max-w-3xl">
-          <ConnectionNotice heading="Fleet data is not connected yet">
-            The web application has no tenant or telemetry API configured. Asset
-            counts, locations, conditions, and alerts will appear only after
-            approved backend connections and data-quality rules are in place.
-          </ConnectionNotice>
-        </div>
-      )}
+      <Suspense fallback={<p role="status">Opening fleet overview…</p>}>
+        <Show when={showingSample()} fallback={<ConnectedOverviewContent />}>
+          <SampleContent />
+        </Show>
+      </Suspense>
+      <Show when={DevelopmentOverviewContent && !showingSample()}>
+        <TextLink href="/?preview=sample">View illustrative overview</TextLink>
+      </Show>
     </div>
   );
 }

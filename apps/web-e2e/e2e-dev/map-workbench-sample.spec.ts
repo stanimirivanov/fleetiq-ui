@@ -9,7 +9,7 @@ test('sample map keeps list, marker, selected evidence, and browser history in s
   const shell = new ShellPage(page);
   const map = new MapPage(page);
 
-  await shell.open();
+  await shell.open('/?preview=sample');
   const mapLink = shell.primaryNavigation.getByRole('link', {
     name: 'Map',
     exact: true,

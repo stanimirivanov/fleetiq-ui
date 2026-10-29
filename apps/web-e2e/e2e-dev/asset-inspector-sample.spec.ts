@@ -11,7 +11,7 @@ test('sample rail journey traces selected component evidence and preserves URL h
   const overview = new OverviewPage(page);
   const inspector = new AssetInspectorPage(page);
 
-  await shell.open();
+  await shell.open('/?preview=sample');
   await overview.searchFor('Electric locomotive 417');
   const inspectLink = overview.assetDiscovery.getByRole('link', {
     name: 'Inspect Electric locomotive 417',

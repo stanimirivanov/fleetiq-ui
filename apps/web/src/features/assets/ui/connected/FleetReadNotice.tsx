@@ -1,7 +1,7 @@
 import type { JSX } from 'solid-js';
 import { StatusBadge, type StatusTone } from '#shared/ui';
 /** Setup, validation and authorization failures are distinct from empty fleet data. */
-export function MapNotice(props: {
+export function FleetReadNotice(props: {
   readonly heading: string;
   readonly label: string;
   readonly tone: StatusTone;

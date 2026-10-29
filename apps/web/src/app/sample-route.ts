@@ -1,8 +1,10 @@
 import { isAlertsSamplePreview } from '#features/alerts';
 import {
+  fleetWorkspaceHref,
   isAssetInspectorSamplePreview,
   isAssetSamplePreview,
   isMapSamplePreview,
+  isOverviewSamplePreview,
   isRegistrySamplePreview,
 } from '#features/assets';
 import { APP_ROUTES } from './route-metadata';
@@ -15,7 +17,7 @@ export function isDevelopmentSampleRoute(
 ): boolean {
   return (
     development &&
-    (pathname === APP_ROUTES.overview.path ||
+    (isOverviewSamplePreview(pathname, search) ||
       isAssetSamplePreview(pathname, search) ||
       isAssetInspectorSamplePreview(pathname, search) ||
       isMapSamplePreview(pathname, search) ||
@@ -32,12 +34,16 @@ export function navigationHref(
 ): string {
   if (
     development &&
-    (pathname === APP_ROUTES.assets.path ||
+    new URLSearchParams(currentSearch).get('preview') === 'sample' &&
+    (pathname === APP_ROUTES.overview.path ||
+      pathname === APP_ROUTES.assets.path ||
       pathname === APP_ROUTES.map.path ||
       pathname === APP_ROUTES.alerts.path)
   ) {
     return `${pathname}?preview=sample`;
   }
+  if (pathname === APP_ROUTES.overview.path || pathname === APP_ROUTES.map.path)
+    return fleetWorkspaceHref(pathname, currentSearch);
   if (pathname === APP_ROUTES.assets.path) {
     const current = new URLSearchParams(currentSearch);
     const context = new URLSearchParams();

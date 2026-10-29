@@ -37,3 +37,5 @@ evidence and material limitations for future reviewers.
 - [Connected operator user guide](2026-10-connected-operator-guide.md) — M04.
 
 - [Operator tenant selection and capability-aware navigation](2026-10-operator-tenant-selection.md) — M02, delivery-plan PR 3.
+
+- [Connected geodetic map](2026-10-connected-geodetic-map.md): PR #91 merged with passing checks, M04 product PR 29.

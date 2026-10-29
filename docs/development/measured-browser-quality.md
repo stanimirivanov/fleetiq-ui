@@ -12,7 +12,7 @@ controls, not live fleet capacity or backend latency promises.
 
 ## Critical behavior and coverage
 
-[The scope](../../tools/quality/coverage-scope.json) names fourteen owned modules:
+[The scope](../../tools/quality/coverage-scope.json) names fifteen owned modules:
 managed HTTP, session parsing/ownership/access, asset and semantic parsing, the live
 metadata reader, URL context and cancellable reads, plus the device adapter, evidence validation and cancellable
 read/command controllers. Generated code is excluded.
@@ -50,7 +50,7 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 375,000 / 110,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 400,000 / 120,000 JS bytes and 60,000 / 16,000 CSS bytes.
 The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
 to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
 and adding a 200-replacement burst/disposal workload under unchanged latency,
@@ -209,3 +209,25 @@ The corrected local five-cycle trial retained **0 nodes** (1,383 before/after),
 877,760 heap bytes, and had a maximum navigation of 1,448 ms and filter of 496 ms.
 The 400-node, 16-MiB, 2-second and 1-second caps are unchanged. Full CI qualification
 remains authoritative; these bounded local results are not capacity certification.
+
+## Connected overview workload
+
+PR 30 adds desktop/narrow light/dark overview accessibility in fresh contexts and
+a worker-free retained-resource workload. A test-owned 200-asset inventory returns
+50 rows per page with full-tenant aggregates. Two complete filter/selection/paging
+warmups precede five latency samples and a separate five-cycle retained-resource
+window. Each pagination cycle checks two bounded requests, stable global totals
+and no map SDK/worker acquisition. Existing latency, heap and node caps apply.
+The optional preview reuses the existing geographic owner and qualification lane;
+no runtime or security check is disabled. Heavy workloads run on CI.
+
+The shared `useFleetWorkspace` lifecycle has an added per-file ratchet: 100% lines,
+statements and functions, 90% branches, with measured minimum denominators
+17/18/8/10. Mandatory overview assertions cover tenant cancellation/late completion,
+authorization/preview cleanup and missing fleet capability. Existing fourteen
+sources and their floors remain unchanged.
+
+On 2026-10-29 the owner approved 400,000 raw / 120,000 gzip non-map JavaScript
+bytes for the connected overview, measured at 391,941 / 112,391. This replaces
+the previous 375,000 / 110,000 limits. Map/worker, CSS, latency, retained-node,
+heap, coverage and security gates remain unchanged.

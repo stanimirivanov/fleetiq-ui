@@ -4,6 +4,7 @@ import type { FleetAsset } from '../../model/fleet';
 export function GeodeticCanvas(props: {
   readonly assets: readonly FleetAsset[];
   readonly selected: string | null;
+  readonly compact?: boolean;
   readonly select: (id: string) => void;
 }) {
   let container: HTMLDivElement | undefined;
@@ -42,7 +43,7 @@ export function GeodeticCanvas(props: {
     >
       <div
         ref={container}
-        class="h-[32rem] overflow-hidden rounded-xl border border-outline bg-surface"
+        class={`overflow-hidden rounded-xl border border-outline bg-surface ${props.compact ? 'h-64' : 'h-[32rem]'}`}
         data-testid="geodetic-canvas"
       />
       <p role="status" class="text-xs text-muted">

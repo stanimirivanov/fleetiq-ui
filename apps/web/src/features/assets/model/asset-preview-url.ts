@@ -77,3 +77,12 @@ export function registrySampleHref(assetId?: string): string {
   if (assetId !== undefined) parameters.set('asset', assetId);
   return `/assets/registry/review?${parameters.toString()}`;
 }
+
+/** The overview sample follows the same explicit development opt-in as other views. */
+export function isOverviewSamplePreview(
+  pathname: string,
+  search: string,
+): boolean {
+  const values = new URLSearchParams(search).getAll('preview');
+  return pathname === '/' && values.length === 1 && values[0] === 'sample';
+}

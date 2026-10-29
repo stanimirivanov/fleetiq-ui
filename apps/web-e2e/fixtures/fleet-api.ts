@@ -2,7 +2,18 @@ import type { Page } from '@playwright/test';
 import { Schema } from 'effect';
 import { FleetSnapshot } from '../../web/src/generated/fleetiq-api';
 /** Synthetic bounded page with one exact observed pair and one unlocated asset. */
-export async function installFleetApi(page: Page) {
+export async function installFleetApi(
+  page: Page,
+  options: {
+    readonly inventorySize?: number;
+    readonly total?: string;
+    readonly pending?: boolean;
+  } = {},
+) {
+  const size = options.inventorySize ?? 2;
+  if (!Number.isSafeInteger(size) || size < 0 || size > 1000)
+    throw new Error('Use a bounded synthetic inventory');
+  let latest: typeof FleetSnapshot.Type | undefined;
   let status = 200,
     externalStyle = false;
   const requests: string[] = [];
@@ -50,10 +61,10 @@ export async function installFleetApi(page: Page) {
         received_at_ms: '1500',
       },
     });
-    const body = Schema.decodeUnknownSync(FleetSnapshot)({
+    const wire = {
       generation: '1',
       revision: '1',
-      pending: false,
+      pending: options.pending ?? false,
       evaluated_at_ms: '2000',
       stale_after_ms: 30000,
       mapping: {
@@ -63,10 +74,10 @@ export async function installFleetApi(page: Page) {
       },
       mapping_supported: true,
       summary: {
-        assets: '2',
+        assets: options.total ?? String(size),
         communication_devices: '0',
-        mapped_assets: '2',
-        assets_with_current_properties: '1',
+        mapped_assets: String(Math.min(size, 2)),
+        assets_with_current_properties: size ? '1' : '0',
       },
       assets: [
         {
@@ -93,7 +104,32 @@ export async function installFleetApi(page: Page) {
         },
       ],
       next_after: null,
+    };
+    const all = [
+      ...wire.assets.slice(0, Math.min(size, 2)),
+      ...Array.from({ length: Math.max(0, size - 2) }, (_, i) => ({
+        asset_id: `asset-c${String(i).padStart(3, '0')}`,
+        display_name: `Fixture equipment ${String(i).padStart(3, '0')}`,
+        asset_type: { id: 'equipment.unmapped', version: 1 },
+        location: { status: 'unmapped' },
+      })),
+    ];
+    const after = url.searchParams.get('after'),
+      limit = Math.min(
+        100,
+        Math.max(1, Number(url.searchParams.get('limit') ?? 50)),
+      );
+    const suffix = all.filter(
+        (asset) => after === null || asset.asset_id > after,
+      ),
+      rows = suffix.slice(0, limit);
+    const body = Schema.decodeUnknownSync(FleetSnapshot)({
+      ...wire,
+      assets: rows,
+      next_after:
+        suffix.length > limit ? (rows.at(-1)?.asset_id ?? null) : null,
     });
+    latest = body;
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -133,6 +169,10 @@ export async function installFleetApi(page: Page) {
   });
   return {
     requests,
+    latest: () => latest,
+    recover: () => {
+      status = 200;
+    },
     deny: () => {
       status = 403;
     },

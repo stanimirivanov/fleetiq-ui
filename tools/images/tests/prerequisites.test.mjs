@@ -42,12 +42,9 @@ test('all nine remote manifests are verified before cached pulls can run', async
       '--raw',
       tools[role],
     ]),
-    ...['transport', 'registry', 'scanner', 'node', 'edge'].map((role) => [
-      'pull',
-      '--platform',
-      tools.platform,
-      tools[role],
-    ]),
+    ...['transport', 'registry', 'scanner', 'node', 'edge', 'tls'].map(
+      (role) => ['pull', '--platform', tools.platform, tools[role]],
+    ),
   ]);
 });
 

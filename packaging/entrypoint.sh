@@ -13,6 +13,20 @@ for value in "$FLEETIQ_PUBLIC_AUTHORITY" "$FLEETIQ_API_UPSTREAM"; do
   esac
 done
 case "$FLEETIQ_API_UPSTREAM" in *:*) ;; *) invalid ;; esac
-# Explicit HTTPS origin is a deployment contract: only the TLS gateway may expose
-# this private HTTP listener. Never trust client-supplied forwarded scheme/host.
-exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+# Render only these validated literal tokens, preserving NGINX's $variables.
+# No shell eval/envsubst or browser rebuild receives runtime values.
+umask 077
+scratch="$(mktemp -d /tmp/fleetiq-edge.XXXXXXXXXX)" || invalid
+public_host="${FLEETIQ_PUBLIC_AUTHORITY%%:*}"
+for name in nginx.conf proxy.conf; do
+  sed -e "s|@@SCRATCH@@|$scratch|g" \
+      -e "s|@@PUBLIC_HOST@@|$public_host|g" \
+      -e "s|@@PUBLIC_AUTHORITY@@|$FLEETIQ_PUBLIC_AUTHORITY|g" \
+      -e "s|@@API_UPSTREAM@@|$FLEETIQ_API_UPSTREAM|g" \
+      "/etc/fleetiq/$name.template" > "$scratch/$name" || invalid
+done
+if ! nginx -t -c "$scratch/nginx.conf" >/dev/null 2>&1; then
+  printf '%s\n' 'NGINX configuration validation failed; inspect the source-owned template and scratch policy.' >&2
+  exit 78
+fi
+exec nginx -c "$scratch/nginx.conf" -g 'daemon off;'

@@ -22,8 +22,10 @@ function scannerFixture(f) {
     SchemaVersion: 2,
     Metadata: { ImageID: artifact.config, OS: { Family: 'alpine' } },
     Results: [
-      { Class: 'os-pkgs', Packages: [{ Name: 'musl' }] },
-      { Class: 'lang-pkgs', Type: 'gobinary', Packages: [{ Name: 'caddy' }] },
+      {
+        Class: 'os-pkgs',
+        Packages: [{ Name: 'musl' }, { Name: 'nginx', Version: '1.30.6-r1' }],
+      },
     ],
   };
   const db = {
@@ -146,7 +148,7 @@ test('scanner findings and operational failures have distinct redacted diagnosti
     try {
       const s = scannerFixture(f);
       if (['vulnerability', 'contradictory-success'].includes(mode))
-        s.report.Results[1].Vulnerabilities = [
+        s.report.Results[0].Vulnerabilities = [
           {
             Severity: 'HIGH',
             VulnerabilityID: 'CVE-2026-111943',
@@ -155,7 +157,7 @@ test('scanner findings and operational failures have distinct redacted diagnosti
           },
         ];
       if (mode === 'secret')
-        s.report.Results[1].Secrets = [
+        s.report.Results[0].Secrets = [
           {
             RuleID: 'synthetic',
             Severity: 'HIGH',
@@ -214,7 +216,7 @@ test('local and CI shared scanner reject current go-jose advisory without ignori
   const f = layoutFixture();
   try {
     const s = scannerFixture(f);
-    s.report.Results[1].Vulnerabilities = [
+    s.report.Results[0].Vulnerabilities = [
       {
         Severity: 'HIGH',
         VulnerabilityID: 'CVE-2026-116587',
@@ -235,7 +237,7 @@ test('local and CI shared scanner reject current go-jose advisory without ignori
     );
     assert.equal(
       JSON.parse(readFileSync(join(f.directory, 'reports/scan.json')))
-        .Results[1].Vulnerabilities.length,
+        .Results[0].Vulnerabilities.length,
       2,
     );
     assert.ok(!existsSync(join(f.directory, 'private-scan/raw.json')));

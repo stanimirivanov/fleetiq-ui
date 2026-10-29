@@ -63,3 +63,10 @@ still depend on v3.0.5. The remaining image finding therefore has no supported
 dependency-only update on this graph. Retain the owner decision to defer v3;
 do not suppress the finding or claim image/publication qualification. Replacing
 the edge or maintaining a cryptographic fork requires a separate review.
+
+## Superseding remediation
+
+On 2026-10-29 the owner approved replacing Caddy with native NGINX. The
+[replacement plan](2026-10-native-nginx-edge.md) removes the runtime dependency
+instead of waiting for a v3 patch. Historical v4 test evidence above remains valid;
+full remediation requires a passing replacement image scan and native gates.

@@ -50,8 +50,10 @@ function evidence() {
       SchemaVersion: 2,
       Metadata: { ImageID: artifact.config, OS: { Family: 'alpine' } },
       Results: [
-        { Class: 'os-pkgs', Packages: [{ Name: 'musl' }] },
-        { Type: 'gobinary', Packages: [{ Name: 'caddy' }] },
+        {
+          Class: 'os-pkgs',
+          Packages: [{ Name: 'musl' }, { Name: 'nginx', Version: '1.30.6-r1' }],
+        },
       ],
     },
     scanner: {

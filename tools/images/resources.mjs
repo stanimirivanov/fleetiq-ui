@@ -5,6 +5,7 @@ import { docker, jsonDocker, setDockerOwner } from './process.mjs';
 export class Resources {
   id = randomUUID();
   containers = [];
+  volumes = [];
   network = `fiq-image-${this.id}`;
   label = 'io.fleetiq.image-qualification';
   constructor() {
@@ -18,6 +19,19 @@ export class Resources {
       `${this.label}=${this.id}`,
       this.network,
     ]);
+  }
+  async volume(suffix) {
+    ensure(/^[a-z0-9-]+$/u.test(suffix), 'Invalid owned volume suffix.');
+    const name = `${this.network}-${suffix}`;
+    this.volumes.push(name);
+    await docker([
+      'volume',
+      'create',
+      '--label',
+      `${this.label}=${this.id}`,
+      name,
+    ]);
+    return name;
   }
   async container(suffix, args, network = this.network) {
     const name = `${this.network}-${suffix}`;
@@ -64,6 +78,38 @@ export class Resources {
       );
       await docker(['rm', '--force', '--volumes', name]);
     }
+    const volumes = (
+      await docker([
+        'volume',
+        'ls',
+        '--filter',
+        `label=${this.label}=${this.id}`,
+        '--format',
+        '{{.Name}}',
+      ])
+    )
+      .trim()
+      .split(/\r?\n/u)
+      .filter(Boolean);
+    for (const name of volumes) {
+      ensure(this.volumes.includes(name), 'Unexpected owned volume.');
+      const [metadata] = await jsonDocker(['volume', 'inspect', name]);
+      assertOwnedVolume(metadata, name, this);
+      await docker(['volume', 'rm', name]);
+    }
+    ensure(
+      !(
+        await docker([
+          'volume',
+          'ls',
+          '--filter',
+          `label=${this.label}=${this.id}`,
+          '--format',
+          '{{.Name}}',
+        ])
+      ).trim(),
+      'Owned volumes remain.',
+    );
     const networks = (
       await docker([
         'network',
@@ -112,4 +158,14 @@ export async function until(probe, timeout = 60_000) {
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
   throw new Error('Image probe deadline expired.');
+}
+
+/** Refuse cleanup if either the registered name or exact ownership changed. */
+export function assertOwnedVolume(metadata, name, owner) {
+  ensure(
+    owner.volumes.includes(name) &&
+      metadata.Name === name &&
+      metadata.Labels?.[owner.label] === owner.id,
+    'Volume ownership changed.',
+  );
 }

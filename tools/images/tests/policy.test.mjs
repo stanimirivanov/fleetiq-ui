@@ -12,6 +12,7 @@ import {
   readJson,
   SOURCE,
   validateDockerfile,
+  validateEdgeConfiguration,
   validateQualification,
   validateScan,
   validateTools,
@@ -38,11 +39,9 @@ function scanFixture() {
       SchemaVersion: 2,
       Metadata: { ImageID: digest, OS: { Family: 'alpine' } },
       Results: [
-        { Class: 'os-pkgs', Packages: [{ Name: 'musl' }] },
         {
-          Type: 'gobinary',
-          Class: 'lang-pkgs',
-          Packages: [{ Name: 'github.com/caddyserver/caddy/v2' }],
+          Class: 'os-pkgs',
+          Packages: [{ Name: 'musl' }, { Name: 'nginx', Version: '1.30.6-r1' }],
         },
       ],
     },
@@ -63,12 +62,12 @@ test('actual image recipe/context/workflow pass strict producer policy', () => {
 });
 test('floating tools, root images and environment-specific browser builds fail', () => {
   for (const mutate of [
-    (t) => (t.edge = 'caddy:latest'),
+    (t) => (t.edge = 'nginx:latest'),
     (t) => (t.transport = `quay.io/skopeo/stable:v1.22.3@${digest}`),
     (t) => (t.transport = `quay.io/containers/skopeo:v1.22.3@${digest}`),
     (t) =>
       (t.transport = `quay.io/containers/skopeo:latest-immutable@${digest}`),
-    (t) => (t.go = 'golang:1.26.10-alpine3.23'),
+    (t) => (t.tls = 'alpine/openssl:3.5.9'),
     (t) => (t.platform = 'linux/arm64'),
     (t) => (t.node = `untrusted/node@${digest}`),
   ]) {
@@ -79,24 +78,16 @@ test('floating tools, root images and environment-specific browser builds fail',
   for (const bad of [
     recipe.replace('USER 10001:10001', 'USER root'),
     recipe.replace('--frozen-lockfile', ''),
-    recipe.replace('FROM golang:1.26.10-alpine3.23@', 'FROM golang:latest@'),
-    recipe.replace('go mod verify', 'go mod tidy'),
-    recipe.replace('COPY packaging/caddy/security/ ./security/', ''),
+    recipe.replace('COPY packaging/nginx/ /etc/fleetiq/', ''),
     recipe.replace(
-      'RUN GOTOOLCHAIN=local go test -mod=readonly ./security',
+      'COPY --from=builder /tmp/csp.conf /usr/share/fleetiq/csp.conf',
       '',
     ),
-    recipe.replace('-mod=readonly', ''),
-    recipe.replace('go build -mod=readonly', 'go build'),
-    recipe.replace('COPY --from=edge-builder /edge/caddy /usr/bin/caddy', ''),
-    recipe.replace('test -z "$(getcap /usr/bin/caddy)"', ''),
-    recipe.replace('apk --no-network del curl', 'true'),
-    recipe.replace(
-      'for package in curl libcurl brotli-libs',
-      'for package in unrelated',
-    ),
-    recipe.replace('apk --no-network info -e "$package"', 'false'),
+    recipe.replace('STOPSIGNAL SIGQUIT', 'STOPSIGNAL SIGTERM'),
+    recipe.replace('command -v nginx >/dev/null', 'true'),
     recipe.replace('command -v wget >/dev/null', 'true'),
+    `${recipe}\nRUN apk add openssl`,
+    `${recipe}\nRUN setcap cap_net_bind_service=+ep /usr/sbin/nginx`,
     `${recipe}\nARG VITE_BACKEND_URL`,
   ])
     assert.throws(() => validateDockerfile(bad, tools));
@@ -164,12 +155,14 @@ test('canonical UI identity rejects historical labels and provenance in new arti
   }
 });
 
-test('wrong image, incomplete OS/Go coverage, findings and stale DB fail closed', () => {
+test('wrong image, incomplete native coverage, findings and stale DB fail closed', () => {
   const good = scanFixture();
   validateScan(good.scan, good.db, good.now, digest);
   for (const mutate of [
     (s) => (s.Metadata.ImageID = `sha256:${'b'.repeat(64)}`),
-    (s) => s.Results.pop(),
+    (s) => s.Results[0].Packages.pop(),
+    (s) =>
+      s.Results.push({ Type: 'gobinary', Packages: [{ Name: 'unexpected' }] }),
     (s) => (s.Results[0].Packages = []),
     (s) =>
       (s.Results[0].Vulnerabilities = [{ Severity: 'HIGH', FixedVersion: '' }]),
@@ -328,18 +321,54 @@ test('runtime bundle evidence requires independently bounded lazy map bytes', ()
   );
 });
 
-test('owned map resources are handled before SPA fallback without rewriting missing files', () => {
-  const caddy = readFileSync('packaging/Caddyfile', 'utf8').replaceAll(
-    '\r\n',
-    '\n',
+test('owned map resources fail closed while asset inspector routes retain SPA fallback', () => {
+  const nginx = readFileSync(
+    'packaging/nginx/nginx.conf.template',
+    'utf8',
+  ).replaceAll('\r\n', '\n');
+  assert(nginx.includes('location /maps/ {'));
+  assert(nginx.includes('try_files $uri =404;'));
+  assert(nginx.includes('try_files $uri /index.html;'));
+  assert(!nginx.includes('location /assets/ {'));
+  assert(nginx.includes('proxy_read_timeout 75s;'));
+  assert(nginx.includes('server_tokens off;'));
+});
+
+test('NGINX routing/privacy/streaming controls cannot be silently removed', () => {
+  const main = readFileSync('packaging/nginx/nginx.conf.template', 'utf8');
+  const proxy = readFileSync('packaging/nginx/proxy.conf.template', 'utf8');
+  const entry = readFileSync('packaging/entrypoint.sh', 'utf8');
+  validateEdgeConfiguration(main, proxy, entry);
+  for (const weakened of [
+    main.replace('server_tokens off;', 'server_tokens on;'),
+    main.replace('fastcgi_temp_path /tmp/fastcgi;', ''),
+    main.replace('types { application/javascript mjs; }', ''),
+    main.replace('client_max_body_size 8m;', 'client_max_body_size 1m;'),
+    main.replace('add_header_inherit merge;', ''),
+    main.replace('return 421;', 'return 200;'),
+    main.replace('try_files $uri =404;', 'try_files $uri /index.html;'),
+    main.replace('proxy_read_timeout 75s;', ''),
+    main.replace('        include @@SCRATCH@@/proxy.conf;', ''),
+  ])
+    assert.throws(() => validateEdgeConfiguration(weakened, proxy, entry));
+  for (const weakened of [
+    proxy.replace('proxy_buffering off;', 'proxy_buffering on;'),
+    proxy.replace(
+      'proxy_set_header X-Forwarded-For $remote_addr;',
+      'proxy_set_header X-Forwarded-For $http_x_forwarded_for;',
+    ),
+    proxy.replace(
+      'proxy_set_header Origin $http_origin;',
+      'proxy_set_header Origin https://fleet.test;',
+    ),
+    proxy.replace('proxy_hide_header ETag;', ''),
+  ])
+    assert.throws(() => validateEdgeConfiguration(main, weakened, entry));
+  assert.throws(() =>
+    validateEdgeConfiguration(
+      main,
+      proxy,
+      entry.replace('nginx -t -c', 'true -c'),
+    ),
   );
-  const map = caddy.indexOf('handle /maps/* {'),
-    assets = caddy.indexOf('handle /assets/* {'),
-    fallback = caddy.indexOf('try_files {path} /index.html');
-  assert.ok(map >= 0 && map < assets && assets < fallback);
-  const block = caddy.slice(map, assets);
-  assert.ok(block.includes('not method GET HEAD'));
-  assert.ok(block.includes('respond @mapNotRead 405'));
-  assert.ok(block.includes('file_server'));
-  assert.ok(!block.includes('try_files'));
 });

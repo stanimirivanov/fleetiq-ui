@@ -55,8 +55,8 @@ export function validateTools(tools) {
     scanner: 'aquasec/trivy',
     registry: 'registry',
     node: 'node',
-    go: 'golang',
-    edge: 'caddy',
+    tls: 'alpine/openssl',
+    edge: 'nginx',
   })) {
     const [tag, digest] = String(tools[name]).split('@');
     ensure(
@@ -72,7 +72,6 @@ export function validateDockerfile(text, tools) {
   );
   ensure(
     text.includes(`FROM ${tools.node} AS builder`) &&
-      text.includes(`FROM ${tools.go} AS edge-builder`) &&
       text.includes(`FROM ${tools.edge} AS runtime`),
     'Image bases differ from reviewed tools.',
   );
@@ -80,24 +79,19 @@ export function validateDockerfile(text, tools) {
     'ARG BUILDKIT_SBOM_SCAN_STAGE=true',
     'pnpm@12.5.1 --ignore-scripts',
     'pnpm install --frozen-lockfile && pnpm build',
-    'COPY packaging/caddy/go.mod packaging/caddy/go.sum ./',
-    'GOTOOLCHAIN=local go mod download && GOTOOLCHAIN=local go mod verify',
-    'COPY packaging/caddy/main.go ./',
-    'COPY packaging/caddy/security/ ./security/',
-    'RUN GOTOOLCHAIN=local go test -mod=readonly ./security',
-    'CGO_ENABLED=0 GOTOOLCHAIN=local go build -mod=readonly -trimpath',
-    'COPY --from=edge-builder /edge/caddy /usr/bin/caddy',
-    'apk --no-network del curl',
-    'for package in curl libcurl brotli-libs',
-    'apk --no-network info -e "$package"',
+    'COPY packaging/nginx/ /etc/fleetiq/',
+    'COPY --from=builder /tmp/csp.conf /usr/share/fleetiq/csp.conf',
+    'command -v nginx >/dev/null',
     'command -v wget >/dev/null',
+    'STOPSIGNAL SIGQUIT',
     'USER 10001:10001',
     'ENTRYPOINT ["/usr/local/bin/fleetiq-edge"]',
-    'test -z "$(getcap /usr/bin/caddy)"',
   ])
     ensure(text.includes(required), 'Production image recipe drift.');
   ensure(
-    !text.includes('VITE_') && !text.includes('GITHUB_TOKEN'),
+    !text.includes('VITE_') &&
+      !text.includes('GITHUB_TOKEN') &&
+      !/caddy|golang:|go build|setcap|apk add/u.test(text),
     'Environment/credential build inputs are prohibited.',
   );
 }
@@ -108,6 +102,7 @@ export function validateRuntime(config, revision) {
   );
   ensure(
     config.config.User === '10001:10001' &&
+      config.config.StopSignal === 'SIGQUIT' &&
       JSON.stringify(config.config.Entrypoint) ===
         '["/usr/local/bin/fleetiq-edge"]',
     'Runtime identity/entrypoint differs.',
@@ -132,9 +127,21 @@ export function validateScan(scan, database, now = Date.now(), expectedConfig) {
     'Scan does not identify this runtime image.',
   );
   ensure(
-    scan.Results?.some((r) => r.Class === 'os-pkgs' && r.Packages?.length) &&
-      scan.Results.some((r) => r.Type === 'gobinary' && r.Packages?.length),
-    'Missing runtime OS/Go binary coverage.',
+    scan.Results?.some(
+      (r) =>
+        r.Class === 'os-pkgs' &&
+        r.Packages?.some(
+          (p) =>
+            p.Name === 'nginx' &&
+            typeof p.Version === 'string' &&
+            p.Version.length > 0,
+        ),
+    ),
+    'Missing package-owned native NGINX runtime coverage.',
+  );
+  ensure(
+    !scan.Results.some((r) => r.Type === 'gobinary' && r.Packages?.length),
+    'Unexpected Go binary in the native NGINX runtime.',
   );
   for (const result of scan.Results) {
     ensure(!result.Secrets?.length, 'Runtime secret finding.');
@@ -186,5 +193,64 @@ export function validateQualification(record, revision) {
     JSON.stringify(record.checks) === JSON.stringify(CHECKS) &&
       record.scan.outcome === 'passed',
     'Required image checks missing.',
+  );
+}
+
+/** Static drift sensor complements native nginx -t and actual HTTP/TLS probes. */
+export function validateEdgeConfiguration(main, proxy, entrypoint) {
+  for (const required of [
+    'worker_processes 1;',
+    'server_tokens off;',
+    'fastcgi_temp_path /tmp/fastcgi;',
+    'uwsgi_temp_path /tmp/uwsgi;',
+    'scgi_temp_path /tmp/scgi;',
+    'types { application/javascript mjs; }',
+    'client_max_body_size 8m;',
+    'access_log off;',
+    'listen 127.0.0.1:8081;',
+    'add_header_inherit merge;',
+    'if ($fleet_host_allowed = 0) { return 421; }',
+    'if ($http_host = "") { return 421; }',
+    'include /usr/share/fleetiq/csp.conf;',
+    'try_files $uri =404;',
+    'try_files $uri /index.html;',
+    'proxy_read_timeout 75s;',
+  ])
+    ensure(main.includes(required), 'NGINX main configuration drift.');
+  const mapBlock = main.match(/location \/maps\/ \{([\s\S]*?)\n {4}\}/u)?.[1];
+  ensure(
+    mapBlock?.includes('try_files $uri =404;'),
+    'NGINX map resources must not fall through to SPA.',
+  );
+  const liveBlock = main.match(
+    /location ~ \^\/api\/v1\/tenants\/[^\n]+\{([\s\S]*?)\n {6}\}/u,
+  )?.[1];
+  ensure(
+    liveBlock?.includes('include @@SCRATCH@@/proxy.conf;') &&
+      liveBlock.includes('proxy_read_timeout 75s;'),
+    'NGINX SSE location must own its proxy handler and idle bound.',
+  );
+  for (const required of [
+    'proxy_set_header Host $http_host;',
+    'proxy_set_header Origin $http_origin;',
+    'proxy_set_header Forwarded "";',
+    'proxy_set_header X-Forwarded-For $remote_addr;',
+    'proxy_set_header X-Forwarded-Proto https;',
+    'proxy_set_header X-Forwarded-Host "@@PUBLIC_AUTHORITY@@";',
+    'proxy_hide_header Cache-Control;',
+    'proxy_hide_header ETag;',
+    'add_header Cache-Control no-store always;',
+    'proxy_buffering off;',
+    'proxy_request_buffering off;',
+    'proxy_redirect off;',
+    'proxy_pass http://@@API_UPSTREAM@@;',
+  ])
+    ensure(proxy.includes(required), 'NGINX proxy configuration drift.');
+  ensure(
+    entrypoint.includes('mktemp -d /tmp/fleetiq-edge.XXXXXXXXXX') &&
+      entrypoint.includes('nginx -t -c "$scratch/nginx.conf"') &&
+      entrypoint.includes('exec nginx -c "$scratch/nginx.conf"') &&
+      !/\beval\s|envsubst\s/u.test(entrypoint.replace(/^#.*$/gmu, '')),
+    'NGINX configuration renderer drift.',
   );
 }

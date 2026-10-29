@@ -29,6 +29,7 @@ export function layoutFixture({
     architecture: 'amd64',
     config: {
       User: '10001:10001',
+      StopSignal: 'SIGQUIT',
       Entrypoint: ['/usr/local/bin/fleetiq-edge'],
       Labels: {
         'org.opencontainers.image.revision': revision,
@@ -51,11 +52,11 @@ export function layoutFixture({
       name: 'sbom',
       packages: [
         {
-          name: 'libc6',
+          name: 'nginx',
           externalRefs: [
             {
               referenceType: 'purl',
-              referenceLocator: 'pkg:apk/alpine/libc6@2.41',
+              referenceLocator: 'pkg:apk/alpine/nginx@1.30.6-r1',
             },
           ],
         },

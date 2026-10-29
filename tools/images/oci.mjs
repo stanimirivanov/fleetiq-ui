@@ -79,8 +79,8 @@ export function inspectLayout(layout, revision) {
       p.externalRefs?.some((ref) => ref.referenceLocator?.startsWith(prefix)),
     );
   ensure(
-    hasPackage(sbom, 'pkg:apk/alpine/'),
-    'Missing runtime Alpine SBOM coverage.',
+    hasPackage(sbom, 'pkg:apk/alpine/nginx@'),
+    'Missing package-owned NGINX runtime SBOM coverage.',
   );
   ensure(
     sboms.some(

@@ -1,6 +1,6 @@
 # Source-owned immutable UX/static-edge delivery
 
-Status: Proposed for review in issue #71.
+Status: Delivery ownership retained; Caddy runtime superseded by [0012](0012-native-nginx-edge.md) in issue #100.
 
 ## TL;DR
 

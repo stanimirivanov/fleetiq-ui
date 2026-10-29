@@ -7,6 +7,7 @@ import { inlineScriptHashes } from './inline-csp.mjs';
 import { ensure, hash } from './policy.mjs';
 import { docker, jsonDocker } from './process.mjs';
 import { until } from './resources.mjs';
+import { fixtureCertificates } from './tls.mjs';
 import { validateLoadedIdentity } from './transport.mjs';
 
 const restrictions = [
@@ -17,10 +18,6 @@ const restrictions = [
   'no-new-privileges:true',
   '--tmpfs',
   '/tmp:rw,noexec,nosuid,size=32m',
-  '--tmpfs',
-  '/data:ro,noexec,nosuid,size=1m',
-  '--tmpfs',
-  '/config:ro,noexec,nosuid,size=1m',
 ];
 export async function qualifyRuntime(loaded, tools, directory, resources) {
   validateLoadedIdentity(
@@ -52,6 +49,10 @@ export async function qualifyRuntime(loaded, tools, directory, resources) {
   ]);
   await until(async () => {
     const [meta] = await jsonDocker(['inspect', edge]);
+    ensure(
+      !['exited', 'dead'].includes(meta.State.Status),
+      `Native edge stopped before readiness (exit=${meta.State.ExitCode}).`,
+    );
     return meta.State.Health?.Status === 'healthy';
   });
   const [meta] = await jsonDocker(['inspect', edge]);
@@ -130,6 +131,10 @@ export async function qualifyRuntime(loaded, tools, directory, resources) {
   ]);
   await until(async () => {
     const [state] = await jsonDocker(['inspect', browserEdge]);
+    ensure(
+      !['exited', 'dead'].includes(state.State.Status),
+      `Browser edge stopped before readiness (exit=${state.State.ExitCode}).`,
+    );
     return state.State.Health?.Status === 'healthy';
   });
   const [browserMeta] = await jsonDocker(['inspect', browserEdge]);
@@ -139,44 +144,27 @@ export async function qualifyRuntime(loaded, tools, directory, resources) {
     'Browser fixture must remain loopback.',
   );
   await qualifyBrowser(`http://127.0.0.1:${browserPort.HostPort}`);
-  const gatewayRestrictions = restrictions.filter(
-    (arg, index) =>
-      arg !== '/data:ro,noexec,nosuid,size=1m' &&
-      !(
-        arg === '--tmpfs' &&
-        restrictions[index + 1] === '/data:ro,noexec,nosuid,size=1m'
-      ),
-  );
+  const tls = await fixtureCertificates(tools, resources);
   const gateway = await resources.container('gateway', [
-    ...gatewayRestrictions,
+    ...restrictions,
     '--no-healthcheck',
-    '--tmpfs',
-    '/data:rw,noexec,nosuid,size=16m,uid=10001,gid=10001',
     '--env',
-    `FLEETIQ_TEST_EDGE_HOST=${edge}`,
+    'FLEETIQ_PUBLIC_AUTHORITY=fleet.test',
     '--env',
-    'XDG_DATA_HOME=/data',
+    `FLEETIQ_API_UPSTREAM=${edge}:8080`,
     '--volume',
-    `${fixtures}:/fixture:ro`,
-    '--entrypoint',
-    '/usr/bin/caddy',
+    `${fixtures}/gateway.conf.template:/etc/fleetiq/nginx.conf.template:ro`,
+    '--mount',
+    `type=volume,source=${tls},target=/run/tls,readonly,volume-subpath=edge`,
     loaded.image,
-    'run',
-    '--config',
-    '/fixture/Gatewayfile',
-    '--adapter',
-    'caddyfile',
   ]);
-  let ca;
   await until(async () => {
     try {
-      ca = await docker([
-        'exec',
-        gateway,
-        'cat',
-        '/data/caddy/pki/authorities/local/root.crt',
-      ]);
-      return ca.includes('BEGIN CERTIFICATE');
+      return (
+        (
+          await docker(['exec', gateway, 'test', '-s', '/tmp/nginx.pid'])
+        ).trim() === ''
+      );
     } catch {
       return false;
     }
@@ -184,8 +172,8 @@ export async function qualifyRuntime(loaded, tools, directory, resources) {
   await runProbe('tls', [
     '--env',
     `FLEETIQ_TEST_GATEWAY=${gateway}`,
-    '--env',
-    `FLEETIQ_TEST_CA=${Buffer.from(ca).toString('base64')}`,
+    '--mount',
+    `type=volume,source=${tls},target=/run/public,readonly,volume-subpath=public`,
   ]);
   await docker(['stop', '--timeout', '10', upstream]);
   await runProbe('unavailable');

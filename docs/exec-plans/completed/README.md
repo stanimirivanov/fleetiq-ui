@@ -41,3 +41,5 @@ evidence and material limitations for future reviewers.
 - [Connected geodetic map](2026-10-connected-geodetic-map.md): PR #91 merged with passing checks, M04 product PR 29.
 
 - [Connected fleet overview](2026-10-connected-fleet-overview.md): PR #93 merged with passing checks, confirmed by the owner.
+
+- [Registry commissioning](2026-10-registry-commissioning.md): PR #95 merged, owner confirmed all checks passing.

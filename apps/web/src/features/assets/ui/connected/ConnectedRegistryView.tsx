@@ -1,104 +1,8 @@
-import { A } from '@solidjs/router';
-import { createMemo, createSignal, Show } from 'solid-js';
-import type { AssetRequest } from '../../model/metadata';
+import { createSignal, Show } from 'solid-js';
 import { clearSnapshotSelection } from '../../model/metadata-query';
 import { RegistryCommissioning } from '../commissioning/RegistryCommissioning';
-import { AssetIdentityEvidence } from './AssetIdentityEvidence';
-import { ConnectedAssetCatalogue } from './ConnectedAssetCatalogue';
-import { MetadataContextControls } from './MetadataContextControls';
-import { MetadataPanel } from './MetadataPanel';
-import { MetadataReadContent } from './MetadataReadContent';
-import { RelationshipEvidence } from './RelationshipEvidence';
-import { SourceBindingEvidence } from './SourceBindingEvidence';
-import { TargetBindingEvidence } from './TargetBindingEvidence';
-import { useMetadataRead } from './useMetadataRead';
+import { RegistryEvidence } from './RegistryEvidence';
 import { useMetadataWorkspace } from './useMetadataWorkspace';
-
-/** Three-zone read-only review: paged identities, directed structure, binding evidence. */
-function RegistryEvidence() {
-  const workspace = useMetadataWorkspace();
-  const request = createMemo<AssetRequest | null>(() => {
-    const query = workspace.query();
-    return query?.assetId
-      ? { tenantId: query.tenantId, assetId: query.assetId }
-      : null;
-  });
-  const identity = useMetadataRead(request, (reader, query, options) =>
-    reader.getAsset(query, options),
-  );
-  const selectedAsset = createMemo(() => {
-    const state = identity.state();
-    return state.kind === 'ready' ? state.value : undefined;
-  });
-  const path = '/assets/registry/review';
-  return (
-    <div class="grid min-w-0 gap-4">
-      <MetadataContextControls workspace={workspace} />
-      <div class="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(14rem,0.8fr)_minmax(0,1.7fr)] xl:grid-cols-[minmax(14rem,0.8fr)_minmax(15rem,0.95fr)_minmax(0,1.9fr)]">
-        <ConnectedAssetCatalogue workspace={workspace} selectable />
-        <div class="grid min-w-0 gap-4">
-          <MetadataPanel
-            title="Selected asset"
-            description="Select an identity from the current page, or retain an explicit asset ID in the URL."
-          >
-            <MetadataReadContent
-              state={identity.state()}
-              label="selected asset"
-              retry={identity.retry}
-            >
-              {(asset) => (
-                <div class="grid gap-2 text-xs">
-                  <p class="text-sm font-semibold">{asset.name}</p>
-                  <p class="break-all font-mono text-muted">{asset.id}</p>
-                  <A
-                    class="text-accent hover:underline"
-                    href={workspace.href(
-                      `/assets/${encodeURIComponent(asset.id)}`,
-                    )}
-                  >
-                    Inspect {asset.name}
-                  </A>
-                </div>
-              )}
-            </MetadataReadContent>
-          </MetadataPanel>
-          <Show when={selectedAsset()}>
-            {(asset) => (
-              <>
-                <RelationshipEvidence
-                  workspace={workspace}
-                  assetId={asset().id}
-                  path={path}
-                />
-                <AssetIdentityEvidence asset={asset()} />
-              </>
-            )}
-          </Show>
-        </div>
-        <div class="grid min-w-0 gap-4">
-          <MetadataPanel
-            title="Signal binding evidence"
-            description="Pinned metadata and exact-source candidates are reviewed at the same cutoffs. This view does not apply mapping changes."
-          >
-            <p class="text-xs leading-5 text-muted">
-              Select an asset to review target bindings, then choose an exact
-              source to inspect candidate revisions and the pinned property
-              definition.
-            </p>
-          </MetadataPanel>
-          <Show when={identity.state().kind === 'ready'}>
-            <TargetBindingEvidence
-              workspace={workspace}
-              assetId={workspace.query()?.assetId}
-              path={path}
-            />
-          </Show>
-          <SourceBindingEvidence workspace={workspace} path={path} />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /** Commissioning stays mounted while acknowledged commands remount authoritative review reads. */
 export function ConnectedRegistryView() {
@@ -110,6 +14,23 @@ export function ConnectedRegistryView() {
         {(tenant) => (
           <RegistryCommissioning
             tenant={tenant()}
+            bindingCommitted={(receipt, draft) => {
+              workspace.update({
+                ...clearSnapshotSelection(),
+                after: null,
+                q: null,
+                type: null,
+                asset: draft.target.asset_id,
+                binding: receipt.id ?? null,
+                binding_revision: receipt.revision ?? null,
+                device_asset_id: draft.source.device_asset_id,
+                endpoint_id: draft.source.endpoint_id,
+                signal_id: draft.source.signal_id,
+                effective_at_ms: String(draft.effective_interval.start_ms),
+                known_at_ms: String(receipt.recordedAt),
+              });
+              setRevision((v) => v + 1);
+            }}
             committed={(receipt, id, effectiveAt) => {
               workspace.update({
                 ...clearSnapshotSelection(),
@@ -126,7 +47,7 @@ export function ConnectedRegistryView() {
         )}
       </Show>
       <Show when={revision()} keyed>
-        {(_revision) => <RegistryEvidence />}
+        {(_revision) => <RegistryEvidence workspace={workspace} />}
       </Show>
     </div>
   );

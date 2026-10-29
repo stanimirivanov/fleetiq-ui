@@ -112,3 +112,25 @@ test('route links remove preview opt-in and encode identities without changing c
     `/assets/asset%201${context}`,
   );
 });
+
+test('exact binding revision context is explicit, unambiguous and cleared on selection changes', () => {
+  expect(
+    readMetadataQuery(
+      `${context}&binding=binding-a&binding_revision=18446744073709551615`,
+    ).kind,
+  ).toBe('ready');
+  for (const suffix of [
+    '&binding_revision=1',
+    '&binding=b&binding_revision=0',
+    '&binding=b&binding_revision=1&binding_revision=2',
+  ])
+    expect(readMetadataQuery(context + suffix).kind).toBe('invalid');
+  expect(
+    metadataHref(
+      '/assets/registry/review',
+      `${context}&binding=old&binding_revision=2`,
+      { binding: 'new' },
+    ),
+  ).not.toContain('binding_revision');
+  expect(tenantContextChanges('tenant-b').binding_revision).toBeNull();
+});

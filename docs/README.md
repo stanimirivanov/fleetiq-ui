@@ -45,3 +45,5 @@ homes rather than growing the root README.
 - [Connected fleet overview](design-docs/0009-connected-fleet-overview.md): inventory/coverage scopes, navigation and owned preview.
 
 - [Registry commissioning](design-docs/0010-registry-commissioning.md): command boundaries, exact versions, temporal corrections and ambiguous-outcome recovery.
+
+- [Binding authoring and attribution review](design-docs/0011-binding-authoring.md): exact source discovery, target membership, revision commands and immutable facts.

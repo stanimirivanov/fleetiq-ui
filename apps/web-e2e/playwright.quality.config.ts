@@ -54,6 +54,7 @@ export default defineConfig({
         '**/geographic-map-accessibility.spec.ts',
         '**/overview-accessibility.spec.ts',
         '**/commissioning-accessibility.spec.ts',
+        '**/binding-accessibility.spec.ts',
       ],
     },
     {

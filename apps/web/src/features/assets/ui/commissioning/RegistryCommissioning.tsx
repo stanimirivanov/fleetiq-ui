@@ -1,11 +1,14 @@
 import { createMemo, Show } from 'solid-js';
+import type { BindingDraft } from '../../model/binding-authoring';
 import type { CommandReceipt } from '../../model/commissioning';
+import { BindingAuthoring } from '../bindings/BindingAuthoring';
 import { MetadataPanel } from '../connected/MetadataPanel';
 import { useMetadataReader } from '../connected/MetadataReaderProvider';
 import { AssetCreationForm } from './AssetCreationForm';
 import { RelationshipCommissioningForm } from './RelationshipCommissioningForm';
 export function RegistryCommissioning(props: {
   tenant: string;
+  bindingCommitted?: (receipt: CommandReceipt, draft: BindingDraft) => void;
   committed: (receipt: CommandReceipt, id: string, effectiveAt: number) => void;
 }) {
   const context = useMetadataReader();
@@ -52,6 +55,16 @@ export function RegistryCommissioning(props: {
                   committed={props.committed}
                 />
               </div>
+              <Show when={context.bindings && props.bindingCommitted}>
+                {(committed) => (
+                  <div class="lg:col-span-2">
+                    <BindingAuthoring
+                      tenant={s.tenant}
+                      committed={committed()}
+                    />
+                  </div>
+                )}
+              </Show>
             </div>
           )}
         </Show>

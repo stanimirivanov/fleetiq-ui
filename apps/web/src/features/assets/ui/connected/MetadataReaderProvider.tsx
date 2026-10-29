@@ -1,10 +1,12 @@
 import { createContext, type JSX, useContext } from 'solid-js';
+import type { BindingGateway } from '../../model/binding-authoring';
 import type { CommissioningGateway } from '../../model/commissioning';
 import type { FleetReader } from '../../model/fleet';
 import type { MetadataReader } from '../../model/metadata';
 import type { TelemetryReader } from '../../model/property-evidence';
 
 interface MetadataReaderContext {
+  readonly bindings?: BindingGateway;
   readonly commissioning?: CommissioningGateway;
   readonly actions?: () => readonly string[] | undefined;
   readonly reader?: MetadataReader & {

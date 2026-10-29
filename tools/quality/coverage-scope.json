@@ -16,6 +16,8 @@
     "src/features/devices/ui/useDeviceCommand.ts",
     "src/features/devices/ui/useDeviceRead.ts",
     "src/features/assets/ui/connected/useFleetWorkspace.ts",
-    "src/features/assets/ui/commissioning/useRegistryCommand.ts"
+    "src/features/assets/ui/commissioning/useRegistryCommand.ts",
+    "src/features/assets/ui/bindings/useBindingSource.ts",
+    "src/features/assets/ui/bindings/useBindingTarget.ts"
   ]
 }

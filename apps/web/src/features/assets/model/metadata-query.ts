@@ -1,7 +1,7 @@
 import { isValidAssetIdentifier } from './asset-catalogue';
 import { evidenceKeys } from './evidence-query';
 import { fleetKeys } from './fleet-query';
-import type { SignalSource } from './metadata';
+import { isRevision, type SignalSource } from './metadata';
 
 export const snapshotCursorKeys = [
   'relationship_after',
@@ -44,6 +44,7 @@ const identifierKeys = [
   ...sourceQueryKeys,
 ] as const;
 const knownKeys = [
+  'binding_revision',
   ...identifierKeys,
   'q',
   'type',
@@ -63,6 +64,12 @@ export function readMetadataQuery(search: string): MetadataQueryResult {
     )
   )
     return invalid('Tenant, asset, source, or cursor context is invalid.');
+  if (
+    params.has('binding_revision') &&
+    (!params.get('binding') ||
+      !isRevision(params.get('binding_revision') ?? ''))
+  )
+    return invalid('Exact binding revision context is invalid.');
   const tenantId = params.get('tenant');
   if (!tenantId) return { kind: 'missing-tenant' };
   const effective = params.get('effective_at_ms');
@@ -120,6 +127,8 @@ export function metadataHref(
 ): string {
   const params = new URLSearchParams(search);
   params.delete('preview');
+  if ('binding' in changes && !('binding_revision' in changes))
+    params.delete('binding_revision');
   for (const [key, value] of Object.entries(changes)) {
     if (value === null || value === '') params.delete(key);
     else params.set(key, value);
@@ -146,10 +155,12 @@ export function tenantContextChanges(
 
 export function clearSnapshotSelection(): Record<string, null> {
   return Object.fromEntries(
-    [...snapshotCursorKeys, ...sourceQueryKeys, ...evidenceKeys].map((key) => [
-      key,
-      null,
-    ]),
+    [
+      'binding_revision',
+      ...snapshotCursorKeys,
+      ...sourceQueryKeys,
+      ...evidenceKeys,
+    ].map((key) => [key, null]),
   );
 }
 

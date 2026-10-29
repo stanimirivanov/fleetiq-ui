@@ -12,7 +12,7 @@ controls, not live fleet capacity or backend latency promises.
 
 ## Critical behavior and coverage
 
-[The scope](../../tools/quality/coverage-scope.json) names sixteen owned modules:
+[The scope](../../tools/quality/coverage-scope.json) names eighteen owned modules:
 managed HTTP, session parsing/ownership/access, asset and semantic parsing, the live
 metadata reader, URL context and cancellable reads, plus the device adapter, evidence validation and cancellable
 read/command controllers. Generated code is excluded.
@@ -50,7 +50,7 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 425,000 / 120,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 440,000 / 125,000 JS bytes and 60,000 / 16,000 CSS bytes.
 The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
 to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
 and adding a 200-replacement burst/disposal workload under unchanged latency,
@@ -249,3 +249,20 @@ On 2026-10-29 the owner approved increasing only non-map raw JS from 400,000 to
 425,000 bytes for the complete commissioning slice. The final measured output is
 410,739 raw / 116,750 gzip bytes; the 120,000 gzip limit and all map/worker, CSS,
 latency, heap, node and security limits are unchanged.
+
+## Binding authoring qualification
+
+PR 32 registers desktop/narrow light/dark binding accessibility and conflict states;
+the configuration sensor rejects omission. Source and target selection controllers
+are added with 100% measured floors for every metric. Source minimum denominators
+are 34 lines, 39 statements, 16 functions and 25 branches; target denominators are
+24/25/13/14. Existing sixteen source floors and command-owner obligations remain
+unchanged. Mandatory new tests cover exact property eligibility, source cancellation
+and protocol-permission loss. Full coverage and measured quality remain CI checks.
+
+The complete binding feature exceeds the prior non-map byte cap. On 2026-10-29
+the owner approved 440,000 raw / 125,000 gzip bytes for this feature. Map/worker,
+CSS, latency, heap, node and security limits are unchanged.
+
+Final binding-authoring production output is 428,166 raw / 120,479 gzip non-map
+JavaScript bytes, within the owner-approved 440,000 / 125,000 limits.

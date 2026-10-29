@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "bundle": {
-    "javascriptBytes": 425000,
-    "javascriptGzipBytes": 120000,
+    "javascriptBytes": 440000,
+    "javascriptGzipBytes": 125000,
     "cssBytes": 60000,
     "cssGzipBytes": 16000,
     "forbiddenModules": [
@@ -316,6 +316,42 @@
         "percent": 96,
         "minimumTotal": 31
       }
+    },
+    "src/features/assets/ui/bindings/useBindingSource.ts": {
+      "lines": {
+        "percent": 100,
+        "minimumTotal": 34
+      },
+      "statements": {
+        "percent": 100,
+        "minimumTotal": 39
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 16
+      },
+      "branches": {
+        "percent": 100,
+        "minimumTotal": 25
+      }
+    },
+    "src/features/assets/ui/bindings/useBindingTarget.ts": {
+      "lines": {
+        "percent": 100,
+        "minimumTotal": 24
+      },
+      "statements": {
+        "percent": 100,
+        "minimumTotal": 25
+      },
+      "functions": {
+        "percent": 100,
+        "minimumTotal": 13
+      },
+      "branches": {
+        "percent": 100,
+        "minimumTotal": 14
+      }
     }
   },
   "obligations": [
@@ -387,6 +423,14 @@
         "double submission is blocked and unknown outcomes replay only the frozen command",
         "scope disposal aborts pending commands and suppresses non-cooperative late receipts",
         "definite conflict stays editable and unauthorized completion invalidates the operator"
+      ]
+    },
+    {
+      "file": "src/features/assets/ui/bindings/binding-selection.test.tsx",
+      "titles": [
+        "source changes abort superseded reads and reject non-cooperative late endpoint evidence",
+        "target selection rejects unsupported versions and invalidates pinned properties when identity changes",
+        "protocol grant removal aborts diagnostics and hides late sampled tuples without inventing inventory"
       ]
     }
   ]

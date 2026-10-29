@@ -1,6 +1,6 @@
 # Asset and temporal relationship commissioning
 
-Status: active
+Status: completed
 Milestone: M04 - Semantic Twin and Live UI
 Issue: #94
 
@@ -38,7 +38,7 @@ intervals. Owner approved 425,000 raw JS bytes; gzip remains 120,000.
 - [x] Cancel owned work and suppress late receipts on scope loss/unmount.
 - [x] Add focused regressions, required operator guide and browser-quality scenarios.
 - [x] Complete focused final verification and record measured output.
-- [ ] Pass full CI acceptance, browser, browser-quality and image groups.
+- [x] Pass full CI acceptance, browser, browser-quality and image groups (owner confirmed merged PR #95 with all checks passing).
 
 ## Acceptance evidence
 
@@ -57,3 +57,5 @@ do not qualify providers, live devices, production capacity, D06 or an installat
 
 Signal-binding authoring, definition editing, new backend contracts, bulk commands,
 optimistic local evidence, cryptographic exceptions, D06 and full-profile qualification.
+
+Closure: owner confirmed PR #95 merged with all checks passing on 2026-10-29.

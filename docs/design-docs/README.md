@@ -26,3 +26,5 @@ consequences, and alternatives.
 - [0009: Connected fleet overview](0009-connected-fleet-overview.md): authoritative inventory, scoped coverage and optional geographic context.
 
 - [0010: Registry commissioning](0010-registry-commissioning.md).
+
+- [0011: Signal-binding authoring](0011-binding-authoring.md).

@@ -10,35 +10,25 @@ qualified complete index to GHCR by digest. No Kubernetes environment is changed
 
 ## Ownership and prerequisites
 
-The root [Dockerfile](../../Dockerfile), [Caddy configuration](../../packaging/Caddyfile)
+The root [Dockerfile](../../Dockerfile), [NGINX configuration](../../packaging/nginx/nginx.conf.template)
 and [producer](../../tools/images/qualify.mjs) own this artifact. The deployment
 repository's transitional source-build Compose image is not a second publisher;
 D04/D05 consume published images and D12 retires competing release ownership.
 See [decision 0005](../design-docs/0005-immutable-ux-delivery.md) and the upstream
 [Kubernetes plan](https://github.com/stanimirivanov/fleetiq-deploy/blob/main/docs/exec-plans/active/kubernetes-gitops-deployment.md).
 
-The official Caddy 2.11.7 image contains a Go 1.26.8 binary and x/net 0.59.0;
-the current runtime scan finds high-severity vulnerabilities in those compiled
-dependencies. The Dockerfile builds the same Caddy release and standard modules
-as a separate, versioned Go module in [packaging/caddy](../../packaging/caddy/),
-using the reviewed Go 1.26.10 image and x/net 0.60.0. Its committed go.mod and
-go.sum lock the dependency graph. The rebuilt binary replaces the official
-image's binary, preserving its runtime layout while correcting the findings.
-Go 1.26.10 also corrects [CVE-2026-111943](https://pkg.go.dev/vuln/GO-2026-6809),
-a HIGH standard-library finding in the earlier Go 1.26.9 build. Updating the
-compiler rebuilds the embedded standard library; it does not require a Go module
-version change. The build uses local toolchains, read-only module resolution and
-verified module checksums. The final runtime scan remains authoritative: if a new high or
-critical finding appears, qualification fails until the dependency is fixed.
+The runtime is the official `nginx:1.30.6-alpine-slim` linux/amd64 manifest
+`sha256:8f06fd647c6687eae0fd7bee8a43df66e61edb9f093bb0a9079d69cb355b879b`.
+Its native version and remote manifest are checked before adoption. Only the
+Node/pnpm frontend build remains: there is no rebuilt Go proxy or JOSE runtime.
+No APK packages are downloaded or modified in the production recipe.
 
-The pinned Alpine runtime also ships curl and its libcurl/Brotli dependencies,
-which the application does not use. Health checks use BusyBox wget and proxying
-uses the statically rebuilt Caddy binary. The recipe removes curl and its orphaned
-libraries using the installed APK database with networking disabled; it asserts
-that curl, libcurl and brotli-libs are absent and wget remains available. This
-removes the affected runtime packages for CVE-2026-92392 and CVE-2026-111497 without
-introducing mutable package downloads or changing the vulnerability gate. The
-producer policy and negative fixtures require these removal/postcondition steps.
+The original-image scanner requires the package-owned NGINX OS inventory and
+rejects unexpected Go binaries; the runtime SPDX document must include NGINX.
+High/critical vulnerabilities, all secret findings, stale DBs and missing evidence
+remain fatal. The pinned OpenSSL image is a disposable TLS fixture tool, not a
+runtime dependency: fresh CA/leaf keys live only in a labeled Docker volume,
+mounted by exact subpath and removed after checked cleanup. No host trust changes.
 
 Use reviewed Node 24/pnpm, a frozen install, Git, Docker's Linux daemon with
 Buildx, and Playwright Chromium. Run `pnpm security:install` and
@@ -72,7 +62,7 @@ tool version. Record these checks in the PR.
 The canonical producer is `stanimirivanov/fleetiq-ui`; current source labels,
 GitHub authorization, BuildKit provenance and GHCR transport all use that identity.
 Future publication produces `ghcr.io/stanimirivanov/fleetiq-ui@sha256:...`.
-The root package and local Caddy module also use the renamed repository identity.
+The root package and image source labels use the renamed repository identity.
 
 The existing `fleetiq-ux-image-qualification.v1` format and deployment `ux` role
 remain stable wire identifiers. They do not authorize the retired repository.
@@ -104,14 +94,14 @@ The same image runs in every environment, without a Vite rebuild. Supply:
 IPv6 literal authorities are not supported by this initial bounded configuration
 parser; DNS upstreams can resolve to the deployment's supported address family.
 Invalid or missing configuration exits with code 78 without printing its values.
-Kubernetes does not need the base image's data/config volumes: TLS and certificate
-storage belong to the gateway. Docker qualification overlays those inherited
-volume locations with read-only scratch; every owned container/volume is removed.
+NGINX inherits no data/config volumes. TLS and certificate storage belong to the
+gateway. The renderer creates unique private configuration under bounded `/tmp`;
+it never writes into `/etc` or adopts stale files. Every owned fixture is removed.
 
 Only the trusted gateway should reach port 8080. D04 owns network enforcement;
 this image does not establish a firewall or authenticate gateway peers. It
 requires the public Host and constructs canonical HTTPS forwarded host/scheme
-headers. Caddy ignores incoming X-Forwarded values from untrusted peers; the edge drops Forwarded. Original Host,
+headers. NGINX replaces incoming X-Forwarded-For with its peer address and drops Forwarded. Original Host,
 Origin, cookies, request method/path/query/body, response cookies and redirects
 remain intact. The backend owns OIDC, authorization, CSRF and cookie policy.
 A spoofed Origin is preserved for backend rejection, never rewritten as trusted.
@@ -207,16 +197,30 @@ than infer trust from an unsigned statement. No automatic rollback or deployment
 is performed, and the workflow is not dispatched from an unmerged feature branch.
 A failed run remains incomplete; fix the cause and qualify a fresh owned run.
 
-## Deferred JOSE v3 release blocker
+## JOSE dependency removal
 
-The locked edge selects go-jose v4.1.6 for CVE-2026-116587. Its pinned Go builder
-runs `go test -mod=readonly ./security` before compiling the unchanged standard
-Caddy module set. Synthetic JWK fixtures exercise ordinary/maximum/oversized
-public RSA moduli and disproportionate private primes; no timing thresholds or
-operator credentials are used.
+The NGINX decision supersedes the former Caddy/Smallstep JOSE remediation.
+See [native NGINX edge](../design-docs/0012-native-nginx-edge.md). The generic
+`Server: nginx` identity is permitted, but version and upstream identity disclosure
+are rejected by real probes. CSP and all other security/cache/cookie controls
+remain required; this is no advisory exception or scan bypass.
 
-Caddy still requires unpatched go-jose v3 through Smallstep. The owner chose to
-retain Caddy and wait for a supported upstream remediation. Runtime scanning,
-including unfixed HIGH/CRITICAL findings, continues to block qualification and
-publication. See [local security preflight](image-security.md). A merged source
-change or passing JOSE v4 test is not a clean or publishable runtime image.
+## NGINX compatibility and streaming
+
+The canonical public authority is forwarded from validated configuration; Host
+matching retains predecessor hostname semantics, excluding its optional port.
+Original Host, Origin and cookies reach the backend unchanged. Access logs are
+disabled; critical process errors do not routinely log OAuth request URLs.
+Compiled resource extensions under `/assets/` are served as immutable files with
+missing-file 404s. `/assets/<id>` and `/assets/registry/review` remain SPA routes;
+`/maps/` never falls through to HTML. All static responses accept only GET/HEAD.
+
+Ordinary upstream reads keep a five-second idle bound; exact property SSE gets
+75 seconds. Request/response buffering is off. The real streaming probe withholds
+completion until the client receives an event and sends an acknowledgement, so
+buffering cannot satisfy it. SIGQUIT provides bounded graceful shutdown.
+
+After the UI change merges, deployment PR #32 must pin its exact reviewed source
+and replace its source-owned TLS configuration before real HTTPS/OIDC/TCP
+qualification. UI image probes alone do not complete installed acceptance.
+Persistent D06 and full-profile qualification remain deferred.

@@ -10,7 +10,7 @@ export const IMAGE_ROLES = [
   'frontend',
   'buildkit',
   'sbom',
-  'go',
+  'tls',
 ];
 
 function prerequisiteError(role, category) {
@@ -78,6 +78,7 @@ export async function pullToolImages(
     'scanner',
     'node',
     'edge',
+    'tls',
   ].filter((role) => roles.includes(role))) {
     console.log(`Pull pinned ${role} image: ${tools[role]}`);
     try {

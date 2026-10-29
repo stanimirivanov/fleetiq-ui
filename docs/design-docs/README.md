@@ -28,3 +28,5 @@ consequences, and alternatives.
 - [0010: Registry commissioning](0010-registry-commissioning.md).
 
 - [0011: Signal-binding authoring](0011-binding-authoring.md).
+
+- [0012: Native NGINX edge](0012-native-nginx-edge.md): remove the unpatched JOSE runtime while preserving qualified static/API/TLS behavior.

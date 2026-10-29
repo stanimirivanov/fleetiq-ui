@@ -7,6 +7,6 @@ export function qualificationMode(mode) {
     format: 'fleetiq-ui-image-security.v1',
     securityOnly: true,
     checks: ['oci-metadata', 'runtime-security-scan', 'cleanup'],
-    roles: ['scanner', 'node', 'edge', 'frontend', 'buildkit', 'sbom', 'go'],
+    roles: ['scanner', 'node', 'edge', 'frontend', 'buildkit', 'sbom'],
   };
 }

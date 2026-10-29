@@ -7,6 +7,7 @@ import {
   ensure,
   readJson,
   validateDockerfile,
+  validateEdgeConfiguration,
   validateTools,
 } from './policy.mjs';
 export function renderPublication(template) {
@@ -72,6 +73,11 @@ export function checkProducer(root = process.cwd()) {
     'Image builder Node major differs from the reviewed runtime.',
   );
   validateDockerfile(read('Dockerfile').replaceAll('\r\n', '\n'), tools);
+  validateEdgeConfiguration(
+    read('packaging/nginx/nginx.conf.template'),
+    read('packaging/nginx/proxy.conf.template'),
+    read('packaging/entrypoint.sh'),
+  );
   validateContext(read('.dockerignore'));
   checkPublication(
     read('.github/image-publication.yml.template'),

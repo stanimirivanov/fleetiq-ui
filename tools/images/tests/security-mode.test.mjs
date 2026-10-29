@@ -76,7 +76,12 @@ test('security preflight verifies build/scanner remote pins but does not acquire
     },
     plan.roles,
   );
-  assert.equal(calls.filter((args) => args[0] === 'buildx').length, 7);
+  assert.equal(
+    calls.filter((args) => args[0] === 'buildx').length,
+    plan.roles.length,
+  );
+  assert(!plan.roles.includes('go'));
+  assert(!plan.roles.includes('tls'));
   assert.deepEqual(
     calls.filter((args) => args[0] === 'pull').map((args) => args.at(-1)),
     [tools.scanner, tools.node, tools.edge],

@@ -19,7 +19,7 @@ function request(path, options = {}) {
         path,
         method: options.method ?? 'GET',
         headers: { Host: 'fleet.test', ...options.headers },
-        servername: tls ? 'fleet.test' : undefined,
+        servername: tls ? (options.servername ?? 'fleet.test') : undefined,
         ca: options.ca,
         agent: false,
       },
@@ -55,6 +55,9 @@ if (mode === 'http') {
     '/',
     '/tenants/tenant-a/assets/asset-1?view=details',
     '/tenants/tenant-a/registry',
+    '/assets',
+    '/assets/asset-main',
+    '/assets/registry/review',
   ]) {
     const r = await request(path);
     assert.equal(r.status, 200);
@@ -65,7 +68,7 @@ if (mode === 'http') {
     assert.ok(
       r.headers['content-security-policy'].includes("frame-ancestors 'none'"),
     );
-    assert.equal(r.headers.server, undefined);
+    assert.equal(r.headers.server, 'nginx');
     for (const hash of contract.cspHashes)
       assert.ok(r.headers['content-security-policy'].includes(hash));
     assert.ok(
@@ -83,6 +86,13 @@ if (mode === 'http') {
     const r = await request(`/${file.name}`);
     assert.equal(r.status, 200);
     assert.equal(sha(r.body), file.sha256);
+    if (/\.(?:js|mjs)$/u.test(file.name))
+      assert.match(
+        r.headers['content-type'],
+        /^application\/javascript(?:;|$)/u,
+      );
+    if (file.name.endsWith('.css'))
+      assert.match(r.headers['content-type'], /^text\/css(?:;|$)/u);
     assert.equal(
       r.headers['cache-control'],
       'public, max-age=31536000, immutable',
@@ -125,6 +135,7 @@ if (mode === 'http') {
   assert.equal(r.status, 200);
   assert.equal(r.headers['cache-control'], 'no-store');
   assert.equal(r.headers.etag, undefined);
+  assert.equal(r.headers.server, 'nginx');
   assert.deepEqual(r.headers['set-cookie'], [
     'fleetiq.session=fixture; Path=/; HttpOnly; Secure; SameSite=Lax',
     'fleetiq.csrf=fixture; Path=/; Secure; SameSite=Strict',
@@ -140,6 +151,74 @@ if (mode === 'http') {
   assert.equal(echo.headers['x-forwarded-host'], 'fleet.test');
   assert.ok(!echo.headers['x-forwarded-for']?.includes('203.0.113.13'));
   checks++;
+  // A response is deliberately held open until the client receives its first
+  // event and sends an independent acknowledgement. Buffered proxies deadlock
+  // at the bounded deadline instead of producing a false streaming pass.
+  await new Promise((resolve, reject) => {
+    let received = '',
+      acknowledged = false;
+    const req = http.get(
+      {
+        hostname: edge,
+        port: 8080,
+        path: '/api/v1/tenants/tenant-a/assets/asset-1/properties/temperature/versions/1/live',
+        headers: { Host: 'fleet.test' },
+        agent: false,
+      },
+      (response) => {
+        try {
+          assert.equal(response.statusCode, 200);
+          assert.equal(response.headers['content-type'], 'text/event-stream');
+        } catch (error) {
+          response.destroy();
+          reject(error);
+          return;
+        }
+        response.setEncoding('utf8');
+        response.on('data', (chunk) => {
+          received += chunk;
+          if (received.length > 4096) {
+            response.destroy();
+            reject(new Error('Stream budget exceeded'));
+            return;
+          }
+          if (!acknowledged && received.includes('data: first\n\n')) {
+            acknowledged = true;
+            request('/api/finish-stream', { method: 'POST' }).catch(reject);
+          }
+        });
+        response.on('error', reject);
+        response.on('end', () => {
+          try {
+            assert(acknowledged);
+            assert(received.includes('data: second\n\n'));
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+    );
+    req.setTimeout(10000, () =>
+      req.destroy(new Error('Streaming handshake deadline exceeded')),
+    );
+    req.on('error', reject);
+  });
+  checks++;
+  const upload = Buffer.alloc(1024 * 1024 + 1);
+  const uploaded = await request('/api/upload', {
+    method: 'POST',
+    body: upload,
+  });
+  assert.equal(uploaded.status, 200);
+  assert.equal(JSON.parse(uploaded.body).bytes, upload.length);
+  const tooLarge = await request('/api/upload', {
+    method: 'POST',
+    headers: { 'Content-Length': String(8 * 1024 * 1024 + 1) },
+  });
+  assert.equal(tooLarge.status, 413);
+  assert.equal(tooLarge.headers['cache-control'], 'no-store');
+  checks += 2;
   const untrusted = JSON.parse(
     (await request('/api/echo', { headers: { Origin: 'https://evil.test' } }))
       .body,
@@ -170,7 +249,11 @@ if (mode === 'http') {
       'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
     ].includes(error.code),
   );
-  const ca = Buffer.from(process.env.FLEETIQ_TEST_CA, 'base64');
+  const ca = readFileSync('/run/public/ca.crt');
+  await assert.rejects(
+    request('/', { tls: true, ca, servername: 'wrong.test' }),
+    (error) => error.code === 'ERR_TLS_CERT_ALTNAME_INVALID',
+  );
   const r = await request('/tenants/tenant-a/assets', { tls: true, ca });
   assert.equal(r.status, 200);
   assert.equal(sha(r.body), contract.index);
@@ -183,7 +266,7 @@ if (mode === 'http') {
   assert.equal(echo.headers.origin, 'https://fleet.test');
   assert.equal(echo.headers.host, 'fleet.test');
   assert.equal(echo.headers['x-forwarded-proto'], 'https');
-  checks = 3;
+  checks = 4;
 } else if (mode === 'unavailable') {
   const r = await request('/api/echo');
   assert.equal(r.status, 502);

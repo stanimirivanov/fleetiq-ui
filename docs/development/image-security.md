@@ -62,23 +62,14 @@ within 24 hours. No ignore list or severity exception is added. A later CI scan
 can discover new advisories after a local pass; rerun the preflight when database
 contents, dependencies or image pins change.
 
-## Current blocking finding
+## Native runtime remediation
 
-The 28 October 2026 CI report identified CVE-2026-116587 in
-`github.com/go-jose/go-jose/v3 v3.0.5` and
-`github.com/go-jose/go-jose/v4 v4.1.5`. That report lists `4.1.6` as the fixed v4
-version and no fixed v3 version. This preflight detects and preserves that
-failure; it does not exempt it. The edge now selects v4.1.6; its builder runs
-synthetic public/private RSA-JWK regression tests before compiling Caddy. The upstream fix rejects moduli larger
-than 4096 bits by default; FleetIQ does not raise that limit.
+The former Caddy runtime pulled in unpatched go-jose v3 through Smallstep. The
+owner approved dependency removal through the [NGINX decision](../design-docs/0012-native-nginx-edge.md).
+The final image contains the official package-owned native NGINX binary and no
+Caddy, Go build stage or JOSE module overlay. Qualification requires NGINX in both
+runtime scanner inventory and SBOM, and rejects any unexpected Go binary.
 
-The owner explicitly chose to retain Caddy and defer v3 remediation until a
-supported upstream path exists. Caddy's TLS/Caddyfile code imports Smallstep's
-certificate/crypto packages; removing the umbrella standard-module import alone
-does not remove this dependency. The image gate continues to reject v3.0.5.
-This is a deferred vulnerability, not an accepted exception or clean image.
-No image publication should be attempted until full qualification passes.
-
-References: [upstream advisory](https://github.com/go-jose/go-jose/security/advisories/GHSA-mgcc-cww5-fp2q),
-[patched v4 release](https://github.com/go-jose/go-jose/releases/tag/v4.1.6),
-[Smallstep migration issue](https://github.com/smallstep/crypto/issues/441).
+No vulnerability is suppressed: the same exact-OCI, fresh-DB, high/critical and
+secret gates remain authoritative. A clean result must be measured from actual
+runtime bytes; changing server technology alone does not prove a scan pass.

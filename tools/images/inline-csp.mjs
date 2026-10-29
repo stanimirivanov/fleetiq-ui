@@ -29,6 +29,6 @@ if (
 ) {
   writeFileSync(
     process.argv[3],
-    `Content-Security-Policy "${cspFor(readFileSync(process.argv[2], 'utf8'))}"\n`,
+    `add_header Content-Security-Policy "${cspFor(readFileSync(process.argv[2], 'utf8'))}" always;\n`,
   );
 }

@@ -5,41 +5,21 @@ WORKDIR /workspace
 RUN npm install --global pnpm@12.5.1 --ignore-scripts
 COPY . .
 RUN pnpm install --frozen-lockfile && pnpm build
-RUN node tools/images/inline-csp.mjs apps/web/dist/index.html /tmp/csp.caddy
+RUN node tools/images/inline-csp.mjs apps/web/dist/index.html /tmp/csp.conf
 # Keep graph evidence outside the public document root.
 RUN cp apps/web/dist/quality-manifest.json /tmp/quality-manifest.json && rm apps/web/dist/quality-manifest.json
-FROM golang:1.26.10-alpine3.23@sha256:9d1e2c4fda593efb2c405e1c855c75ec17fe42dc02f6b7142a5ea7af7f386bf4 AS edge-builder
-
-ARG BUILDKIT_SBOM_SCAN_STAGE=true
-WORKDIR /edge
-COPY packaging/caddy/go.mod packaging/caddy/go.sum ./
-RUN GOTOOLCHAIN=local go mod download && GOTOOLCHAIN=local go mod verify
-COPY packaging/caddy/main.go ./
-COPY packaging/caddy/security/ ./security/
-RUN GOTOOLCHAIN=local go test -mod=readonly ./security
-RUN CGO_ENABLED=0 GOTOOLCHAIN=local go build -mod=readonly -trimpath -ldflags="-s -w" -o /edge/caddy ./main.go
-FROM caddy:2.11.7-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f AS runtime
+FROM nginx:1.30.6-alpine-slim@sha256:8f06fd647c6687eae0fd7bee8a43df66e61edb9f093bb0a9079d69cb355b879b AS runtime
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.title="FleetIQ UI" org.opencontainers.image.description="FleetIQ production static edge" org.opencontainers.image.source="https://github.com/stanimirivanov/fleetiq-ui" org.opencontainers.image.revision=$SOURCE_REVISION
-# No low ports or file capabilities are required behind the TLS gateway.
-COPY --from=edge-builder /edge/caddy /usr/bin/caddy
-# Health checks use BusyBox wget; the proxy is the statically built Caddy binary.
-# Remove unused HTTP-client libraries offline from the pinned base's package graph.
-RUN apk --no-network del curl \
-    && for package in curl libcurl brotli-libs; do \
-         if apk --no-network info -e "$package"; then \
-           printf '%s\n' "Unexpected unused runtime package: $package" >&2; exit 1; \
-         fi; \
-       done \
-    && command -v wget >/dev/null
-RUN test -z "$(getcap /usr/bin/caddy)" && mkdir -p /srv /usr/share/fleetiq
+# Use the official package-owned native binary; no Go/JOSE overlay or APK download.
+RUN command -v nginx >/dev/null && command -v wget >/dev/null && mkdir -p /srv /usr/share/fleetiq /etc/fleetiq
 COPY --from=builder /workspace/apps/web/dist/ /srv/
 COPY --from=builder /tmp/quality-manifest.json /usr/share/fleetiq/quality-manifest.json
-COPY --from=builder /tmp/csp.caddy /usr/share/fleetiq/csp.caddy
-COPY packaging/Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /tmp/csp.conf /usr/share/fleetiq/csp.conf
+COPY packaging/nginx/ /etc/fleetiq/
 COPY --chmod=0555 packaging/entrypoint.sh /usr/local/bin/fleetiq-edge
-ENV XDG_CONFIG_HOME=/tmp/config XDG_DATA_HOME=/tmp/data
 USER 10001:10001
 EXPOSE 8080
+STOPSIGNAL SIGQUIT
 HEALTHCHECK --interval=5s --timeout=2s --start-period=5s --retries=3 CMD ["wget", "-q", "--spider", "http://127.0.0.1:8081/ready"]
 ENTRYPOINT ["/usr/local/bin/fleetiq-edge"]

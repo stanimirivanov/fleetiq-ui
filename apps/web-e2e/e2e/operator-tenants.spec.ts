@@ -1,6 +1,8 @@
 import { installMetadataApi } from '../fixtures/metadata-api';
 import { expect, test } from '../fixtures/production-test';
+import { installTelemetryApi } from '../fixtures/telemetry-api';
 import { ConnectedMetadataPage } from '../pages/connected-metadata.page';
+import { PropertyEvidencePage } from '../pages/property-evidence.page';
 
 test('discover pages, preserve history, select exact grants and revoke metadata access', async ({
   page,
@@ -144,4 +146,35 @@ test('account refresh discards old tenant grants before applying the new account
     metadata.tenantAccess.getByText('metadata.read', { exact: true }),
   ).toHaveCount(0);
   await expect(metadata.catalogue).toHaveCount(0);
+});
+
+test('all five advertised grants allow connected catalogue and inspector readings', async ({
+  page,
+}) => {
+  const actions = [
+    'access.manage',
+    'metadata.manage',
+    'metadata.read',
+    'protocol.manage',
+    'telemetry.read',
+  ] as const;
+  await installMetadataApi(page, {
+    tenants: [{ tenant_id: 'tenant-a', actions }],
+  });
+  await installTelemetryApi(page);
+  const metadata = new ConnectedMetadataPage(page);
+  const inspector = new PropertyEvidencePage(page);
+  await metadata.openCatalogue();
+  await expect(metadata.permittedTenant).toBeEnabled();
+  for (const action of actions)
+    await expect(
+      metadata.tenantAccess.getByText(action, { exact: true }),
+    ).toBeVisible();
+  await expect(metadata.asset('Primary machine')).toBeVisible();
+  await metadata.inspect('Primary machine');
+  await expect(metadata.identity).toBeVisible();
+  await expect(inspector.property).toBeVisible();
+  await inspector.open();
+  await expect(inspector.readings).toContainText('32.1');
+  await expect(metadata.permittedTenant).toHaveValue('tenant-a');
 });

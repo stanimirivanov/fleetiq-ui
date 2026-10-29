@@ -6,6 +6,13 @@ const lifetimes: BrowserApi[] = [];
 afterEach(async () => {
   await Promise.all(lifetimes.splice(0).map((api) => api.dispose()));
 });
+const completeActions = [
+  'access.manage',
+  'metadata.manage',
+  'metadata.read',
+  'protocol.manage',
+  'telemetry.read',
+] as const;
 const payload = {
   tenants: [{ tenant_id: 'tenant-a', actions: ['metadata.read'] }],
   next_after: null,
@@ -39,6 +46,24 @@ test('uses the shared generated client with bounded params and no credentials in
   });
 });
 
+test.each([4, 5])(
+  'accepts complete %i-grant discovery without dropping advertised actions',
+  async (count) => {
+    const actions = completeActions.slice(0, count);
+    await expect(
+      reader(async () =>
+        json({
+          tenants: [{ tenant_id: 'tenant-a', actions }],
+          next_after: null,
+        }),
+      ).list({ limit: 50 }),
+    ).resolves.toEqual({
+      tenants: [{ id: 'tenant-a', actions }],
+      nextAfter: null,
+    });
+  },
+);
+
 test.each([400, 401, 500])(
   'keeps HTTP %s as a structured failure',
   async (status) => {
@@ -69,6 +94,12 @@ test.each([
   { tenants: [{ tenant_id: 'a', actions: ['unknown'] }], next_after: null },
   {
     tenants: [{ tenant_id: 'a', actions: ['metadata.read', 'metadata.read'] }],
+    next_after: null,
+  },
+  {
+    tenants: [
+      { tenant_id: 'a', actions: [...completeActions, 'metadata.read'] },
+    ],
     next_after: null,
   },
   { tenants: [payload.tenants[0], payload.tenants[0]], next_after: null },

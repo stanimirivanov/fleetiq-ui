@@ -27,3 +27,5 @@ retains the required check merge barrier.
 
 
 - [Signal-binding authoring and attribution review](2026-10-binding-authoring.md).
+
+- [Complete tenant-grant contract integration](2026-10-complete-tenant-grants.md): M04 issue #98; consume the merged five-grant schema correction.

@@ -177,7 +177,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.20' ||
+    contract.info?.version !== '1.0.0-baseline.21' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||
@@ -194,6 +194,19 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
       throw new Error(`Missing or changed published operation ${operationId}`);
     }
   }
+  const vocabulary = contract.components.schemas.TenantAction.enum;
+  const grants = contract.components.schemas.OperatorTenant.properties?.actions;
+  if (
+    !Array.isArray(vocabulary) ||
+    vocabulary.length === 0 ||
+    new Set(vocabulary).size !== vocabulary.length ||
+    grants?.minItems !== 1 ||
+    grants?.maxItems !== vocabulary.length ||
+    grants?.uniqueItems !== true
+  )
+    throw new Error(
+      'Tenant discovery bound must match the complete unique action vocabulary',
+    );
   const cookie = contract.components.securitySchemes.cookieAuth;
   if (
     cookie.type !== 'apiKey' ||

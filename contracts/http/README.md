@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.19` from merged
-`fleetiq-platform` commit `7e1f322430d7c927486a9b8b7674d32e8e7ccae3`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.21` from merged
+`fleetiq-platform` commit `a1ca9e24035efdffca69ae50c2118228257936e4`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -133,3 +133,15 @@ unchanged. Actor and recorded time remain server-owned.
 Browser generation additionally selects existing appendSignalBindingRevision and
 getSignalBindingRevision operations for immutable attribution authoring/review.
 The backend-owned OpenAPI bytes and source revision are unchanged.
+
+## Complete tenant grants
+
+Baseline.21 corrects the discovery response bound to five existing actions.
+Four- and five-grant operators are valid; generated decoding still rejects empty,
+duplicate, unknown and excessive action arrays. Contract qualification ties the
+bound to the complete unique vocabulary. Explicit grants remain advisory and
+never substitute for backend authorization. This consumes
+[platform PR #349](https://github.com/stanimirivanov/fleetiq-platform/pull/349).
+After this UI revision is merged, deployment PR #32 must pin it and rerun real
+HTTPS/OIDC/TCP qualification. Browser contract fixtures do not complete that
+installation acceptance; D06 and full-profile qualification remain deferred.

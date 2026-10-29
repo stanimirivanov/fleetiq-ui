@@ -212,3 +212,46 @@ for (const field of ['commit', 'sha256']) {
     );
   });
 }
+
+for (const [name, mutate] of [
+  [
+    'legacy three-grant bound',
+    (schema) => {
+      schema.OperatorTenant.properties.actions.maxItems = 3;
+    },
+  ],
+  [
+    'excessive six-grant bound',
+    (schema) => {
+      schema.OperatorTenant.properties.actions.maxItems = 6;
+    },
+  ],
+  [
+    'empty grants allowed',
+    (schema) => {
+      schema.OperatorTenant.properties.actions.minItems = 0;
+    },
+  ],
+  [
+    'duplicate grants allowed',
+    (schema) => {
+      schema.OperatorTenant.properties.actions.uniqueItems = false;
+    },
+  ],
+  [
+    'duplicated vocabulary',
+    (schema) => {
+      schema.TenantAction.enum.push(schema.TenantAction.enum[0]);
+    },
+  ],
+]) {
+  test(`discovery contract rejects ${name} even with an updated digest`, async (context) => {
+    const paths = await changedContract(context, (contract) =>
+      mutate(contract.components.schemas),
+    );
+    await assert.rejects(
+      checkAssetContract(paths),
+      /complete unique action vocabulary/u,
+    );
+  });
+}

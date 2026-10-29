@@ -95,4 +95,6 @@ Product-plan PR 29 is the completed [connected geodetic map slice](exec-plans/co
 
 Product-plan PR 30 is the completed [connected fleet overview](exec-plans/completed/2026-10-connected-fleet-overview.md) slice, including a connected overview guide chapter. D06 and full-profile qualification remain deferred.
 
-Product-plan PR 31 is the active [registry commissioning slice](exec-plans/active/2026-10-registry-commissioning.md): asset registration, temporal relationship corrections and an operator guide. PR 30 is complete (merged PR #93). D06 and full-profile qualification remain deferred.
+Product-plan PR 31 is the completed [registry commissioning slice](exec-plans/completed/2026-10-registry-commissioning.md): asset registration, temporal relationship corrections and an operator guide. PR 30 is complete (merged PR #93). D06 and full-profile qualification remain deferred.
+
+Product-plan PR 32 is the active [binding authoring and attribution review](exec-plans/active/2026-10-binding-authoring.md) slice. PR 31 is complete (merged PR #95). D06, full-profile qualification and the installed end-to-end qualification remain deferred.

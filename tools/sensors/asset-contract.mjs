@@ -35,6 +35,16 @@ const operations = {
 };
 export const BROWSER_OPERATIONS = [
   {
+    path: '/api/v1/tenants/{tenant_id}/signal-bindings/{binding_id}/revisions/{revision}',
+    method: 'get',
+    id: 'getSignalBindingRevision',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/signal-bindings/{binding_id}/revisions/{revision}',
+    method: 'post',
+    id: 'appendSignalBindingRevision',
+  },
+  {
     path: '/api/v1/tenants/{tenant_id}/relationship-types',
     method: 'get',
     id: 'listRelationshipTypeDefinitions',

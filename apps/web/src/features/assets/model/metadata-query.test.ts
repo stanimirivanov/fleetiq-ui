@@ -112,3 +112,68 @@ test('route links remove preview opt-in and encode identities without changing c
     `/assets/asset%201${context}`,
   );
 });
+
+test('exact binding revision context is explicit, unambiguous and cleared on selection changes', () => {
+  expect(
+    readMetadataQuery(
+      `${context}&binding=binding-a&binding_revision=18446744073709551615`,
+    ).kind,
+  ).toBe('ready');
+  for (const suffix of [
+    '&binding_revision=1',
+    '&binding=b&binding_revision=0',
+    '&binding=b&binding_revision=1&binding_revision=2',
+  ])
+    expect(readMetadataQuery(context + suffix).kind).toBe('invalid');
+  expect(
+    metadataHref(
+      '/assets/registry/review',
+      `${context}&binding=old&binding_revision=2`,
+      { binding: 'new' },
+    ),
+  ).not.toContain('binding_revision');
+  expect(tenantContextChanges('tenant-b').binding_revision).toBeNull();
+});
+
+test('filter boundaries reject oversized input, control characters and invalid type scope', () => {
+  const accepted = new URLSearchParams({
+    q: '🛠'.repeat(200),
+    type: 'generic.machine',
+  });
+  expect(readMetadataQuery(`${context}&${accepted}`)).toMatchObject({
+    kind: 'ready',
+    query: { q: '🛠'.repeat(200), type: 'generic.machine' },
+  });
+  for (const [key, value] of [
+    ['q', '🛠'.repeat(201)],
+    ['q', 'machine\nother'],
+    ['q', 'machine\u0000other'],
+    ['type', ' generic.machine'],
+  ] as const) {
+    expect(
+      readMetadataQuery(`${context}&${new URLSearchParams([[key, value]])}`)
+        .kind,
+    ).toBe('invalid');
+  }
+});
+
+test('navigation removes an empty query and preserves only explicitly paired revision changes', () => {
+  expect(
+    metadataHref('/assets', '?preview=sample&tenant=tenant-a', {
+      tenant: null,
+    }),
+  ).toBe('/assets');
+  expect(metadataHref('/assets', '?q=machine', { q: '' })).toBe('/assets');
+  const next = metadataHref(
+    '/assets/registry/review',
+    `${context}&binding=old&binding_revision=2`,
+    {
+      binding: 'new',
+      binding_revision: '7',
+    },
+  );
+  const params = new URLSearchParams(next.split('?')[1]);
+  expect(params.get('binding')).toBe('new');
+  expect(params.get('binding_revision')).toBe('7');
+  expect(readMetadataQuery(`?${params}`).kind).toBe('ready');
+});

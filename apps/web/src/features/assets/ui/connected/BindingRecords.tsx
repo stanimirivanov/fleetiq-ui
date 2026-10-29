@@ -56,6 +56,18 @@ export function BindingRecords(props: {
               {binding.effectiveInterval.startMs},{' '}
               {binding.effectiveInterval.endMs ?? 'open'}) ms
             </p>
+            <A
+              class="text-accent underline"
+              href={props.workspace.href('/assets/registry/review', {
+                binding: binding.id,
+                binding_revision: binding.revision,
+                device_asset_id: binding.source.deviceAssetId,
+                endpoint_id: binding.source.endpointId,
+                signal_id: binding.source.signalId,
+              })}
+            >
+              Review immutable {binding.id} revision {binding.revision}
+            </A>
             <Show
               when={!props.sourceCandidates}
               fallback={

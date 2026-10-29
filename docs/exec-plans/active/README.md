@@ -25,4 +25,5 @@ retains the required check merge barrier.
 - [Inspector live delivery](2026-10-inspector-live-delivery.md): M04 product PR 27, issue #88.
 
 
-- [Asset and temporal relationship commissioning](2026-10-registry-commissioning.md).
+
+- [Signal-binding authoring and attribution review](2026-10-binding-authoring.md).

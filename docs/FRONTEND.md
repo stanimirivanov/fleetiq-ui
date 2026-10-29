@@ -124,3 +124,10 @@ The connected registry composes create-only asset registration and explicit dire
 relationship revisions beside authoritative evidence. Forms require both read and
 manage hints. Read-only review is retained. Exact definition discovery, frozen
 ambiguous replay and receipt-scoped refresh follow [decision 0010](design-docs/0010-registry-commissioning.md).
+
+## Signal binding authoring
+
+Registry authoring distinguishes registered endpoints, optional observed samples,
+configured attribution and committed telemetry. Select only exact supported target
+properties. The shared command owner and exact immutable review follow
+[decision 0011](design-docs/0011-binding-authoring.md).

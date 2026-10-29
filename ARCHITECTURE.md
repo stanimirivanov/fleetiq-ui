@@ -23,7 +23,7 @@ flowchart TD
   Assets --> Runtime
   Runtime --> Generated[Generated Effect client and wire schemas]
   Runtime --> API[Same-origin /api/v1]
-  Assets --> Model[Pure asset models and read ports]
+  Assets --> Model[Pure asset models and ports]
   Assets --> UI[Shared presentation primitives]
   Identity --> Failures[Shared safe failure categories]
 ```
@@ -125,3 +125,8 @@ URL scope, exact arithmetic and adapter validation stay inward; centre-pane
 components own selection/disclosure while pages retain layout responsibility.
 
 The [live inspector decision](docs/design-docs/0007-inspector-live-delivery.md) defines bounded shared-runtime SSE, validated event application and finite reconnect. Feature services own recovery; keyed Solid controllers own disposal and suppress late callbacks.
+
+Binding authoring uses a separate asset-feature command/discovery port injected by
+app composition. Registered endpoints and protocol-authorized observations remain
+distinct; target eligibility uses the asset type’s exact property references. See
+[decision 0011](docs/design-docs/0011-binding-authoring.md).

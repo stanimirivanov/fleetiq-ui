@@ -129,3 +129,7 @@ Registry commissioning consumes the already-published relationship-type catalogu
 and exact relationship revision append operations. Browser selection/generation now
 includes those routes; the pinned specification and its upstream revision remain
 unchanged. Actor and recorded time remain server-owned.
+
+Browser generation additionally selects existing appendSignalBindingRevision and
+getSignalBindingRevision operations for immutable attribution authoring/review.
+The backend-owned OpenAPI bytes and source revision are unchanged.

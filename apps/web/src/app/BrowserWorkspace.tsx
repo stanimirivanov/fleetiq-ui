@@ -1,5 +1,6 @@
 import { useLocation } from '@solidjs/router';
 import { onCleanup, type ParentProps, Show } from 'solid-js';
+import { createAlertReader } from '#features/alerts';
 import {
   createBindingGateway,
   createCommissioningGateway,
@@ -24,6 +25,7 @@ export function BrowserWorkspace(props: ParentProps) {
   const reader = createMetadataReader(browser);
   const commissioning = createCommissioningGateway(browser);
   const bindings = createBindingGateway(browser);
+  const alerts = createAlertReader(browser);
   const devices = createDeviceGateway(browser);
   const session = createOperatorSessionService(browser);
   const tenants = createOperatorTenantReader(browser);
@@ -33,6 +35,7 @@ export function BrowserWorkspace(props: ParentProps) {
   return (
     <OperatorSessionProvider service={session}>
       <MetadataComposition
+        alerts={alerts}
         bindings={bindings}
         commissioning={commissioning}
         reader={reader}
@@ -47,6 +50,7 @@ export function BrowserWorkspace(props: ParentProps) {
 
 function MetadataComposition(
   props: ParentProps<{
+    readonly alerts: ReturnType<typeof createAlertReader>;
     readonly bindings: ReturnType<typeof createBindingGateway>;
     readonly commissioning: ReturnType<typeof createCommissioningGateway>;
     readonly devices: ReturnType<typeof createDeviceGateway>;
@@ -57,6 +61,7 @@ function MetadataComposition(
   const operator = useOperatorSession();
   return (
     <TenantMetadataWorkspace
+      alerts={props.alerts}
       bindings={props.bindings}
       commissioning={props.commissioning}
       devices={props.devices}
@@ -87,7 +92,7 @@ export function MetadataAccessBoundary(props: ParentProps) {
           <Show when={operator.state().kind !== 'authenticated'}>
             <header>
               <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-accent">
-                Workspace / Metadata
+                Workspace / Operator access
               </p>
               <h1
                 id="page-title"
@@ -98,8 +103,7 @@ export function MetadataAccessBoundary(props: ParentProps) {
                   : routeTitle(location.pathname)}
               </h1>
               <p class="mt-1 text-sm text-muted">
-                Operator access is required to review authorized tenant
-                metadata.
+                Operator access is required to review authorized tenant records.
               </p>
             </header>
           </Show>

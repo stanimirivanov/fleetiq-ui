@@ -45,7 +45,7 @@ test('the byte-identical pinned contract and provenance pass', async (context) =
   const paths = await fixture(context);
   assert.deepEqual(await checkAssetContract(paths), {
     commit: pinnedSource.commit,
-    operations: 31,
+    operations: 36,
   });
   assert.deepEqual(await readFile(paths.contractPath), pinnedBytes);
 });
@@ -167,7 +167,7 @@ const publishedOperations = BROWSER_OPERATIONS.map(
 );
 assert.equal(
   publishedOperations.length,
-  31,
+  36,
   'every consumed browser operation has a negative fixture',
 );
 for (const { route, method, id } of publishedOperations) {
@@ -221,7 +221,7 @@ for (const [name, mutate] of [
     },
   ],
   [
-    'excessive six-grant bound',
+    'legacy six-grant bound',
     (schema) => {
       schema.OperatorTenant.properties.actions.maxItems = 6;
     },

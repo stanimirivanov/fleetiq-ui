@@ -33,8 +33,8 @@ There is no separate mock server to start. Direct preview URLs are:
 - `/design-system` — synthetic light/dark design specimen.
 
 A production build never activates these sample previews or includes their
-fixture payloads. The ordinary overview and map use authorized backend evidence; Alerts remains
-unavailable until its backend contract exists.
+fixture payloads. The ordinary overview, map and Alerts use authorized backend evidence. Alerts
+provides bounded read-only lifecycle triage and exact calculator evidence.
 
 ## Connect metadata
 
@@ -75,3 +75,14 @@ recordings. See the [testing guide](docs/development/testing.md).
 Start with [AGENTS.md](AGENTS.md) and [docs/README.md](docs/README.md).
 [ARCHITECTURE.md](ARCHITECTURE.md) explains dependency and lifetime ownership;
 [docs/PLANS.md](docs/PLANS.md) tracks reviewable work.
+
+
+## Read alert evidence
+
+Open `/alerts`, select an authorized tenant and choose a phase filter. Select an
+exact rule revision to review its condition and bounded transition history, then
+choose **Inspect latest transition evidence** or a history entry. Calculator
+provenance and exact decimal outputs require separate `telemetry.read` access;
+`alerts.read` does not grant it. Use the explicit next-page links for queue,
+history and outputs. URL selection is shareable, but pages are independent
+observations and do not establish complete history or condition health.

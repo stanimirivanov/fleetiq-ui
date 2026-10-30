@@ -30,3 +30,5 @@ consequences, and alternatives.
 - [0011: Signal-binding authoring](0011-binding-authoring.md).
 
 - [0012: Native NGINX edge](0012-native-nginx-edge.md): remove the unpatched JOSE runtime while preserving qualified static/API/TLS behavior.
+
+- [0013: Connected alerts](0013-connected-alerts.md): bounded lifecycle triage and independently authorized exact calculator evidence.

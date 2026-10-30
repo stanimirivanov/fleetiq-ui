@@ -8,16 +8,12 @@ test('production Alerts route cannot activate synthetic incidents', async ({
   await page.goto('/alerts?preview=sample');
 
   await expect(alerts.heading).toBeVisible();
-  await expect(alerts.connectionNotice).toBeVisible();
-  await expect(alerts.connectionNotice).toContainText(
-    'Alert lifecycle, evidence reads, and browser-safe identity',
-  );
   await expect(alerts.queue).toHaveCount(0);
   await expect(alerts.selectedEvidence).toHaveCount(0);
   await expect(page.getByRole('banner')).toContainText('Sign-in unavailable');
 
   await page.goto('/alerts');
-  await expect(alerts.connectionNotice).toBeVisible();
+  await expect(page.getByRole('banner')).toContainText('Sign-in unavailable');
   await expect(alerts.alertList).toHaveCount(0);
   await expect(
     page.getByRole('link', { name: 'View sample alerts' }),

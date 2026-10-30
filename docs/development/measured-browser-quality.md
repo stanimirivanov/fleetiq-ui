@@ -266,3 +266,19 @@ CSS, latency, heap, node and security limits are unchanged.
 
 Final binding-authoring production output is 428,166 raw / 120,479 gzip non-map
 JavaScript bytes, within the owner-approved 440,000 / 125,000 limits.
+
+
+## M05 connected alerts qualification
+
+M05-PR13 adds desktop/narrow light/dark alert accessibility, keyboard filtering
+and independent denial states to the owned quality project. Its configuration
+sensor rejects omission. The 42-scenario quality group passes alongside 75
+production and 24 development browser scenarios. Alert parser/controller tests
+cover scope substitution, exact counters/decimals, bounded pages, unknown evidence,
+explicit retry, cancellation/unmount and late non-cooperative completion.
+
+Non-map JavaScript measures 433,783 raw / 123,920 gzip bytes, within unchanged
+440,000 / 125,000 caps; CSS measures 39,714 / 8,198. Private generator compaction
+shares identical primitive constraints and omits runtime documentation strings,
+with whole-published-schema constraint equivalence tests. No byte, map, latency,
+heap, node, existing coverage or security threshold is increased or removed.

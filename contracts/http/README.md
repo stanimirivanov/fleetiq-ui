@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.21` from merged
-`fleetiq-platform` commit `a1ca9e24035efdffca69ae50c2118228257936e4`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.26` from merged
+`fleetiq-platform` commit `c74e65d63f67b01968f7822ab3a6dd269d622b57`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -145,3 +145,29 @@ never substitute for backend authorization. This consumes
 After this UI revision is merged, deployment PR #32 must pin it and rerun real
 HTTPS/OIDC/TCP qualification. Browser contract fixtures do not complete that
 installation acceptance; D06 and full-profile qualification remain deferred.
+
+## Alert lifecycle and calculator evidence
+
+The selected browser client now consumes 36 operations, including listAlerts,
+getAlert, listAlertTransitions, getCalculatorEvaluationEvidence and
+listCalculatorEvaluationOutputs. Alert reads require alerts.read; calculator
+reads independently require telemetry.read. Queue/history/output pages request
+20 records, retain resource-bound opaque cursors and never imply snapshot coverage.
+Rule revisions are integers; lifecycle counters, timestamps and output decimals
+remain exact text. Discovery now admits all nine published actions independently.
+No acknowledgement or rule-write operation is selected.
+
+Baseline.26 contains a malformed escaped control-character regex in
+AdministrationIdentifier and SemanticDefinitionName. The exact-shape checked
+[identifier adapter](../../tools/sensors/identifier-generation.mjs) translates it
+only for private generation to the backend's no-trim/no-C0-or-C1-control rule,
+preserving bounds and rejecting unexpected source drift. The pinned artifact is
+byte-identical to upstream; an upstream specification correction remains desirable.
+
+The [compaction adapter](../../tools/sensors/compact-generation.mjs) hoists
+byte-identical primitive schemas and omits schema documentation descriptions from
+runtime output. It retains every validation keyword; tests expand the aliases and
+compare every published schema's constraint graph. Descriptions remain in this
+pinned OpenAPI artifact. This keeps the new slice within unchanged byte budgets.
+Generated internal schema identifiers/diagnostic text may differ; public typed
+failure categories and wire contracts are unchanged.

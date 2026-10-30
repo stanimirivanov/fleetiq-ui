@@ -1,17 +1,18 @@
 import { useLocation } from '@solidjs/router';
 import { lazy, Show, Suspense } from 'solid-js';
-import { ConnectionNotice, TextLink } from '#shared/ui';
+import { TextLink } from '#shared/ui';
 import {
   alertsSampleHref,
   isAlertsSamplePreview,
 } from '../model/alert-preview-url';
+import { ConnectedAlertsContent } from './connected/ConnectedAlertsContent';
 
 const DevelopmentAlertsContent = import.meta.env.DEV
   ? lazy(() => import('./DevelopmentAlertsContent'))
   : undefined;
 const SampleContent = DevelopmentAlertsContent ?? (() => null);
 
-/** Route boundary; alert records do not exist in the browser-safe API yet. */
+/** Explicit development samples are isolated from authenticated connected reads. */
 export function AlertsPage() {
   const location = useLocation();
   const showingSample = () =>
@@ -37,12 +38,8 @@ export function AlertsPage() {
       <Show
         when={showingSample()}
         fallback={
-          <div class="grid max-w-3xl gap-4">
-            <ConnectionNotice heading="Alerts are not connected">
-              Alert lifecycle, evidence reads, and browser-safe identity need
-              published backend contracts. No alert state can be inferred from
-              asset metadata or a last-known signal.
-            </ConnectionNotice>
+          <div class="grid min-w-0 gap-4">
+            <ConnectedAlertsContent />
             {DevelopmentAlertsContent && (
               <TextLink href={alertsSampleHref()}>View sample alerts</TextLink>
             )}

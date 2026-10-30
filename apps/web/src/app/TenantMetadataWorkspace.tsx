@@ -1,5 +1,11 @@
 import { useLocation, useNavigate } from '@solidjs/router';
 import type { ParentProps } from 'solid-js';
+import {
+  AlertProvider,
+  type AlertReader,
+  alertHref,
+  alertTenantHref,
+} from '#features/alerts';
 import type {
   BindingGateway,
   CommissioningGateway,
@@ -22,6 +28,7 @@ import { AppShell } from './AppShell';
 import { isDevelopmentSampleRoute } from './sample-route';
 
 type WorkspaceProps = ParentProps<{
+  readonly alerts: AlertReader;
   readonly devices: DeviceGateway;
   readonly commissioning: CommissioningGateway;
   readonly bindings: BindingGateway;
@@ -36,6 +43,7 @@ export function TenantMetadataWorkspace(props: WorkspaceProps) {
   const enabled = () =>
     (location.pathname.startsWith('/assets') ||
       location.pathname === '/devices' ||
+      location.pathname === '/alerts' ||
       location.pathname === '/map' ||
       location.pathname === '/') &&
     !isDevelopmentSampleRoute(
@@ -129,7 +137,26 @@ function MetadataWorkspaceBridge(props: WorkspaceProps) {
           />
         )}
       >
-        <AppShell>{props.children}</AppShell>
+        <AlertProvider
+          reader={props.alerts}
+          onUnauthorized={props.onUnauthorized}
+          tenantControl={(selected) => (
+            <OperatorTenantSelector
+              selected={selected}
+              after={tenantDiscoveryCursor(location.search)}
+              select={(id) => navigate(alertTenantHref(location.search, id))}
+              page={(after) =>
+                navigate(
+                  alertHref(location.search, {
+                    tenant_after: after ?? undefined,
+                  }),
+                )
+              }
+            />
+          )}
+        >
+          <AppShell>{props.children}</AppShell>
+        </AlertProvider>
       </DeviceProvider>
     </MetadataReaderProvider>
   );

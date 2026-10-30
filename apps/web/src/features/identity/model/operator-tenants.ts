@@ -4,7 +4,11 @@ export type TenantAction =
   | 'metadata.manage'
   | 'metadata.read'
   | 'telemetry.read'
-  | 'protocol.manage';
+  | 'protocol.manage'
+  | 'analytics.manage'
+  | 'alerts.read'
+  | 'alerts.manage'
+  | 'alerts.acknowledge';
 
 export interface OperatorTenant {
   readonly id: string;

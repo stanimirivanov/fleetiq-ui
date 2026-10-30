@@ -1,5 +1,7 @@
 import { isDeepStrictEqual } from 'node:util';
 import { BROWSER_OPERATIONS } from './asset-contract.mjs';
+import { compactBrowserSchemas } from './compact-generation.mjs';
+import { identifierGenerationPatch } from './identifier-generation.mjs';
 
 /** Equivalent disjoint union for the one conditional unsupported by Effect 4.0.5.
  * Fail on upstream drift: never silently drop an unknown schema constraint.
@@ -58,6 +60,8 @@ export function browserGenerationPatch(spec) {
   const source = structuredClone(spec);
   for (const patch of routeGenerationPatch(spec))
     source.components.schemas.ProtocolDeviceRoute = patch.value;
+  for (const patch of identifierGenerationPatch(spec))
+    source.components.schemas[patch.path.split('/').at(-1)] = patch.value;
   const paths = {};
   for (const { path, method, id } of BROWSER_OPERATIONS) {
     if (source.paths[path]?.[method]?.operationId !== id)
@@ -89,6 +93,7 @@ export function browserGenerationPatch(spec) {
     for (const child of Object.values(value)) visit(child);
   };
   visit(paths);
+  compactBrowserSchemas(components);
   return [
     { op: 'replace', path: '/paths', value: paths },
     { op: 'replace', path: '/components', value: components },

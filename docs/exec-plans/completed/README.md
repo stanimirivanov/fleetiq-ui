@@ -43,3 +43,5 @@ evidence and material limitations for future reviewers.
 - [Connected fleet overview](2026-10-connected-fleet-overview.md): PR #93 merged with passing checks, confirmed by the owner.
 
 - [Registry commissioning](2026-10-registry-commissioning.md): PR #95 merged, owner confirmed all checks passing.
+
+- [Connected alert queue and evidence](2026-10-connected-alerts.md) — M05-PR13, issue #104; local required groups passed.

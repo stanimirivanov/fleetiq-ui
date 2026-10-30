@@ -1,3 +1,7 @@
+import type {
+  Acknowledgement,
+  AcknowledgementRequest,
+} from './acknowledgement';
 import type { Definition } from './alert-definition';
 import type { RuleGateway } from './alert-rules';
 
@@ -10,6 +14,7 @@ export interface EvaluationRef {
   readonly output_index: number | null;
 }
 export interface Transition {
+  readonly acknowledgement?: Acknowledgement | null;
   readonly version: string;
   readonly phase: Phase;
   readonly event_at_ms: string;
@@ -117,6 +122,10 @@ export interface ReadOptions {
   readonly signal?: AbortSignal;
 }
 export interface AlertReader {
+  acknowledge?(
+    request: AcknowledgementRequest,
+    options?: ReadOptions,
+  ): Promise<Acknowledgement>;
   readonly rules?: RuleGateway;
   queue(request: QueueRequest, options?: ReadOptions): Promise<AlertPage>;
   detail(request: DetailRequest, options?: ReadOptions): Promise<Detail>;

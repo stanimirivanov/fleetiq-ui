@@ -95,3 +95,13 @@ deactivate using the reviewed generation. The UI needs `alerts.read` for review
 and separate `alerts.manage` for writes. Missing/unusable evidence is unknown.
 An unconfirmed command locks its original payload for **Retry exact command**;
 a conflicting command offers a fresh-head reload. A retry receipt may be historical.
+
+## Acknowledge an alert
+
+Select an exact pending/firing alert and choose **Acknowledge displayed version**.
+This independently requires `alerts.acknowledge`; rule-management grants do not
+imply it. The receipt identifies the exact lifecycle version, actor and recorded
+time. Acknowledgement does not resolve, silence, assign or suppress delivery.
+A resolution race requires **Refresh current alert**; an unconfirmed response
+allows only the captured exact retry. Later lifecycle versions require their own
+acknowledgement. Current and historical transition annotations remain separate.

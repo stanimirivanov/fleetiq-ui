@@ -148,14 +148,14 @@ installation acceptance; D06 and full-profile qualification remain deferred.
 
 ## Alert lifecycle and calculator evidence
 
-The selected browser client now consumes 40 operations, including listAlerts,
+The selected browser client now consumes 41 operations, including listAlerts,
 getAlert, listAlertTransitions, getCalculatorEvaluationEvidence and
 listCalculatorEvaluationOutputs. Alert reads require alerts.read; calculator
 reads independently require telemetry.read. Queue/history/output pages request
 20 records, retain resource-bound opaque cursors and never imply snapshot coverage.
 Rule revisions are integers; lifecycle counters, timestamps and output decimals
 remain exact text. Discovery now admits all nine published actions independently.
-Rule-write selection is documented below; acknowledgement remains in PR14b.
+Rule-write and acknowledgement selection is documented below.
 
 Baseline.26 contains a malformed escaped control-character regex in
 AdministrationIdentifier and SemanticDefinitionName. The exact-shape checked
@@ -175,9 +175,17 @@ failure categories and wire contracts are unchanged.
 ## Alert rule commands
 
 The consumer selection adds getAlertRuleHead, getAlertRuleRevision,
-createAlertRuleRevision and changeAlertRuleActivation (40 operations total), all
+createAlertRuleRevision and changeAlertRuleActivation (41 operations total), all
 already present in the unchanged pinned baseline.26. Managed browser mutations
 supply the existing CSRF contract without exposing credentials. Retained definition,
 revision, generation and audit values are validated; legacy numeric audit clocks
 must be safe integers. Parameter compaction shares equivalent scalar validators
 and preserves defaults as well as bounds; schema and parameter fixtures qualify it.
+
+## Exact-version acknowledgement
+
+The consumer selects acknowledgeAlert (41 operations total) from the same pinned
+snapshot. Only expected_version is serialized; app-owned actor expectation validates
+its returned audit identity. Lifecycle counters and acknowledgement clocks remain
+canonical signed-i64 strings. Optional read annotations are validated against each
+transition's own version. Neither receipts nor annotations resolve/silence an alert.

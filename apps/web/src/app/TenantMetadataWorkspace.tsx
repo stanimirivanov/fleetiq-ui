@@ -29,6 +29,7 @@ import { isDevelopmentSampleRoute } from './sample-route';
 
 type WorkspaceProps = ParentProps<{
   readonly alerts: AlertReader;
+  readonly actorId: () => string | undefined;
   readonly devices: DeviceGateway;
   readonly commissioning: CommissioningGateway;
   readonly bindings: BindingGateway;
@@ -138,6 +139,7 @@ function MetadataWorkspaceBridge(props: WorkspaceProps) {
         )}
       >
         <AlertProvider
+          actorId={props.actorId}
           actions={() => {
             const s = tenants.state();
             return s.kind === 'ready'

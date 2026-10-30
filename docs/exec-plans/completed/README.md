@@ -47,3 +47,5 @@ evidence and material limitations for future reviewers.
 - [Connected alert queue and evidence](2026-10-connected-alerts.md) — M05-PR13, issue #104; local required groups passed.
 
 - [Alert rule authoring](2026-10-alert-rule-authoring.md) — M05-PR14a, issue #106; local required groups passed.
+
+- [Alert acknowledgement UI](2026-10-alert-acknowledgement-ui.md) — M05-PR14b, issue #107; local required groups passed.

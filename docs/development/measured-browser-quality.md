@@ -295,3 +295,16 @@ rule-form accessibility tests cover desktop/narrow light/dark and keyboard use.
 The isolated rule-authoring slice passes all required groups: 78 production,
 24 development and 46 measured-quality scenarios. Final non-map JS measures
 444,820 raw / 128,043 gzip bytes within the approved caps.
+
+
+## M05 exact-version acknowledgement workload
+
+PR14b adds independent acknowledgement desktop/narrow light/dark keyboard and
+annotation checks, plus omission rejection in the quality configuration sensor.
+Focused tests cover exact actor/version/time, optional historical annotations,
+uncertain replay after denial and a resolution race requiring current-alert refresh.
+The already approved JavaScript caps and every other policy threshold are unchanged.
+
+The combined acknowledgement slice passes 81 production, 24 development and
+50 quality scenarios. Final non-map JS measures 448,822 raw / 129,023 gzip bytes;
+no further budget or other threshold changes are introduced by this slice.

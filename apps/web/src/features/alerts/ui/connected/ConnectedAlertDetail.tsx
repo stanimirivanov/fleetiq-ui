@@ -1,11 +1,16 @@
-import { createMemo, For, Show } from 'solid-js';
+import { createMemo, createSignal, For, Show } from 'solid-js';
 import { TextLink } from '#shared/ui';
+import type { Acknowledgement } from '../../model/acknowledgement';
 import {
   type AlertQuery,
   alertHref,
   clearEvidence,
 } from '../../model/alert-query';
 import type { DetailRequest } from '../../model/connected-alerts';
+import {
+  AcknowledgementNote,
+  AlertAcknowledgement,
+} from '../AlertAcknowledgement';
 import { AlertReadPanel } from './AlertReadPanel';
 import { ConnectedAlertEvidence } from './ConnectedAlertEvidence';
 import { useAlertRead } from './useAlertRead';
@@ -22,6 +27,10 @@ export function ConnectedAlertDetail(props: {
         }
       : null,
   );
+  const [receipt, setReceipt] = createSignal<{
+    scope: string;
+    value: Acknowledgement;
+  }>();
   const detail = useAlertRead(request, (reader, r, o) => reader.detail(r, o));
   const ready = createMemo(() => {
     const s = detail.state();
@@ -57,6 +66,20 @@ export function ConnectedAlertDetail(props: {
   });
   return (
     <div class="grid min-w-0 gap-4 lg:grid-cols-2">
+      <Show
+        when={
+          receipt()?.scope === JSON.stringify(request())
+            ? receipt()?.value
+            : undefined
+        }
+      >
+        {(a) => (
+          <div role="status" class="lg:col-span-2">
+            <p>Confirmed command receipt:</p>
+            <AcknowledgementNote receipt={a()} />
+          </div>
+        )}
+      </Show>
       <AlertReadPanel
         label="Alert detail"
         state={detail.state()}
@@ -91,6 +114,19 @@ export function ConnectedAlertDetail(props: {
               Last event {d.alert.last_event_at_ms} ms · duration candidate
               since {d.alert.candidate_since_ms ?? '—'}
             </p>
+            <AlertAcknowledgement
+              tenant={props.query.tenant}
+              alert={d.alert}
+              refresh={() => {
+                detail.retry();
+                history.retry();
+              }}
+              committed={(value) => {
+                setReceipt({ scope: JSON.stringify(request()), value });
+                detail.retry();
+                history.retry();
+              }}
+            />
             <TextLink
               href={alertHref(props.search, {
                 evaluation: d.alert.latest_transition.evidence.evaluation_id,
@@ -127,6 +163,7 @@ export function ConnectedAlertDetail(props: {
                           {t.event_at_ms} ms · recorded {t.recorded_at_ms} ms ·
                           activation {t.activation_generation}
                         </p>
+                        <AcknowledgementNote receipt={t.acknowledgement} />
                         <TextLink
                           href={alertHref(props.search, {
                             evaluation: t.evidence.evaluation_id,

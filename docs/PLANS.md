@@ -110,3 +110,7 @@ M05-PR14 is split before implementation into rule authoring and acknowledgement,
 following its approved size condition. The [rule-authoring slice](exec-plans/completed/2026-10-alert-rule-authoring.md)
 adds exact configuration review, immutable appends and generation-checked activation;
 acknowledgement follows as a separate stacked review slice.
+
+The stacked [acknowledgement slice](exec-plans/completed/2026-10-alert-acknowledgement-ui.md)
+completes M05-PR14 with exact-version actor-attributed commands and conflict/retry
+recovery, without changing lifecycle or delivery state.

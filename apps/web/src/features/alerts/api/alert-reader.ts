@@ -18,6 +18,7 @@ import {
   parseOutputs,
   parseQueue,
 } from './parse-alerts';
+import { createRuleGateway } from './rule-gateway';
 /** All execution uses the app-owned managed browser runtime. */
 export function createAlertReader(api: BrowserApi): AlertReader {
   const valid = (ids: readonly string[], after?: string) => {
@@ -44,6 +45,7 @@ export function createAlertReader(api: BrowserApi): AlertReader {
       options,
     );
   return {
+    rules: createRuleGateway(api),
     async queue(r, o) {
       valid([r.tenant], r.after);
       if (r.phase !== undefined && !phases.includes(r.phase))

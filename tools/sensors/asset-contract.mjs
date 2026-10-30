@@ -35,6 +35,27 @@ const operations = {
 };
 export const BROWSER_OPERATIONS = [
   {
+    path: '/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}',
+    method: 'get',
+    id: 'getAlertRuleHead',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}/revisions/{revision}',
+    method: 'get',
+    id: 'getAlertRuleRevision',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}/revisions/{revision}',
+    method: 'put',
+    id: 'createAlertRuleRevision',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}/activation',
+    method: 'put',
+    id: 'changeAlertRuleActivation',
+  },
+
+  {
     path: '/api/v1/tenants/{tenant_id}/alerts',
     method: 'get',
     id: 'listAlerts',

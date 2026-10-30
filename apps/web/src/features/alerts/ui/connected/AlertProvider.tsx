@@ -3,6 +3,7 @@ import type { AlertReader } from '../../model/connected-alerts';
 
 interface Context {
   readonly reader?: AlertReader;
+  readonly actions?: () => readonly string[] | undefined;
   readonly onUnauthorized?: () => void;
   readonly tenantControl?: (selected: string) => JSX.Element;
 }

@@ -1,9 +1,8 @@
 # FleetIQ UI
 
-Development and repository verification are supported on Linux.
-
-
 ## TL;DR
+
+Development and repository verification are supported on Linux.
 
 FleetIQ's SolidJS operator console connects asset identities, pinned definitions,
 directed relationships, and signal bindings through same-origin operator sessions.
@@ -86,3 +85,13 @@ provenance and exact decimal outputs require separate `telemetry.read` access;
 `alerts.read` does not grant it. Use the explicit next-page links for queue,
 history and outputs. URL selection is shareable, but pages are independent
 observations and do not establish complete history or condition health.
+
+## Configure alert rules
+
+On `/alerts`, enter an exact **Rule ID to configure**. Review the current head and
+retained definition, then append its next immutable numeric-threshold revision.
+Creation leaves activation unchanged. Explicitly activate a retained revision or
+deactivate using the reviewed generation. The UI needs `alerts.read` for review
+and separate `alerts.manage` for writes. Missing/unusable evidence is unknown.
+An unconfirmed command locks its original payload for **Retry exact command**;
+a conflicting command offers a fresh-head reload. A retry receipt may be historical.

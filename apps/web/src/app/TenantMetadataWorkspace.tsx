@@ -138,6 +138,15 @@ function MetadataWorkspaceBridge(props: WorkspaceProps) {
         )}
       >
         <AlertProvider
+          actions={() => {
+            const s = tenants.state();
+            return s.kind === 'ready'
+              ? s.page.tenants.find(
+                  (t) =>
+                    t.id === new URLSearchParams(location.search).get('tenant'),
+                )?.actions
+              : undefined;
+          }}
           reader={props.alerts}
           onUnauthorized={props.onUnauthorized}
           tenantControl={(selected) => (

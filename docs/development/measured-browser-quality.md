@@ -50,7 +50,7 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 440,000 / 125,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 460,000 / 132,000 JS bytes and 60,000 / 16,000 CSS bytes.
 The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
 to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
 and adding a 200-replacement burst/disposal workload under unchanged latency,
@@ -282,3 +282,16 @@ Non-map JavaScript measures 433,783 raw / 123,920 gzip bytes, within unchanged
 shares identical primitive constraints and omits runtime documentation strings,
 with whole-published-schema constraint equivalence tests. No byte, map, latency,
 heap, node, existing coverage or security threshold is increased or removed.
+
+
+## M05 alert-command budget review
+
+On 2026-10-30 the owner explicitly approved non-map JavaScript caps of 460,000
+raw / 132,000 gzip bytes for both M05-PR14 slices after parameter compaction and
+measured form workloads. All CSS, map, latency, heap, DOM, existing coverage and
+security limits remain unchanged. Decoder diagnostics are retained. Dedicated
+rule-form accessibility tests cover desktop/narrow light/dark and keyboard use.
+
+The isolated rule-authoring slice passes all required groups: 78 production,
+24 development and 46 measured-quality scenarios. Final non-map JS measures
+444,820 raw / 128,043 gzip bytes within the approved caps.

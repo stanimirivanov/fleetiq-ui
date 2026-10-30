@@ -32,3 +32,5 @@ consequences, and alternatives.
 - [0012: Native NGINX edge](0012-native-nginx-edge.md): remove the unpatched JOSE runtime while preserving qualified static/API/TLS behavior.
 
 - [0013: Connected alerts](0013-connected-alerts.md): bounded lifecycle triage and independently authorized exact calculator evidence.
+
+- [0014: Alert commands](0014-alert-commands.md): immutable rule authoring, optimistic activation and exact ambiguous-command recovery.

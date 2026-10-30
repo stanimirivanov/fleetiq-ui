@@ -85,3 +85,20 @@ test('every published schema retains its complete constraint graph after primiti
       name,
     );
 });
+
+test('reused parameter constraints and defaults survive hoisting without altering query semantics', () => {
+  const components = {
+    schemas: {},
+    parameters: {
+      Limit: {
+        name: 'limit',
+        in: 'query',
+        required: false,
+        schema: { type: 'integer', minimum: 1, maximum: 100, default: 50 },
+      },
+    },
+  };
+  const before = structuredClone(components.parameters);
+  compactBrowserSchemas(components);
+  assert.deepEqual(expand(components.parameters, components.schemas), before);
+});

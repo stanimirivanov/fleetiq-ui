@@ -105,3 +105,8 @@ in **M02** removes Windows host support and CI lanes while retaining Linux gates
 The completed [connected alert queue and evidence slice](exec-plans/completed/2026-10-connected-alerts.md)
 implements M05-PR13 with authorized reads and exact calculator evidence; rule editing
 and acknowledgement controls remain separate slices.
+
+M05-PR14 is split before implementation into rule authoring and acknowledgement,
+following its approved size condition. The [rule-authoring slice](exec-plans/completed/2026-10-alert-rule-authoring.md)
+adds exact configuration review, immutable appends and generation-checked activation;
+acknowledgement follows as a separate stacked review slice.

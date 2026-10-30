@@ -45,3 +45,5 @@ evidence and material limitations for future reviewers.
 - [Registry commissioning](2026-10-registry-commissioning.md): PR #95 merged, owner confirmed all checks passing.
 
 - [Connected alert queue and evidence](2026-10-connected-alerts.md) — M05-PR13, issue #104; local required groups passed.
+
+- [Alert rule authoring](2026-10-alert-rule-authoring.md) — M05-PR14a, issue #106; local required groups passed.

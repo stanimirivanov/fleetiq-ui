@@ -32,8 +32,8 @@ backend publishes browser-safe detail and signal read models.
 The [completed fleet overview and asset discovery slice](exec-plans/completed/2026-10-fleet-overview-asset-discovery.md)
 uses clearly labelled synthetic operational data for local design review. The
 published backend contract currently provides bounded asset identity pages;
-location, status,
-alerts, and signal views wait for backend-owned read models. Existing
+operational previews originally waited for backend-owned read models. Connected
+location, property evidence and alert lifecycle reads now consume published contracts. Existing
 [cursor navigation](exec-plans/completed/2026-10-asset-catalogue-cursor-navigation.md)
 keeps sample pages reachable without inventing a fleet total or server-side
 search.
@@ -101,3 +101,7 @@ Product-plan PR 32 is the active [binding authoring and attribution review](exec
 
 The [Linux development cleanup](exec-plans/active/2026-10-linux-development.md)
 in **M02** removes Windows host support and CI lanes while retaining Linux gates.
+
+The completed [connected alert queue and evidence slice](exec-plans/completed/2026-10-connected-alerts.md)
+implements M05-PR13 with authorized reads and exact calculator evidence; rule editing
+and acknowledgement controls remain separate slices.

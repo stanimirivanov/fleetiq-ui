@@ -58,7 +58,14 @@ render(
           </MetadataAccessBoundary>
         )}
       />
-      <Route path={APP_ROUTES.alerts.path} component={AlertsPage} />
+      <Route
+        path={APP_ROUTES.alerts.path}
+        component={() => (
+          <MetadataAccessBoundary>
+            <AlertsPage />
+          </MetadataAccessBoundary>
+        )}
+      />
       <Route
         path={APP_ROUTES.registry.path}
         component={() => (

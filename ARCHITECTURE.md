@@ -96,8 +96,8 @@ Local Vite development retains the labelled sample overview, schematic map, asse
 inspector, finite signal playback, registry, and alert triage. These fixtures are
 separate from backend models and excluded from production output. The map uses
 percentage canvas positions, not observed geography. Production exact-property snapshots, bounded hot history and original provenance
-now exist. Exact-property SSE is opt-in; no geodetic map SDK, tiles, alert lifecycle or native
-mobile app is connected yet. Introduce Effect Atom only with an actual shared granular-state need.
+now exist. Exact-property SSE is opt-in; geodetic mapping and bounded alert lifecycle reads are connected; native mobile
+remains outside this UI. Introduce Effect Atom only with an actual shared granular-state need.
 
 [FRONTEND.md](docs/FRONTEND.md) details the selected stack;
 [PLANS.md](docs/PLANS.md) records sequencing and acceptance evidence.
@@ -130,3 +130,10 @@ Binding authoring uses a separate asset-feature command/discovery port injected 
 app composition. Registered endpoints and protocol-authorized observations remain
 distinct; target eligibility uses the asset type’s exact property references. See
 [decision 0011](docs/design-docs/0011-binding-authoring.md).
+
+
+The [alert read decision](docs/design-docs/0013-connected-alerts.md) keeps alert
+models and validated calculator evidence inside the alerts feature. App composition
+supplies a separate port, tenant selector and session invalidation. Alerts do not
+inherit metadata.read or telemetry.read from discovery hints. URL selection and
+bounded cursor changes dispose superseded reads, including non-cooperative results.

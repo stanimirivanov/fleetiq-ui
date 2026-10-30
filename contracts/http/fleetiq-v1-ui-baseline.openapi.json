@@ -2,8 +2,8 @@
   "openapi": "3.1.1",
   "info": {
     "title": "FleetIQ HTTP UI baseline",
-    "version": "1.0.0-baseline.21",
-    "description": "Backend-owned, versioned subset of the /api/v1 HTTP surface for asset identity, semantic metadata reads, and actor administration. Other implemented routes are intentionally not yet described here. Protected routes use configured workload bearer or provider-neutral OIDC browser sessions. Modes are mutually exclusive; metadata reads check current identity and tenant metadata.read policy. Operator tenant discovery returns advisory current grants without authorizing operations. Actor administration requires exact platform identity.manage and browser mutation protection. Platform-grant administration requires exact platform.access.manage authority. Tenant grant administration requires exact tenant access.manage authority. Semantic definition publication requires exact metadata.manage; bounded catalogues require metadata.read. Asset and communication-device registration require exact metadata.manage and atomically record original actor/time evidence. Relationship and signal-binding revision commands preserve immutable temporal lineage with original actor attribution and exact retry resolution. Protocol artifact registration and isolated policy-versioned admission require separate exact protocol.manage; neither activates a device. Property history and exact interpretation provenance require separately delegated telemetry.read; baseline.16 expands the closed action vocabulary without upgrading grants."
+    "version": "1.0.0-baseline.26",
+    "description": "Backend-owned, versioned subset of the /api/v1 HTTP surface for asset identity, semantic metadata reads, and actor administration. Other implemented routes are intentionally not yet described here. Protected routes use configured workload bearer or provider-neutral OIDC browser sessions. Modes are mutually exclusive; metadata reads check current identity and tenant metadata.read policy. Operator tenant discovery returns advisory current grants without authorizing operations. Actor administration requires exact platform identity.manage and browser mutation protection. Platform-grant administration requires exact platform.access.manage authority. Tenant grant administration requires exact tenant access.manage authority. Semantic definition publication requires exact metadata.manage; bounded catalogues require metadata.read. Asset and communication-device registration require exact metadata.manage and atomically record original actor/time evidence. Relationship and signal-binding revision commands preserve immutable temporal lineage with original actor attribution and exact retry resolution. Protocol artifact registration and isolated policy-versioned admission require separate exact protocol.manage; neither activates a device. Property history and exact interpretation provenance require separately delegated telemetry.read; baseline.16 expands the closed action vocabulary without upgrading grants. Calculator configuration reads require metadata.read and revision/activation writes require separate analytics.manage; baseline.22 expands discovery to six actions without implicit grants."
   },
   "servers": [
     {
@@ -12,6 +12,637 @@
   ],
   "security": [],
   "paths": {
+    "/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}": {
+      "get": {
+        "operationId": "getAlertRuleHead",
+        "summary": "Read alert-rule authoring head and current selection",
+        "description": "Requires exact alerts.read before resource discovery; management, metadata or telemetry grants do not imply this read. Latest revision and activation are separate version counters. A newly created rule is inactive.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertRuleHeadSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/AlertRuleMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}/revisions/{revision}": {
+      "get": {
+        "operationId": "getAlertRuleRevision",
+        "summary": "Read one retained alert-rule revision",
+        "description": "Requires exact alerts.read before resource discovery; management, metadata or telemetry grants do not imply this read. Returns retained exact content and original authenticated actor/time.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-revision"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertRuleRevisionSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/AlertRuleMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "operationId": "createAlertRuleRevision",
+        "summary": "Append one immutable alert-rule revision",
+        "description": "Requires exact alerts.manage, independently delegated; browser mutations require matching Origin and X-FleetIQ-CSRF. Current actor, tenant and grant are rechecked transactionally. Create only the next immutable revision; equivalent canonical numeric text and same author retry exactly. New revisions remain inactive while any prior selected revision remains selected.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-revision"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-origin"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-csrf"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertRuleRevisionCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/AlertRuleMethodNotAllowed"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlertRuleConflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertRuleDefinition"
+              },
+              "example": {
+                "kind": "numeric-threshold-v1",
+                "calculator": "mean",
+                "version": "1",
+                "scope": "asset-a",
+                "target": "result",
+                "output_property": "mean.voltage",
+                "output_version": 1,
+                "output_index": 0,
+                "comparison": "gt",
+                "threshold": "50",
+                "threshold_unit": "volt",
+                "hold_ms": 1000,
+                "resolution": "resolve_on_false",
+                "resolve_after_ms": 2000
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}/activation": {
+      "put": {
+        "operationId": "changeAlertRuleActivation",
+        "summary": "Select or deactivate an alert-rule revision",
+        "description": "Requires exact alerts.manage, independently delegated; browser mutations require matching Origin and X-FleetIQ-CSRF. Current actor, tenant and grant are rechecked transactionally. Selection uses expected_generation; exact same-author retries return original receipt without restoring old state. This endpoint configures intent only; no alert worker or notification delivery is started.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-id"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-origin"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-csrf"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertRuleActivationSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/AlertRuleMethodNotAllowed"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlertRuleConflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertRuleActivationRequest"
+              },
+              "example": {
+                "expected_generation": 0,
+                "revision": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/assets/{asset_id}/calculator-evaluations": {
+      "get": {
+        "operationId": "listCalculatorEvaluations",
+        "summary": "listCalculatorEvaluations",
+        "description": "Requires fresh exact telemetry.read before discovery; metadata.read or analytics.manage does not imply access. Strict query fields, no-store, at most 1 MiB serialized response, no raw preparation/payload expansion. Half-open event-time range is [start_at_ms,end_at_ms), at most seven days; event time is window end. Cursors bind tenant/asset/range; new backdated appends are not a paging snapshot.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/telemetry-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evidence-asset-id"
+          },
+          {
+            "$ref": "#/components/parameters/history-start-at-ms"
+          },
+          {
+            "$ref": "#/components/parameters/history-end-at-ms"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evaluation-limit"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evidence-after"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CalculatorEvaluationPageSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/assets/{asset_id}/calculator-evaluations/{evaluation_id}": {
+      "get": {
+        "operationId": "getCalculatorEvaluationEvidence",
+        "summary": "getCalculatorEvaluationEvidence",
+        "description": "Requires fresh exact telemetry.read before discovery; metadata.read or analytics.manage does not imply access. Strict query fields, no-store, at most 1 MiB serialized response, no raw preparation/payload expansion. Returns retained exact calculator/configuration/input identity without re-evaluation. Outputs are paged separately.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/telemetry-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evidence-asset-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evaluation-id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CalculatorEvaluationEvidenceSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/assets/{asset_id}/calculator-evaluations/{evaluation_id}/outputs": {
+      "get": {
+        "operationId": "listCalculatorEvaluationOutputs",
+        "summary": "listCalculatorEvaluationOutputs",
+        "description": "Requires fresh exact telemetry.read before discovery; metadata.read or analytics.manage does not imply access. Strict query fields, no-store, at most 1 MiB serialized response, no raw preparation/payload expansion. Exact evaluation must belong to the tenant and input scope. Cursor binds this evaluation and resource; it cannot be used on another output page.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/telemetry-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evidence-asset-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evaluation-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-output-limit"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-evidence-after"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CalculatorOutputPageSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/calculator-configurations/{configuration_id}/revisions/{revision}": {
+      "get": {
+        "operationId": "getCalculatorConfigurationRevision",
+        "summary": "getCalculatorConfigurationRevision",
+        "description": "Requires current metadata.read before resource discovery. Immutable revision creation leaves the active selection unchanged; exact same-author retries preserve original evidence.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-configuration-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-configuration-revision"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CalculatorRevisionSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorConfigurationMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "operationId": "createCalculatorConfigurationRevision",
+        "summary": "createCalculatorConfigurationRevision",
+        "description": "Requires exact analytics.manage, never implied by metadata/protocol grants. Browser mutations require matching Origin and X-FleetIQ-CSRF. Transactionally rechecks current actor, tenant and grant. Immutable revision creation leaves the active selection unchanged; exact same-author retries preserve original evidence.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-configuration-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-configuration-revision"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-origin"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-csrf"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CalculatorRevisionCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorConfigurationMethodNotAllowed"
+          },
+          "409": {
+            "$ref": "#/components/responses/CalculatorConfigurationConflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculatorParameters"
+              },
+              "example": {
+                "calculator": "mean",
+                "version": "1",
+                "scope": "asset-a",
+                "target": "result",
+                "first_start": 0,
+                "window_ms": 3000,
+                "lateness_ms": 0,
+                "minimum_samples": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/calculator-configurations/{configuration_id}/activation": {
+      "get": {
+        "operationId": "getCalculatorActivation",
+        "summary": "getCalculatorActivation",
+        "description": "Requires current metadata.read before resource discovery. Inactive by default. Selection serializes with enumeration and claims; deactivation pauses unclaimed work, while already issued claims may complete with original evidence. A stale exact retry returns its original receipt without restoring selection.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-configuration-id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CalculatorActivationSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorConfigurationMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "operationId": "changeCalculatorActivation",
+        "summary": "changeCalculatorActivation",
+        "description": "Requires exact analytics.manage, never implied by metadata/protocol grants. Browser mutations require matching Origin and X-FleetIQ-CSRF. Transactionally rechecks current actor, tenant and grant. Inactive by default. Selection serializes with enumeration and claims; deactivation pauses unclaimed work, while already issued claims may complete with original evidence. A stale exact retry returns its original receipt without restoring selection.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/calculator-configuration-id"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-origin"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-csrf"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CalculatorActivationSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorConfigurationMethodNotAllowed"
+          },
+          "409": {
+            "$ref": "#/components/responses/CalculatorConfigurationConflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculatorActivationRequest"
+              },
+              "example": {
+                "expected_generation": 0,
+                "revision": 1
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tenants/{tenant_id}/fleet": {
       "get": {
         "operationId": "getFleetSnapshot",
@@ -3094,10 +3725,1176 @@
           }
         }
       }
+    },
+    "/api/v1/tenants/{tenant_id}/alerts": {
+      "get": {
+        "operationId": "listAlerts",
+        "summary": "Read the tenant alert queue",
+        "description": "Requires exact current alerts.read before discovery. Metadata, telemetry, analytics and alerts.manage grants imply no access. Omission of phase selects pending/firing; exact filters include retained resolved/inactive history. Newly initialized version-zero checkpoints are not alerts. Queue order uses stable rule identity and revision, not mutable phase/time. Inserts before the cursor or changing filters can enter/leave traversal; this is not a live snapshot. All evidence references target existing calculator reads that retain separate telemetry.read authority; no raw output or input payload is expanded.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-phase"
+          },
+          {
+            "$ref": "#/components/parameters/alert-page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/alert-read-after"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertPageSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/alerts/{rule_id}/revisions/{revision}": {
+      "get": {
+        "operationId": "getAlert",
+        "summary": "Read an exact pinned alert lifecycle",
+        "description": "Requires exact current alerts.read before discovery. Metadata, telemetry, analytics and alerts.manage grants imply no access. Returns the current checkpoint, latest phase-changing evaluation reference and exact pinned condition. Missing, foreign and never-transitioned revisions return 404. No acknowledgement or mutation is implied. All evidence references target existing calculator reads that retain separate telemetry.read authority; no raw output or input payload is expanded.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-identity-revision"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertDetailSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/alerts/{rule_id}/revisions/{revision}/transitions": {
+      "get": {
+        "operationId": "listAlertTransitions",
+        "summary": "Read bounded alert transition history",
+        "description": "Requires exact current alerts.read before discovery. Metadata, telemetry, analytics and alerts.manage grants imply no access. Transitions retain original event/receipt times, activation generation and exact evidence identity. Pages advance by positive lifecycle version. A missing/foreign/unobserved alert returns 404; an exhausted page is empty. Cursors from another resource or revision are invalid. All evidence references target existing calculator reads that retain separate telemetry.read authority; no raw output or input payload is expanded.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-identity-revision"
+          },
+          {
+            "$ref": "#/components/parameters/alert-page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/alert-read-after"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertTransitionPageSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/alerts/{rule_id}/revisions/{revision}/acknowledgement": {
+      "put": {
+        "operationId": "acknowledgeAlert",
+        "summary": "Acknowledge an expected open alert version",
+        "description": "Requires independent current alerts.acknowledge; alerts.read/manage and other grants imply no authority. Browser mutations require exact Origin and X-FleetIQ-CSRF. Rechecks active actor, tenant and grant transactionally even for retries. First commands require the current pending/firing version. Exact same-author retries return original actor/time even after resolution; another author or stale/closed/missing/foreign/unobserved target conflicts. Pins the existing lifecycle version without incrementing it, resolving, silencing, changing timers or suppressing notification intents. Body is closed and bounded to 1024 bytes; query parameters are rejected.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-rule-id"
+          },
+          {
+            "$ref": "#/components/parameters/alert-identity-revision"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-origin"
+          },
+          {
+            "$ref": "#/components/parameters/admin-mutation-csrf"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertAcknowledgementRequest"
+              },
+              "example": {
+                "expected_version": "2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AlertAcknowledgementSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/AlertAcknowledgementMethodNotAllowed"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlertAcknowledgementConflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AlertAcknowledgementRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_version"
+        ],
+        "properties": {
+          "expected_version": {
+            "$ref": "#/components/schemas/AlertLifecycleVersion"
+          }
+        }
+      },
+      "AlertAcknowledgement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "actor_id",
+          "recorded_at_ms"
+        ],
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/AlertLifecycleVersion"
+          },
+          "actor_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "recorded_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          }
+        },
+        "description": "Original immutable acknowledgement of this phase-transition version, not condition resolution, silence or suppression. Same-author exact retries retain actor/time even after later phases. A later version requires a separate acknowledgement."
+      },
+      "AlertPhase": {
+        "type": "string",
+        "enum": [
+          "inactive",
+          "pending",
+          "firing",
+          "resolved"
+        ]
+      },
+      "AlertLifecycleVersion": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]*$",
+        "maxLength": 19,
+        "description": "Exact positive signed-64-bit lifecycle phase-transition version as decimal text. This is separate from the immutable rule revision."
+      },
+      "AlertReadCursor": {
+        "type": "string",
+        "maxLength": 8192,
+        "pattern": "^v1\\.(?:[0-9a-f]{2})+$",
+        "description": "Opaque bounded position, not a signature or authority. Bound to tenant/resource/filter and exact rule revision for transitions. Page size may change; traversal is not a snapshot."
+      },
+      "AlertEvaluationRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluation_id",
+          "scope_asset_id",
+          "output_index"
+        ],
+        "properties": {
+          "evaluation_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "scope_asset_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "output_index": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1023
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "description": "Exact reference into the existing tenant/scope calculator evaluation and output reads. Those require separate telemetry.read. Null output_index means the transition consumed unknown evidence without a usable output slot; it does not mean the condition was false."
+      },
+      "AlertTransition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "version",
+          "phase",
+          "event_at_ms",
+          "recorded_at_ms",
+          "activation_generation",
+          "evidence"
+        ],
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/AlertLifecycleVersion"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/AlertPhase"
+          },
+          "event_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "recorded_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "activation_generation": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/AlertEvaluationRef"
+          },
+          "acknowledgement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlertAcknowledgement"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Independent optional operator annotation for this exact version. May arrive after a page was read; original phase/evidence remain immutable."
+          }
+        }
+      },
+      "AlertSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "rule_revision",
+          "scope_asset_id",
+          "target_asset_id",
+          "version",
+          "phase",
+          "selected",
+          "candidate_since_ms",
+          "last_event_at_ms",
+          "latest_transition"
+        ],
+        "properties": {
+          "rule_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "rule_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "scope_asset_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "target_asset_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "version": {
+            "$ref": "#/components/schemas/AlertLifecycleVersion"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/AlertPhase"
+          },
+          "selected": {
+            "type": "boolean"
+          },
+          "candidate_since_ms": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HistoryMillis"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_event_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "latest_transition": {
+            "$ref": "#/components/schemas/AlertTransition"
+          }
+        },
+        "description": "One observed lifecycle, identified by rule ID/revision and its pinned scope. Version-zero configuration checkpoints are excluded. selected describes processing selection, not condition health. Latest transition evidence can precede last_event_at_ms when later evidence did not change phase."
+      },
+      "AlertDetail": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "alert",
+          "definition"
+        ],
+        "properties": {
+          "alert": {
+            "$ref": "#/components/schemas/AlertSummary"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/AlertRuleDefinition"
+          }
+        }
+      },
+      "AlertPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "alerts",
+          "next_after"
+        ],
+        "properties": {
+          "alerts": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/AlertSummary"
+            }
+          },
+          "next_after": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlertReadCursor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AlertTransitionPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "transitions",
+          "next_after"
+        ],
+        "properties": {
+          "transitions": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/AlertTransition"
+            }
+          },
+          "next_after": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlertReadCursor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "AlertRuleDefinition": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "calculator",
+          "version",
+          "scope",
+          "target",
+          "output_property",
+          "output_version",
+          "output_index",
+          "comparison",
+          "threshold",
+          "threshold_unit",
+          "hold_ms",
+          "resolution",
+          "resolve_after_ms"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "numeric-threshold-v1"
+          },
+          "calculator": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "version": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "target": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "output_property": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "output_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1023,
+            "description": "Current admitted mean/MAD implementations support only zero. Unsupported slots conflict."
+          },
+          "comparison": {
+            "type": "string",
+            "enum": [
+              "gt",
+              "gte",
+              "lt",
+              "lte"
+            ]
+          },
+          "threshold": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+            "description": "Finite exact decimal text, canonicalized on write. At most 128 integer and 64 fractional digits; resource bounds are checked by the server. No float conversion."
+          },
+          "threshold_unit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdministrationIdentifier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Required explicit canonical unit, or null for dimensionless output; must equal the selected property unit."
+          },
+          "hold_ms": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 604800000
+          },
+          "resolution": {
+            "type": "string",
+            "const": "resolve_on_false"
+          },
+          "resolve_after_ms": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 604800000
+          }
+        },
+        "description": "Immutable threshold grammar over exact release/scope/target/property/ordinal across execution configurations. Durations use event time. Missing/unusable evidence is unknown, never false and never sufficient to resolve. This slice does not execute alerts."
+      },
+      "AlertRuleRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "definition",
+          "actor_id",
+          "recorded_at_ms"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "definition": {
+            "$ref": "#/components/schemas/AlertRuleDefinition"
+          },
+          "actor_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "recorded_at_ms": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": -9223372036854776000,
+            "maximum": 9223372036854776000
+          }
+        }
+      },
+      "AlertRuleRevisionReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          }
+        }
+      },
+      "AlertRuleActivationState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "generation",
+          "revision",
+          "actor_id",
+          "recorded_at_ms"
+        ],
+        "properties": {
+          "generation": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdministrationIdentifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recorded_at_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": -9223372036854776000,
+            "maximum": 9223372036854776000
+          }
+        },
+        "description": "Generation zero is inactive with null attribution/time. A retry returns its original receipt without restoring old state."
+      },
+      "AlertRuleHead": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "latest_revision",
+          "activation"
+        ],
+        "properties": {
+          "latest_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "activation": {
+            "$ref": "#/components/schemas/AlertRuleActivationState"
+          }
+        }
+      },
+      "AlertRuleActivationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_generation",
+          "revision"
+        ],
+        "properties": {
+          "expected_generation": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 4294967295
+          }
+        },
+        "description": "Select a retained revision or explicit null to deactivate. Omission is invalid. Configuration only; no alert lifecycle execution or delivery."
+      },
+      "CalculatorEvidenceRelease": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version",
+          "implementation"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "version": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "implementation": {
+            "type": "string",
+            "enum": [
+              "window-mean-v1",
+              "window-mad-v1"
+            ]
+          }
+        }
+      },
+      "CalculatorEvidenceProperty": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          }
+        }
+      },
+      "CalculatorEvidenceWindow": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "start_at_ms",
+          "end_at_ms",
+          "finalize_at_ms",
+          "known_at_ms"
+        ],
+        "properties": {
+          "start_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "end_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "finalize_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "known_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          }
+        }
+      },
+      "CalculatorEvaluationSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluation_id",
+          "scope_asset_id",
+          "calculator",
+          "configuration_id",
+          "input_property",
+          "window",
+          "evaluated_at_ms",
+          "outcome",
+          "minimum_samples",
+          "input_count",
+          "output_count"
+        ],
+        "properties": {
+          "evaluation_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "scope_asset_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "calculator": {
+            "$ref": "#/components/schemas/CalculatorEvidenceRelease"
+          },
+          "configuration_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "input_property": {
+            "$ref": "#/components/schemas/CalculatorEvidenceProperty"
+          },
+          "window": {
+            "$ref": "#/components/schemas/CalculatorEvidenceWindow"
+          },
+          "evaluated_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "insufficient",
+              "incompatible_input",
+              "invalid_output",
+              "resource_limit"
+            ]
+          },
+          "minimum_samples": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1024
+          },
+          "input_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1024
+          },
+          "output_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1024
+          }
+        },
+        "description": "Retained terminal evaluation; event time is window end. configuration_id is the immutable execution identity, not an unversioned configuration series. No input/output array expansion."
+      },
+      "CalculatorInputReference": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evidence_id",
+          "event_at_ms"
+        ],
+        "properties": {
+          "evidence_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "event_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          }
+        },
+        "description": "Exact immutable semantic evidence identity and event time. Does not expand decoded payloads or prepared values; semantic history reads use the pinned scope/property/window."
+      },
+      "CalculatorEvaluationEvidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluation",
+          "inputs"
+        ],
+        "properties": {
+          "evaluation": {
+            "$ref": "#/components/schemas/CalculatorEvaluationSummary"
+          },
+          "inputs": {
+            "type": "array",
+            "maxItems": 1024,
+            "items": {
+              "$ref": "#/components/schemas/CalculatorInputReference"
+            }
+          }
+        }
+      },
+      "CalculatorOutputEvidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluation_id",
+          "calculator_id",
+          "calculator_version",
+          "output_index",
+          "asset_id",
+          "property_id",
+          "property_version",
+          "kind",
+          "value",
+          "unit"
+        ],
+        "properties": {
+          "evaluation_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "calculator_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "calculator_version": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1023
+          },
+          "asset_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "property_id": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "property_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "kind": {
+            "type": "string",
+            "const": "decimal"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "description": "Exact finite decimal text, potentially exponent notation. Never convert through binary float."
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdministrationIdentifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "description": "Identity is tenant/evaluation/calculator release/output_index; target/property/unit and stored decimal text are retained."
+      },
+      "CalculatorEvidenceCursor": {
+        "type": "string",
+        "maxLength": 8192,
+        "pattern": "^v1\\.(?:[0-9a-f]{2})+$",
+        "description": "Opaque bounded public position, not a signature or authority. Bound to tenant, asset, resource, time range for lists and exact evaluation for outputs. Page size may change; pages are not snapshots."
+      },
+      "CalculatorEvaluationPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluations",
+          "next_after"
+        ],
+        "properties": {
+          "evaluations": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CalculatorEvaluationSummary"
+            }
+          },
+          "next_after": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalculatorEvidenceCursor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "CalculatorOutputPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "outputs",
+          "next_after"
+        ],
+        "properties": {
+          "outputs": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/CalculatorOutputEvidence"
+            }
+          },
+          "next_after": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalculatorEvidenceCursor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "CalculatorParameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "calculator",
+          "version",
+          "scope",
+          "target",
+          "first_start",
+          "window_ms",
+          "lateness_ms",
+          "minimum_samples"
+        ],
+        "properties": {
+          "calculator": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "version": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "target": {
+            "$ref": "#/components/schemas/AdministrationIdentifier"
+          },
+          "first_start": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": -9223372036854776000,
+            "maximum": 9223372036854776000
+          },
+          "window_ms": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 604800000
+          },
+          "lateness_ms": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 604800000
+          },
+          "minimum_samples": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1024
+          }
+        },
+        "description": "Exact admitted release and compatible target. Signed Unix milliseconds; start + window + lateness must fit int64. Deliberate first_start controls historical catch-up. Revision creation is inactive and does not alter selected scheduling."
+      },
+      "CalculatorRevisionReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          }
+        }
+      },
+      "CalculatorConfigurationRevision": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "parameters",
+          "actor_id",
+          "recorded_at_ms"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/CalculatorParameters"
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdministrationIdentifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recorded_at_ms": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": -9223372036854776000,
+            "maximum": 9223372036854776000
+          }
+        },
+        "description": "Immutable exact revision and original attribution; actor_id is null only for imported trusted schedules."
+      },
+      "CalculatorActivationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expected_generation",
+          "revision"
+        ],
+        "properties": {
+          "expected_generation": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 4294967295
+          }
+        },
+        "description": "Select a retained revision, or explicit null to deactivate. Omission is invalid. Same-author/content retry of generation expected+1 returns its original receipt without restoring old state."
+      },
+      "CalculatorActivationState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "generation",
+          "revision",
+          "actor_id",
+          "recorded_at_ms"
+        ],
+        "properties": {
+          "generation": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdministrationIdentifier"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recorded_at_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "minimum": -9223372036854776000,
+            "maximum": 9223372036854776000
+          }
+        },
+        "description": "Generation zero is inactive with null attribution/time; later generations retain original command evidence."
+      },
       "FleetLocationMapping": {
         "type": "object",
         "additionalProperties": false,
@@ -4673,7 +6470,7 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 200,
-        "pattern": "^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$"
+        "pattern": "^(?!\\s)(?![\\s\\S]*\\s$)[^\\^@-\\^_\\u007F-\\^_]+$"
       },
       "SemanticDefinitionPosition": {
         "type": "object",
@@ -5588,7 +7385,7 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 128,
-        "pattern": "^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$",
+        "pattern": "^(?!\\s)(?![\\s\\S]*\\s$)[^\\^@-\\^_\\u007F-\\^_]+$",
         "description": "Exact opaque domain identifier; no surrounding whitespace or control characters."
       },
       "InitialActorIdentity": {
@@ -5606,7 +7403,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 512,
-            "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000-\\u001F\\u007F-\\u009F]+$",
+            "pattern": "^(?=[\\s\\S]*\\S)[^\\^@-\\^_\\u007F-\\^_]+$",
             "description": "Exact case-sensitive opaque subject; never trimmed or normalized. Not a credential."
           }
         }
@@ -5820,11 +7617,15 @@
         "type": "string",
         "description": "An exact granted tenant action; no action implies another.",
         "enum": [
+          "alerts.read",
+          "alerts.manage",
+          "analytics.manage",
           "access.manage",
           "metadata.manage",
           "metadata.read",
           "protocol.manage",
-          "telemetry.read"
+          "telemetry.read",
+          "alerts.acknowledge"
         ]
       },
       "OperatorTenant": {
@@ -5843,7 +7644,7 @@
           "actions": {
             "type": "array",
             "minItems": 1,
-            "maxItems": 5,
+            "maxItems": 9,
             "uniqueItems": true,
             "description": "Explicit current grants ordered by action name; never reusable authorization.",
             "items": {
@@ -6534,11 +8335,137 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 512,
-        "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000-\\u001F\\u007F-\\u009F]+$",
+        "pattern": "^(?=[\\s\\S]*\\S)[^\\^@-\\^_\\u007F-\\^_]+$",
         "description": "Exact case-sensitive opaque subject; never trimmed or normalized. Not a credential."
       }
     },
     "parameters": {
+      "alert-identity-revision": {
+        "name": "revision",
+        "in": "path",
+        "required": true,
+        "description": "Immutable rule revision forming the alert identity; canonical positive ASCII decimal u32, without leading zeros. This is separate from lifecycle version.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        }
+      },
+      "alert-phase": {
+        "name": "phase",
+        "in": "query",
+        "description": "Exact current phase filter. Omission selects pending and firing. Filtering can change during traversal.",
+        "schema": {
+          "$ref": "#/components/schemas/AlertPhase"
+        }
+      },
+      "alert-page-limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum records returned; one extra record is fetched to determine continuation.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
+        }
+      },
+      "alert-read-after": {
+        "name": "after",
+        "in": "query",
+        "description": "Resume strictly after the opaque tenant/resource/filter-bound position.",
+        "schema": {
+          "$ref": "#/components/schemas/AlertReadCursor"
+        }
+      },
+      "alert-rule-id": {
+        "name": "rule_id",
+        "in": "path",
+        "required": true,
+        "description": "Tenant-owned opaque alert-rule series identity.",
+        "schema": {
+          "$ref": "#/components/schemas/AdministrationIdentifier"
+        }
+      },
+      "alert-rule-revision": {
+        "name": "revision",
+        "in": "path",
+        "required": true,
+        "description": "Positive ASCII decimal u32, leading zeros accepted; creation requires the exact successor unless retrying identical same-author content.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        }
+      },
+      "calculator-evaluation-id": {
+        "name": "evaluation_id",
+        "in": "path",
+        "required": true,
+        "description": "Exact retained calculator evaluation identity.",
+        "schema": {
+          "$ref": "#/components/schemas/AdministrationIdentifier"
+        }
+      },
+      "calculator-evidence-asset-id": {
+        "name": "asset_id",
+        "in": "path",
+        "required": true,
+        "description": "Semantic input scope asset. A scoped collection with no retained evaluations returns an empty page; exact absent records return 404.",
+        "schema": {
+          "$ref": "#/components/schemas/AdministrationIdentifier"
+        }
+      },
+      "calculator-evaluation-limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum summaries returned.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
+        }
+      },
+      "calculator-output-limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum ordered outputs returned without whole-envelope expansion.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 20
+        }
+      },
+      "calculator-evidence-after": {
+        "name": "after",
+        "in": "query",
+        "description": "Versioned position bound to this exact read scope; malformed or foreign positions return 400.",
+        "schema": {
+          "$ref": "#/components/schemas/CalculatorEvidenceCursor"
+        }
+      },
+      "calculator-configuration-id": {
+        "name": "configuration_id",
+        "in": "path",
+        "required": true,
+        "description": "Tenant-owned opaque calculator configuration identity.",
+        "schema": {
+          "$ref": "#/components/schemas/AdministrationIdentifier"
+        }
+      },
+      "calculator-configuration-revision": {
+        "name": "revision",
+        "in": "path",
+        "required": true,
+        "description": "Positive ASCII decimal revision fitting u32; leading zeroes are accepted. Creation requires the next revision, except exact same-author retries.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        }
+      },
       "fleet-latitude-property": {
         "name": "latitude_property",
         "in": "query",
@@ -7283,6 +9210,614 @@
       }
     },
     "responses": {
+      "AlertAcknowledgementSucceeded": {
+        "description": "Open version acknowledged, or original same-author receipt returned without reapplying or changing health.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertAcknowledgement"
+            },
+            "example": {
+              "version": "2",
+              "actor_id": "operator-a",
+              "recorded_at_ms": "2010"
+            }
+          }
+        }
+      },
+      "AlertAcknowledgementConflict": {
+        "description": "Expected version, open phase, original author or target identity conflicts. Foreign/missing/unobserved targets are not distinguished.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:alert-acknowledgement",
+              "title": "Alert acknowledgement version, phase or author conflicts",
+              "status": 409
+            }
+          }
+        }
+      },
+      "AlertAcknowledgementMethodNotAllowed": {
+        "description": "Only PUT is supported. Read acknowledgement annotations through existing alert reads.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          },
+          "Allow": {
+            "schema": {
+              "type": "string"
+            },
+            "description": "PUT."
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:alert-acknowledgement",
+              "title": "Method not allowed",
+              "status": 405
+            }
+          }
+        }
+      },
+      "AlertPageSucceeded": {
+        "description": "Bounded observed alerts in C-collated rule/revision order; no snapshot guarantee.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertPage"
+            },
+            "example": {
+              "alerts": [
+                {
+                  "rule_id": "voltage-high",
+                  "rule_revision": 1,
+                  "scope_asset_id": "asset-a",
+                  "target_asset_id": "result",
+                  "version": "2",
+                  "phase": "firing",
+                  "selected": true,
+                  "candidate_since_ms": null,
+                  "last_event_at_ms": "2000",
+                  "latest_transition": {
+                    "version": "2",
+                    "phase": "firing",
+                    "event_at_ms": "2000",
+                    "recorded_at_ms": "2010",
+                    "activation_generation": 1,
+                    "evidence": {
+                      "evaluation_id": "evaluation-b",
+                      "scope_asset_id": "asset-a",
+                      "output_index": 0
+                    }
+                  }
+                }
+              ],
+              "next_after": null
+            }
+          }
+        }
+      },
+      "AlertDetailSucceeded": {
+        "description": "Retained exact alert, latest transition and pinned rule definition from one statement snapshot.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertDetail"
+            },
+            "example": {
+              "alert": {
+                "rule_id": "voltage-high",
+                "rule_revision": 1,
+                "scope_asset_id": "asset-a",
+                "target_asset_id": "result",
+                "version": "2",
+                "phase": "firing",
+                "selected": true,
+                "candidate_since_ms": null,
+                "last_event_at_ms": "2000",
+                "latest_transition": {
+                  "version": "2",
+                  "phase": "firing",
+                  "event_at_ms": "2000",
+                  "recorded_at_ms": "2010",
+                  "activation_generation": 1,
+                  "evidence": {
+                    "evaluation_id": "evaluation-b",
+                    "scope_asset_id": "asset-a",
+                    "output_index": 0
+                  }
+                }
+              },
+              "definition": {
+                "kind": "numeric-threshold-v1",
+                "calculator": "mean",
+                "version": "1",
+                "scope": "asset-a",
+                "target": "result",
+                "output_property": "mean.voltage",
+                "output_version": 1,
+                "output_index": 0,
+                "comparison": "gt",
+                "threshold": "50",
+                "threshold_unit": "volt",
+                "hold_ms": 1000,
+                "resolution": "resolve_on_false",
+                "resolve_after_ms": 1000
+              }
+            }
+          }
+        }
+      },
+      "AlertTransitionPageSucceeded": {
+        "description": "Bounded immutable transitions in ascending lifecycle version order; later appends can enter a subsequent page.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertTransitionPage"
+            },
+            "example": {
+              "transitions": [
+                {
+                  "version": "2",
+                  "phase": "firing",
+                  "event_at_ms": "2000",
+                  "recorded_at_ms": "2010",
+                  "activation_generation": 1,
+                  "evidence": {
+                    "evaluation_id": "evaluation-b",
+                    "scope_asset_id": "asset-a",
+                    "output_index": 0
+                  }
+                }
+              ],
+              "next_after": null
+            }
+          }
+        }
+      },
+      "AlertRuleHeadSucceeded": {
+        "description": "Current authoring head and selected revision; new revisions do not change activation.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertRuleHead"
+            },
+            "example": {
+              "latest_revision": 1,
+              "activation": {
+                "generation": 0,
+                "revision": null,
+                "actor_id": null,
+                "recorded_at_ms": null
+              }
+            }
+          }
+        }
+      },
+      "AlertRuleRevisionSucceeded": {
+        "description": "Exact immutable definition and original actor/time.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertRuleRevision"
+            },
+            "example": {
+              "revision": 1,
+              "definition": {
+                "kind": "numeric-threshold-v1",
+                "calculator": "mean",
+                "version": "1",
+                "scope": "asset-a",
+                "target": "result",
+                "output_property": "mean.voltage",
+                "output_version": 1,
+                "output_index": 0,
+                "comparison": "gt",
+                "threshold": "50",
+                "threshold_unit": "volt",
+                "hold_ms": 1000,
+                "resolution": "resolve_on_false",
+                "resolve_after_ms": 2000
+              },
+              "actor_id": "operator-a",
+              "recorded_at_ms": 1000
+            }
+          }
+        }
+      },
+      "AlertRuleRevisionCreated": {
+        "description": "Next revision committed or identical same-author content retained. Never implicitly activates.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertRuleRevisionReceipt"
+            },
+            "example": {
+              "revision": 1
+            }
+          }
+        }
+      },
+      "AlertRuleActivationSucceeded": {
+        "description": "Selection committed or original same-author generation receipt returned; no alert evaluation.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AlertRuleActivationState"
+            },
+            "example": {
+              "generation": 1,
+              "revision": 1,
+              "actor_id": "operator-a",
+              "recorded_at_ms": 1000
+            }
+          }
+        }
+      },
+      "AlertRuleConflict": {
+        "description": "Changed retry, skipped revision, stale generation, missing selected revision or unsupported release/output/property/target/unit.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:alert-rule",
+              "title": "Alert rule revision, activation or prerequisites conflict",
+              "status": 409
+            }
+          }
+        }
+      },
+      "AlertRuleMethodNotAllowed": {
+        "description": "Unsupported method; allowed methods depend on the rule resource.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          },
+          "Allow": {
+            "schema": {
+              "type": "string"
+            },
+            "description": "GET/HEAD for the head; GET/HEAD/PUT for revisions; PUT for activation."
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:method-not-allowed",
+              "title": "Method not allowed",
+              "status": 405
+            }
+          }
+        }
+      },
+      "CalculatorEvaluationPageSucceeded": {
+        "description": "Bounded terminal summaries in ascending window-end/evaluation-ID C order. No snapshot guarantee.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CalculatorEvaluationPage"
+            },
+            "example": {
+              "evaluations": [
+                {
+                  "evaluation_id": "evaluation-a",
+                  "scope_asset_id": "asset-a",
+                  "calculator": {
+                    "id": "mean",
+                    "version": "1",
+                    "implementation": "window-mean-v1"
+                  },
+                  "configuration_id": "execution-a",
+                  "input_property": {
+                    "id": "electrical.voltage",
+                    "version": 1
+                  },
+                  "window": {
+                    "start_at_ms": "0",
+                    "end_at_ms": "3000",
+                    "finalize_at_ms": "3000",
+                    "known_at_ms": "3000"
+                  },
+                  "evaluated_at_ms": "3500",
+                  "outcome": "complete",
+                  "minimum_samples": 1,
+                  "input_count": 1,
+                  "output_count": 1
+                }
+              ],
+              "next_after": null
+            }
+          }
+        }
+      },
+      "CalculatorEvaluationEvidenceSucceeded": {
+        "description": "Exact terminal manifest, at most 1024 source identities; outputs are paged separately.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CalculatorEvaluationEvidence"
+            },
+            "example": {
+              "evaluation": {
+                "evaluation_id": "evaluation-a",
+                "scope_asset_id": "asset-a",
+                "calculator": {
+                  "id": "mean",
+                  "version": "1",
+                  "implementation": "window-mean-v1"
+                },
+                "configuration_id": "execution-a",
+                "input_property": {
+                  "id": "electrical.voltage",
+                  "version": 1
+                },
+                "window": {
+                  "start_at_ms": "0",
+                  "end_at_ms": "3000",
+                  "finalize_at_ms": "3000",
+                  "known_at_ms": "3000"
+                },
+                "evaluated_at_ms": "3500",
+                "outcome": "complete",
+                "minimum_samples": 1,
+                "input_count": 1,
+                "output_count": 1
+              },
+              "inputs": [
+                {
+                  "evidence_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                  "event_at_ms": "1000"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "CalculatorOutputPageSucceeded": {
+        "description": "Bounded outputs in ascending deterministic zero-based position.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CalculatorOutputPage"
+            },
+            "example": {
+              "outputs": [
+                {
+                  "evaluation_id": "evaluation-a",
+                  "calculator_id": "mean",
+                  "calculator_version": "1",
+                  "output_index": 0,
+                  "asset_id": "result",
+                  "property_id": "mean.voltage",
+                  "property_version": 1,
+                  "kind": "decimal",
+                  "value": "12345678901234567890.1234567890123456789",
+                  "unit": "volt"
+                }
+              ],
+              "next_after": null
+            }
+          }
+        }
+      },
+      "CalculatorEvidenceMethodNotAllowed": {
+        "description": "Only GET and HEAD are supported.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          },
+          "Allow": {
+            "schema": {
+              "type": "string"
+            },
+            "description": "GET and HEAD."
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:method-not-allowed",
+              "title": "Method not allowed",
+              "status": 405
+            }
+          }
+        }
+      },
+      "CalculatorRevisionCreated": {
+        "description": "The next revision was committed, or exact same-author content was already present. No activation.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CalculatorRevisionReceipt"
+            },
+            "example": {
+              "revision": 1
+            }
+          }
+        }
+      },
+      "CalculatorRevisionSucceeded": {
+        "description": "Retained exact configuration revision and original receipt.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CalculatorConfigurationRevision"
+            },
+            "example": {
+              "revision": 1,
+              "parameters": {
+                "calculator": "mean",
+                "version": "1",
+                "scope": "asset-a",
+                "target": "result",
+                "first_start": 0,
+                "window_ms": 3000,
+                "lateness_ms": 0,
+                "minimum_samples": 1
+              },
+              "actor_id": "operator-a",
+              "recorded_at_ms": 1000
+            }
+          }
+        }
+      },
+      "CalculatorActivationSucceeded": {
+        "description": "Current selection or original same-author retry receipt. No-store.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CalculatorActivationState"
+            },
+            "example": {
+              "generation": 1,
+              "revision": 1,
+              "actor_id": "operator-a",
+              "recorded_at_ms": 1000
+            }
+          }
+        }
+      },
+      "CalculatorConfigurationConflict": {
+        "description": "Stale revision/generation, different retry author/content, or missing/incompatible release, target or selected revision.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:calculator-configuration",
+              "title": "Configuration revision, activation or prerequisites conflict",
+              "status": 409
+            }
+          }
+        }
+      },
+      "CalculatorConfigurationMethodNotAllowed": {
+        "description": "Method is unsupported for this resource.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          },
+          "Allow": {
+            "schema": {
+              "type": "string"
+            },
+            "description": "GET, HEAD and PUT are supported."
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:method-not-allowed",
+              "title": "Method not allowed",
+              "status": 405
+            }
+          }
+        }
+      },
       "FleetSnapshotSucceeded": {
         "description": "Consistent bounded tenant inventory and conservative observed-location evidence. Counts cover the full tenant, not the page suffix. No connectivity/health inference.",
         "headers": {

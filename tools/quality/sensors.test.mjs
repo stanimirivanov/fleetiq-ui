@@ -391,6 +391,7 @@ for (const defect of [
   'missing-overview-accessibility',
   'missing-commissioning-accessibility',
   'missing-binding-accessibility',
+  'missing-alerts-accessibility',
   'trace',
   'video',
   'gc',
@@ -408,6 +409,14 @@ for (const defect of [
       profile.testMatch = profile.testMatch.filter(
         (name) => !name.includes('overview-performance'),
       );
+    if (defect === 'missing-alerts-accessibility') {
+      const accessibility = browser.projects.find(
+        (p) => p.name === 'rendered-accessibility',
+      );
+      accessibility.testMatch = accessibility.testMatch.filter(
+        (name) => !name.includes('alerts-accessibility'),
+      );
+    }
     if (defect === 'missing-binding-accessibility')
       browser.projects.find(
         (p) => p.name === 'rendered-accessibility',

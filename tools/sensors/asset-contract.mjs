@@ -35,6 +35,31 @@ const operations = {
 };
 export const BROWSER_OPERATIONS = [
   {
+    path: '/api/v1/tenants/{tenant_id}/alerts',
+    method: 'get',
+    id: 'listAlerts',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/alerts/{rule_id}/revisions/{revision}',
+    method: 'get',
+    id: 'getAlert',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/alerts/{rule_id}/revisions/{revision}/transitions',
+    method: 'get',
+    id: 'listAlertTransitions',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/calculator-evaluations/{evaluation_id}',
+    method: 'get',
+    id: 'getCalculatorEvaluationEvidence',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/assets/{asset_id}/calculator-evaluations/{evaluation_id}/outputs',
+    method: 'get',
+    id: 'listCalculatorEvaluationOutputs',
+  },
+  {
     path: '/api/v1/tenants/{tenant_id}/signal-bindings/{binding_id}/revisions/{revision}',
     method: 'get',
     id: 'getSignalBindingRevision',
@@ -177,7 +202,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.21' ||
+    contract.info?.version !== '1.0.0-baseline.26' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||

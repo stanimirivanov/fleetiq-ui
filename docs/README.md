@@ -47,3 +47,5 @@ homes rather than growing the root README.
 - [Registry commissioning](design-docs/0010-registry-commissioning.md): command boundaries, exact versions, temporal corrections and ambiguous-outcome recovery.
 
 - [Binding authoring and attribution review](design-docs/0011-binding-authoring.md): exact source discovery, target membership, revision commands and immutable facts.
+
+- [Connected alerts](design-docs/0013-connected-alerts.md): bounded lifecycle triage and exact calculator evidence with separate permissions.

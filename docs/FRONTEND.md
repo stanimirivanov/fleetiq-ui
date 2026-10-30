@@ -78,8 +78,8 @@ excludes sample payloads.
 Sample operational evidence lives outside backend identity models. Quiet borders,
 tints, and visible source labels identify synthetic sections. The schematic map
 uses percentage canvas coordinates; signal playback is a finite deterministic
-example. Production overview and map use authorized backend evidence; Alerts remains
-unavailable until its backend contract exists.
+example. Production overview, map and Alerts use authorized backend evidence, with
+read-only alert lifecycle and exact calculator evidence.
 
 The [visual-language decision](design-docs/0001-operational-visual-language.md) and
 [shell decision](design-docs/0002-persistent-shell-theme.md) define hierarchy and

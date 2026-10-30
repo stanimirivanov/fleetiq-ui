@@ -7,6 +7,7 @@ import {
 } from './connected-alerts';
 
 const owned = [
+  'configure',
   'tenant',
   'phase',
   'after',
@@ -17,6 +18,7 @@ const owned = [
   'outputs_after',
 ] as const;
 export interface AlertQuery {
+  readonly configure?: string;
   readonly tenant: string;
   readonly phase?: Phase;
   readonly after?: string;
@@ -32,6 +34,7 @@ export function alertQuery(search: string): AlertQuery {
   const p = new URLSearchParams(search),
     tenant = p.get('tenant') ?? '',
     rule = p.get('rule') ?? undefined;
+  const configure = p.get('configure') ?? undefined;
   const phase = p.get('phase') ?? 'open',
     rawRevision = p.get('revision'),
     n = rawRevision === null ? undefined : Number(rawRevision);
@@ -40,6 +43,7 @@ export function alertQuery(search: string): AlertQuery {
     evaluation = p.get('evaluation') ?? undefined,
     outputs = p.get('outputs_after') ?? undefined;
   const invalid =
+    (configure !== undefined && (!identifier(configure) || !tenant)) ||
     owned.some((k) => p.getAll(k).length > 1) ||
     (tenant !== '' && !identifier(tenant)) ||
     (phase !== 'open' && !phases.includes(phase as Phase)) ||
@@ -54,6 +58,7 @@ export function alertQuery(search: string): AlertQuery {
     (outputs !== undefined && evaluation === undefined) ||
     (tenant === '' && (rule !== undefined || after !== undefined));
   return {
+    configure,
     tenant,
     phase: phase === 'open' ? undefined : (phase as Phase),
     after,
@@ -88,5 +93,10 @@ export const clearSelection = {
   ...clearEvidence,
 };
 export function alertTenantHref(search: string, tenant: string): string {
-  return alertHref(search, { tenant, after: undefined, ...clearSelection });
+  return alertHref(search, {
+    tenant,
+    configure: undefined,
+    after: undefined,
+    ...clearSelection,
+  });
 }

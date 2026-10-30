@@ -18,6 +18,7 @@ export function compactBrowserSchemas(components) {
           'minLength',
           'maxLength',
           'pattern',
+          'default',
         ].includes(k),
       )
     ) {
@@ -44,9 +45,18 @@ export function compactBrowserSchemas(components) {
   };
   // Response/request schemas refer back to this transitive schema closure.
   for (const schema of Object.values(components.schemas ?? {})) visit(schema);
+  const parameterShapes = new Set();
+  for (const parameter of Object.values(components.parameters ?? {})) {
+    visit(parameter.schema);
+    if (
+      parameter.schema &&
+      ['string', 'integer'].includes(parameter.schema.type)
+    )
+      parameterShapes.add(JSON.stringify(parameter.schema));
+  }
   let ordinal = 0;
   for (const [key, entries] of occurrences) {
-    if (entries.length < 2) continue;
+    if (entries.length < 2 && !parameterShapes.has(key)) continue;
     const name = `BrowserPrimitiveConstraint${++ordinal}`;
     if (components.schemas[name])
       throw new Error('Browser generation constraint name collision.');

@@ -8,6 +8,7 @@ import {
   clearSelection,
 } from '../../model/alert-query';
 import { phases } from '../../model/connected-alerts';
+import { AlertRuleConfiguration } from '../AlertRuleConfiguration';
 import { useAlertContext } from './AlertProvider';
 import { AlertReadPanel } from './AlertReadPanel';
 import { ConnectedAlertDetail } from './ConnectedAlertDetail';
@@ -60,6 +61,7 @@ export function ConnectedAlertsContent() {
         <p role="status">Select a tenant to read alerts.</p>
       </Show>
       <Show when={!q().invalid && q().tenant}>
+        <AlertRuleConfiguration tenant={q().tenant} rule={q().configure} />
         <AlertReadPanel
           label="Alert queue"
           state={queue.state()}

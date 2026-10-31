@@ -5,6 +5,7 @@ export function AlertCommandFeedback<T>(props: {
   readonly state: CommandState<T>;
   readonly replay: () => void;
   readonly reload: () => void;
+  readonly reloadLabel?: string;
 }) {
   const error = () => {
     const s = props.state;
@@ -24,7 +25,7 @@ export function AlertCommandFeedback<T>(props: {
               fallback={
                 <Show when={e().failure === 'conflict'}>
                   <button type="button" onClick={props.reload}>
-                    Reload current rule head
+                    {props.reloadLabel ?? 'Reload current rule head'}
                   </button>
                 </Show>
               }

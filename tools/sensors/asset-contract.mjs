@@ -35,6 +35,11 @@ const operations = {
 };
 export const BROWSER_OPERATIONS = [
   {
+    path: '/api/v1/tenants/{tenant_id}/alerts/{rule_id}/revisions/{revision}/acknowledgement',
+    method: 'put',
+    id: 'acknowledgeAlert',
+  },
+  {
     path: '/api/v1/tenants/{tenant_id}/alert-rules/{rule_id}',
     method: 'get',
     id: 'getAlertRuleHead',

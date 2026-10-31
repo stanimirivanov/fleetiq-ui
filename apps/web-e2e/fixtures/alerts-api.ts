@@ -35,6 +35,29 @@ export async function installAlertsApi(page: Page) {
   const first = outputs.outputs[0];
   if (!first) throw new Error('Missing pinned output example');
   first.evaluation_id = 'evaluation-b';
+  let annotation: {
+    version: string;
+    actor_id: string;
+    recorded_at_ms: string;
+  } | null = null;
+  let resolved = false;
+  const currentTransition = () => ({
+    ...detail.alert.latest_transition,
+    version: resolved ? '3' : detail.alert.version,
+    phase: resolved ? 'resolved' : detail.alert.phase,
+    event_at_ms: resolved ? '3000' : detail.alert.latest_transition.event_at_ms,
+    acknowledgement: resolved ? null : annotation,
+  });
+  const currentDetail = () => ({
+    ...detail,
+    alert: {
+      ...detail.alert,
+      version: resolved ? '3' : detail.alert.version,
+      phase: resolved ? 'resolved' : detail.alert.phase,
+      last_event_at_ms: resolved ? '3000' : detail.alert.last_event_at_ms,
+      latest_transition: currentTransition(),
+    },
+  });
   const requests: {
     method: string;
     path: string;
@@ -91,12 +114,20 @@ export async function installAlertsApi(page: Page) {
       if (url.pathname.endsWith('/transitions'))
         return reply(
           Schema.decodeUnknownSync(AlertTransitionPage)({
-            transitions: [detail.alert.latest_transition],
+            transitions: resolved
+              ? [
+                  {
+                    ...detail.alert.latest_transition,
+                    acknowledgement: annotation,
+                  },
+                  currentTransition(),
+                ]
+              : [currentTransition()],
             next_after: url.searchParams.has('after') ? null : 'v1.01',
           }),
         );
       if (url.pathname.includes('/revisions/'))
-        return reply(Schema.decodeUnknownSync(AlertDetail)(detail));
+        return reply(Schema.decodeUnknownSync(AlertDetail)(currentDetail()));
       const phase = url.searchParams.get('phase'),
         continued = url.searchParams.has('after');
       const alert = {
@@ -105,7 +136,12 @@ export async function installAlertsApi(page: Page) {
       };
       return reply(
         Schema.decodeUnknownSync(AlertPage)({
-          alerts: empty || (phase && phase !== 'firing') ? [] : [alert],
+          alerts:
+            empty ||
+            (!phase && resolved) ||
+            (phase && phase !== (resolved ? 'resolved' : 'firing'))
+              ? []
+              : [alert],
           next_after: empty || phase || continued ? null : 'v1.00',
         }),
       );
@@ -114,6 +150,12 @@ export async function installAlertsApi(page: Page) {
   return {
     metadata,
     requests,
+    annotate: (value: typeof annotation) => {
+      annotation = value;
+    },
+    resolve: () => {
+      resolved = true;
+    },
     denyAlerts: (status: number) => {
       alertStatus = status;
     },

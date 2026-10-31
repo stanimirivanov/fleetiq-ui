@@ -57,6 +57,7 @@ export default defineConfig({
         '**/binding-accessibility.spec.ts',
         '**/alerts-accessibility.spec.ts',
         '**/alert-rules-accessibility.spec.ts',
+        '**/acknowledgement-accessibility.spec.ts',
       ],
     },
     {

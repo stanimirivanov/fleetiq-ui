@@ -1,6 +1,6 @@
 # Revision-aware alert configuration and operator intent
 
-Status: accepted for M05-PR14a, issue #106
+Status: accepted for M05-PR14a/#106 and M05-PR14b/#107
 
 ## Context
 
@@ -44,3 +44,19 @@ the existing protected route boundary.
 The generator reuses equivalent primitive constraints in referenced parameters,
 including their original defaults. Negative and equivalence fixtures preserve the
 published contract. No backend snapshot bytes change for these selected operations.
+
+## Exact-version acknowledgement (PR14b, issue #107)
+
+Treat acknowledgement as an independent audited operator annotation, not lifecycle
+resolution or notification suppression. App composition supplies the current actor
+expectation; the command JSON contains only the displayed expected_version. The
+writer rejects foreign version/actor receipts and unsafe/noncanonical i64 text.
+Optional annotations must match the exact transition they annotate. Historical
+annotations remain attributed even after a later phase; they do not acknowledge
+that later version. A closed observation cannot initiate a new acknowledgement.
+
+Reuse the command owner introduced by PR14a. After confirmation, retain the receipt
+in the selected rule scope and refresh detail/history. On a version race, expose
+conflict and require an explicit current-alert refresh. Every write independently
+requires alerts.acknowledge; neither metadata, management nor telemetry implies it.
+The existing actor-keyed protected boundary disposes receipts on account changes.

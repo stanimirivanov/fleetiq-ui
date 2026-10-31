@@ -11,6 +11,7 @@ import {
   type ReadOptions,
   revision,
 } from '../model/connected-alerts';
+import { createAcknowledgementWriter } from './acknowledgement-writer';
 import {
   parseDetail,
   parseEvaluation,
@@ -46,6 +47,7 @@ export function createAlertReader(api: BrowserApi): AlertReader {
     );
   return {
     rules: createRuleGateway(api),
+    acknowledge: createAcknowledgementWriter(api),
     async queue(r, o) {
       valid([r.tenant], r.after);
       if (r.phase !== undefined && !phases.includes(r.phase))

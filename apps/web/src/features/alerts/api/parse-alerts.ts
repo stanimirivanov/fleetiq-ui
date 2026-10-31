@@ -22,6 +22,7 @@ import {
   type QueueRequest,
   type Transition,
 } from '../model/connected-alerts';
+import { parseAcknowledgement } from './acknowledgement-writer';
 
 function invalid(): never {
   throw new RequestFailure('invalid-response');
@@ -42,6 +43,7 @@ function page(items: readonly unknown[], next: string | null, after?: string) {
     invalid();
 }
 function transition(t: Transition, scope: string) {
+  if (t.acknowledgement) parseAcknowledgement(t.acknowledgement, t.version);
   if (
     !lifecycle(t.version) ||
     ![t.event_at_ms, t.recorded_at_ms].every(millis) ||

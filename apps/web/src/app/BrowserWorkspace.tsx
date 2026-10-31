@@ -61,6 +61,10 @@ function MetadataComposition(
   const operator = useOperatorSession();
   return (
     <TenantMetadataWorkspace
+      actorId={() => {
+        const s = operator.state();
+        return s.kind === 'authenticated' ? s.session.actorId : undefined;
+      }}
       alerts={props.alerts}
       bindings={props.bindings}
       commissioning={props.commissioning}

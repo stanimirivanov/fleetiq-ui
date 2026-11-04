@@ -44,6 +44,10 @@ export function navigationHref(
   }
   if (pathname === APP_ROUTES.overview.path || pathname === APP_ROUTES.map.path)
     return fleetWorkspaceHref(pathname, currentSearch);
+  if (pathname === APP_ROUTES.operations.path) {
+    const tenant = new URLSearchParams(currentSearch).get('tenant');
+    return tenant ? `${pathname}?${new URLSearchParams({ tenant })}` : pathname;
+  }
   if (pathname === APP_ROUTES.assets.path) {
     const current = new URLSearchParams(currentSearch);
     const context = new URLSearchParams();

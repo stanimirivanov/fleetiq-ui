@@ -10,7 +10,8 @@
     "#shared/api": "./src/shared/api/index.ts",
     "#shared/model": "./src/shared/model/index.ts",
     "#features/identity": "./src/features/identity/index.ts",
-    "#features/devices": "./src/features/devices/index.ts"
+    "#features/devices": "./src/features/devices/index.ts",
+    "#features/operations": "./src/features/operations/index.ts"
   },
   "scripts": {
     "dev": "vite",

@@ -16,6 +16,7 @@ flowchart TD
   App --> Assets[Assets feature]
   App --> Alerts[Alerts feature]
   App --> Devices[Devices feature]
+  App --> Operations[Operations feature]
   Devices --> Runtime
   Devices --> DevicePorts[Pure commissioning and diagnostic ports]
   App --> Runtime[Shared managed browser HTTP runtime]
@@ -137,3 +138,8 @@ models and validated calculator evidence inside the alerts feature. App composit
 supplies a separate port, tenant selector and session invalidation. Alerts do not
 inherit metadata.read or telemetry.read from discovery hints. URL selection and
 bounded cursor changes dispose superseded reads, including non-cooperative results.
+
+
+The operations feature owns sampled work diagnostics and reviewed recovery commands.
+App composition injects the managed gateway, current actor, explicit tenant grants
+and URL selection. Recovery targets and receipts stay in the selected scope.

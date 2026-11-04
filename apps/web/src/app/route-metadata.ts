@@ -13,6 +13,11 @@ export const APP_ROUTES = {
     title: 'Alerts & evidence',
     navigationLabel: 'Alerts',
   },
+  operations: {
+    path: '/operations',
+    title: 'Work operations',
+    navigationLabel: 'Operations',
+  },
   assetInspector: { path: '/assets/:assetId', title: 'Asset inspector' },
   registry: { path: '/assets/registry/review', title: 'Asset registry' },
   designSystem: {
@@ -32,6 +37,7 @@ export const PRIMARY_NAVIGATION = [
       { kind: 'route', route: APP_ROUTES.assets, icon: 'assets' },
       { kind: 'route', route: APP_ROUTES.devices, icon: 'devices' },
       { kind: 'route', route: APP_ROUTES.alerts, icon: 'alerts' },
+      { kind: 'route', route: APP_ROUTES.operations, icon: 'operations' },
       { kind: 'planned', label: 'Insights', icon: 'insights' },
     ],
   },

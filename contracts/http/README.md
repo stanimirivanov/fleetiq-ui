@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.26` from merged
-`fleetiq-platform` commit `c74e65d63f67b01968f7822ab3a6dd269d622b57`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.28` from merged
+`fleetiq-platform` commit `47b8016b4df08b7b7920ddbc2932f8ae12d11282`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -157,12 +157,8 @@ Rule revisions are integers; lifecycle counters, timestamps and output decimals
 remain exact text. Discovery now admits all nine published actions independently.
 Rule-write and acknowledgement selection is documented below.
 
-Baseline.26 contains a malformed escaped control-character regex in
-AdministrationIdentifier and SemanticDefinitionName. The exact-shape checked
-[identifier adapter](../../tools/sensors/identifier-generation.mjs) translates it
-only for private generation to the backend's no-trim/no-C0-or-C1-control rule,
-preserving bounds and rejecting unexpected source drift. The pinned artifact is
-byte-identical to upstream; an upstream specification correction remains desirable.
+Baseline.28 supplies corrected identifier patterns directly from the platform.
+The pinned artifact remains byte-identical to upstream.
 
 The [compaction adapter](../../tools/sensors/compact-generation.mjs) hoists
 byte-identical primitive schemas and omits schema documentation descriptions from
@@ -189,3 +185,18 @@ snapshot. Only expected_version is serialized; app-owned actor expectation valid
 its returned audit identity. Lifecycle counters and acknowledgement clocks remain
 canonical signed-i64 strings. Optional read annotations are validated against each
 transition's own version. Neither receipts nor annotations resolve/silence an alert.
+
+
+## Operational work
+
+The browser selects 44 operations, including getWorkDiagnostics,
+getWorkRecoveryTargets and applyWorkRecovery. Tenant discovery accepts eleven
+independent actions. The preparation read requires both operations.read and
+operations.manage. The command reuses the exact observed key and decimal fence.
+The browser validates receipt identity, actor, time and resulting generation.
+
+The private generation adapter expresses the recovery conditional as closed
+retry/control branches and supplies the existing browser mutation header
+parameters described in the upstream operation's prose. The published snapshot
+remains untouched. Repeated generated Problem dispatch shares a decoder builder
+while preserving each operation's status set, typed error tags and schema.

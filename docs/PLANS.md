@@ -114,3 +114,6 @@ acknowledgement follows as a separate stacked review slice.
 The stacked [acknowledgement slice](exec-plans/completed/2026-10-alert-acknowledgement-ui.md)
 completes M05-PR14 with exact-version actor-attributed commands and conflict/retry
 recovery, without changing lifecycle or delivery state.
+
+M05-PR19 connects the [operations workspace](exec-plans/completed/2026-11-work-operations.md)
+to bounded diagnostics and audited work recovery.

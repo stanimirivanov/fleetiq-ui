@@ -4,6 +4,7 @@ import test from 'node:test';
 import { BROWSER_OPERATIONS } from './asset-contract.mjs';
 import {
   browserGenerationPatch,
+  recoveryCommandSchema,
   routeGenerationPatch,
 } from './route-generation.mjs';
 
@@ -22,8 +23,15 @@ test('consumer generation preserves every selected operation and referenced sche
   assert.equal(JSON.stringify(spec), before);
   const paths = patches[0].value,
     components = patches[1].value;
-  for (const { path, method } of BROWSER_OPERATIONS)
-    assert.deepEqual(paths[path][method], spec.paths[path][method]);
+  for (const { path, method, id } of BROWSER_OPERATIONS) {
+    const expected = structuredClone(spec.paths[path][method]);
+    if (id === 'applyWorkRecovery')
+      expected.parameters.push(
+        { $ref: '#/components/parameters/admin-mutation-origin' },
+        { $ref: '#/components/parameters/admin-mutation-csrf' },
+      );
+    assert.deepEqual(paths[path][method], expected);
+  }
   assert.equal(components.schemas.PublishPropertyDefinitionRequest, undefined);
   assert.ok(
     paths[
@@ -70,4 +78,29 @@ test('changed conditions, missing consumed operations and unresolved refs fail c
     $ref: 'https://example.invalid',
   };
   assert.throws(() => browserGenerationPatch(external), /external/);
+});
+
+test('recovery generation keeps retry and empty control targets disjoint', () => {
+  const [retry, control] = recoveryCommandSchema(spec).oneOf;
+  assert.deepEqual(retry.properties.operation, { const: 'retry' });
+  assert.deepEqual(retry.properties.target, {
+    $ref: '#/components/schemas/WorkRetryTarget',
+  });
+  assert.deepEqual(control.properties.operation, { enum: ['pause', 'resume'] });
+  assert.deepEqual(control.properties.target, {
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  });
+  for (const branch of [retry, control]) {
+    assert.deepEqual(branch.required, [
+      'operation',
+      'expected_generation',
+      'target',
+    ]);
+    assert.equal(branch.additionalProperties, false);
+  }
+  const changed = structuredClone(spec);
+  changed.components.schemas.WorkRecoveryCommand.allOf[0].else.properties.target.maxProperties = 1;
+  assert.throws(() => recoveryCommandSchema(changed), /constraint changed/);
 });

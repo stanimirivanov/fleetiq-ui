@@ -45,6 +45,7 @@ export function TenantMetadataWorkspace(props: WorkspaceProps) {
     (location.pathname.startsWith('/assets') ||
       location.pathname === '/devices' ||
       location.pathname === '/alerts' ||
+      location.pathname === '/operations' ||
       location.pathname === '/map' ||
       location.pathname === '/') &&
     !isDevelopmentSampleRoute(

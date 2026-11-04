@@ -9,44 +9,52 @@ import * as HttpClientError from "effect/http/HttpClientError"
 import * as HttpClientRequest from "effect/http/HttpClientRequest"
 import * as HttpClientResponse from "effect/http/HttpClientResponse"
 // non-recursive definitions
-export type BrowserPrimitiveConstraint2 = string
-export const BrowserPrimitiveConstraint2 = Schema.String.annotate({ "identifier": "BrowserPrimitiveConstraint2" })
-export type AlertLifecycleVersion = string
-export const AlertLifecycleVersion = Schema.String.check(Schema.isMaxCodePoints(19).annotate({ "expected": "a string with at most 19 code points" })).check(Schema.isPattern(new RegExp("^[1-9][0-9]*$", "u")).annotate({ "expected": "a string matching the RegExp ^[1-9][0-9]*$", "identifier": "AlertLifecycleVersion" }))
-export type AdministrationIdentifier = string
-export const AdministrationIdentifier = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })).check(Schema.isPattern(new RegExp("^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "u")).annotate({ "expected": "a string matching the RegExp ^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "identifier": "AdministrationIdentifier" }))
 export type HistoryMillis = string
 export const HistoryMillis = Schema.String.check(Schema.isMaxCodePoints(20).annotate({ "expected": "a string with at most 20 code points" })).check(Schema.isPattern(new RegExp("^-?(0|[1-9][0-9]*)$", "u")).annotate({ "expected": "a string matching the RegExp ^-?(0|[1-9][0-9]*)$", "identifier": "HistoryMillis" }))
-export type BrowserPrimitiveConstraint3 = number
-export const BrowserPrimitiveConstraint3 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295", "identifier": "BrowserPrimitiveConstraint3" }))
-export type BrowserPrimitiveConstraint4 = number
-export const BrowserPrimitiveConstraint4 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295", "identifier": "BrowserPrimitiveConstraint4" }))
-export type BrowserPrimitiveConstraint5 = number
-export const BrowserPrimitiveConstraint5 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(1023).annotate({ "expected": "a value less than or equal to 1023", "identifier": "BrowserPrimitiveConstraint5" }))
+export type BrowserPrimitiveConstraint2 = number
+export const BrowserPrimitiveConstraint2 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(64).annotate({ "expected": "a value less than or equal to 64", "identifier": "BrowserPrimitiveConstraint2" }))
+export type BrowserPrimitiveConstraint3 = string
+export const BrowserPrimitiveConstraint3 = Schema.String.annotate({ "identifier": "BrowserPrimitiveConstraint3" })
+export type WorkKind = "replay" | "calculator" | "alert_evaluation" | "notification"
+export const WorkKind = Schema.Literals(["replay", "calculator", "alert_evaluation", "notification"]).annotate({ "identifier": "WorkKind" })
+export type WorkGeneration = string
+export const WorkGeneration = Schema.String.check(Schema.isMaxCodePoints(19).annotate({ "expected": "a string with at most 19 code points" })).check(Schema.isPattern(new RegExp("^(0|[1-9][0-9]*)$", "u")).annotate({ "expected": "a string matching the RegExp ^(0|[1-9][0-9]*)$", "identifier": "WorkGeneration" }))
+export type AdministrationIdentifier = string
+export const AdministrationIdentifier = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })).check(Schema.isPattern(new RegExp("^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "u")).annotate({ "expected": "a string matching the RegExp ^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "identifier": "AdministrationIdentifier" }))
+export type BrowserPrimitiveConstraint5 = string
+export const BrowserPrimitiveConstraint5 = Schema.String.check(Schema.isPattern(new RegExp("^[a-f0-9]{64}$", "u")).annotate({ "expected": "a string matching the RegExp ^[a-f0-9]{64}$", "identifier": "BrowserPrimitiveConstraint5" }))
+export type AlertLifecycleVersion = string
+export const AlertLifecycleVersion = Schema.String.check(Schema.isMaxCodePoints(19).annotate({ "expected": "a string with at most 19 code points" })).check(Schema.isPattern(new RegExp("^[1-9][0-9]*$", "u")).annotate({ "expected": "a string matching the RegExp ^[1-9][0-9]*$", "identifier": "AlertLifecycleVersion" }))
 export type BrowserPrimitiveConstraint6 = number
-export const BrowserPrimitiveConstraint6 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(604800000).annotate({ "expected": "a value less than or equal to 604800000", "identifier": "BrowserPrimitiveConstraint6" }))
+export const BrowserPrimitiveConstraint6 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295", "identifier": "BrowserPrimitiveConstraint6" }))
+export type BrowserPrimitiveConstraint7 = number
+export const BrowserPrimitiveConstraint7 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295", "identifier": "BrowserPrimitiveConstraint7" }))
+export type BrowserPrimitiveConstraint8 = number
+export const BrowserPrimitiveConstraint8 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(1023).annotate({ "expected": "a value less than or equal to 1023", "identifier": "BrowserPrimitiveConstraint8" }))
+export type BrowserPrimitiveConstraint9 = number
+export const BrowserPrimitiveConstraint9 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(604800000).annotate({ "expected": "a value less than or equal to 604800000", "identifier": "BrowserPrimitiveConstraint9" }))
 export type AlertPhase = "inactive" | "pending" | "firing" | "resolved"
 export const AlertPhase = Schema.Literals(["inactive", "pending", "firing", "resolved"]).annotate({ "identifier": "AlertPhase" })
-export type BrowserPrimitiveConstraint17 = number
-export const BrowserPrimitiveConstraint17 = Schema.Number.annotate({ "default": 50 }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(100).annotate({ "expected": "a value less than or equal to 100", "identifier": "BrowserPrimitiveConstraint17" }))
+export type BrowserPrimitiveConstraint20 = number
+export const BrowserPrimitiveConstraint20 = Schema.Number.annotate({ "default": 50 }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(100).annotate({ "expected": "a value less than or equal to 100", "identifier": "BrowserPrimitiveConstraint20" }))
 export type AlertReadCursor = string
 export const AlertReadCursor = Schema.String.check(Schema.isMaxCodePoints(8192).annotate({ "expected": "a string with at most 8192 code points" })).check(Schema.isPattern(new RegExp("^v1\\.(?:[0-9a-f]{2})+$", "u")).annotate({ "expected": "a string matching the RegExp ^v1\\.(?:[0-9a-f]{2})+$", "identifier": "AlertReadCursor" }))
-export type BrowserPrimitiveConstraint8 = number
-export const BrowserPrimitiveConstraint8 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(1024).annotate({ "expected": "a value less than or equal to 1024", "identifier": "BrowserPrimitiveConstraint8" }))
-export type BrowserPrimitiveConstraint18 = number
-export const BrowserPrimitiveConstraint18 = Schema.Number.annotate({ "default": 20 }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(20).annotate({ "expected": "a value less than or equal to 20", "identifier": "BrowserPrimitiveConstraint18" }))
+export type BrowserPrimitiveConstraint11 = number
+export const BrowserPrimitiveConstraint11 = Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(1024).annotate({ "expected": "a value less than or equal to 1024", "identifier": "BrowserPrimitiveConstraint11" }))
+export type BrowserPrimitiveConstraint21 = number
+export const BrowserPrimitiveConstraint21 = Schema.Number.annotate({ "default": 20 }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(20).annotate({ "expected": "a value less than or equal to 20", "identifier": "BrowserPrimitiveConstraint21" }))
 export type CalculatorEvidenceCursor = string
 export const CalculatorEvidenceCursor = Schema.String.check(Schema.isMaxCodePoints(8192).annotate({ "expected": "a string with at most 8192 code points" })).check(Schema.isPattern(new RegExp("^v1\\.(?:[0-9a-f]{2})+$", "u")).annotate({ "expected": "a string matching the RegExp ^v1\\.(?:[0-9a-f]{2})+$", "identifier": "CalculatorEvidenceCursor" }))
-export type BrowserPrimitiveConstraint9 = string
-export const BrowserPrimitiveConstraint9 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(4096).annotate({ "expected": "a string with at most 4096 code points", "identifier": "BrowserPrimitiveConstraint9" }))
-export type BrowserPrimitiveConstraint10 = string
-export const BrowserPrimitiveConstraint10 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points", "identifier": "BrowserPrimitiveConstraint10" }))
-export type BrowserPrimitiveConstraint11 = string
-export const BrowserPrimitiveConstraint11 = Schema.String.check(Schema.isMaxCodePoints(20).annotate({ "expected": "a string with at most 20 code points" })).check(Schema.isPattern(new RegExp("^[1-9][0-9]*$", "u")).annotate({ "expected": "a string matching the RegExp ^[1-9][0-9]*$", "identifier": "BrowserPrimitiveConstraint11" }))
-export type BrowserPrimitiveConstraint12 = number
-export const BrowserPrimitiveConstraint12 = Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer", "identifier": "BrowserPrimitiveConstraint12" }))
+export type BrowserPrimitiveConstraint12 = string
+export const BrowserPrimitiveConstraint12 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(4096).annotate({ "expected": "a string with at most 4096 code points", "identifier": "BrowserPrimitiveConstraint12" }))
 export type BrowserPrimitiveConstraint13 = string
-export const BrowserPrimitiveConstraint13 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })).check(Schema.isPattern(new RegExp("^[^\\s]+$", "u")).annotate({ "expected": "a string matching the RegExp ^[^\\s]+$", "identifier": "BrowserPrimitiveConstraint13" }))
+export const BrowserPrimitiveConstraint13 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points", "identifier": "BrowserPrimitiveConstraint13" }))
+export type BrowserPrimitiveConstraint14 = string
+export const BrowserPrimitiveConstraint14 = Schema.String.check(Schema.isMaxCodePoints(20).annotate({ "expected": "a string with at most 20 code points" })).check(Schema.isPattern(new RegExp("^[1-9][0-9]*$", "u")).annotate({ "expected": "a string matching the RegExp ^[1-9][0-9]*$", "identifier": "BrowserPrimitiveConstraint14" }))
+export type BrowserPrimitiveConstraint15 = number
+export const BrowserPrimitiveConstraint15 = Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer", "identifier": "BrowserPrimitiveConstraint15" }))
+export type BrowserPrimitiveConstraint16 = string
+export const BrowserPrimitiveConstraint16 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })).check(Schema.isPattern(new RegExp("^[^\\s]+$", "u")).annotate({ "expected": "a string matching the RegExp ^[^\\s]+$", "identifier": "BrowserPrimitiveConstraint16" }))
 export type SemanticDefinitionName = string
 export const SemanticDefinitionName = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(200).annotate({ "expected": "a string with at most 200 code points" })).check(Schema.isPattern(new RegExp("^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "u")).annotate({ "expected": "a string matching the RegExp ^(?!\\s)(?![\\s\\S]*\\s$)[^\\u0000-\\u001F\\u007F-\\u009F]+$", "identifier": "SemanticDefinitionName" }))
 export type ProjectionCounter = string
@@ -55,166 +63,182 @@ export type HistoryToken = string
 export const HistoryToken = Schema.String.check(Schema.isMaxCodePoints(8192).annotate({ "expected": "a string with at most 8192 code points" })).check(Schema.isPattern(new RegExp("^v1\\.[0-9a-f]+$", "u")).annotate({ "expected": "a string matching the RegExp ^v1\\.[0-9a-f]+$", "identifier": "HistoryToken" }))
 export type BrowserPrimitiveConstraint1 = string
 export const BrowserPrimitiveConstraint1 = Schema.String.check(Schema.isMaxCodePoints(20).annotate({ "expected": "a string with at most 20 code points" })).check(Schema.isPattern(new RegExp("^-?(0|[1-9][0-9]*)$", "u")).annotate({ "expected": "a string matching the RegExp ^-?(0|[1-9][0-9]*)$", "identifier": "BrowserPrimitiveConstraint1" }))
-export type BrowserPrimitiveConstraint20 = string
-export const BrowserPrimitiveConstraint20 = Schema.String.check(Schema.isMaxCodePoints(110).annotate({ "expected": "a string with at most 110 code points" })).check(Schema.isPattern(new RegExp("^v1\\.[a-f0-9]{64}\\.(0|[1-9][0-9]{0,18})\\.(0|[1-9][0-9]{0,18})$", "u")).annotate({ "expected": "a string matching the RegExp ^v1\\.[a-f0-9]{64}\\.(0|[1-9][0-9]{0,18})\\.(0|[1-9][0-9]{0,18})$", "identifier": "BrowserPrimitiveConstraint20" }))
+export type BrowserPrimitiveConstraint23 = string
+export const BrowserPrimitiveConstraint23 = Schema.String.check(Schema.isMaxCodePoints(110).annotate({ "expected": "a string with at most 110 code points" })).check(Schema.isPattern(new RegExp("^v1\\.[a-f0-9]{64}\\.(0|[1-9][0-9]{0,18})\\.(0|[1-9][0-9]{0,18})$", "u")).annotate({ "expected": "a string matching the RegExp ^v1\\.[a-f0-9]{64}\\.(0|[1-9][0-9]{0,18})\\.(0|[1-9][0-9]{0,18})$", "identifier": "BrowserPrimitiveConstraint23" }))
 export type PropertyLiveStream = string
 export const PropertyLiveStream = Schema.String.annotate({ "identifier": "PropertyLiveStream" })
-export type TenantAction = "alerts.read" | "alerts.manage" | "analytics.manage" | "access.manage" | "metadata.manage" | "metadata.read" | "protocol.manage" | "telemetry.read" | "alerts.acknowledge"
-export const TenantAction = Schema.Literals(["alerts.read", "alerts.manage", "analytics.manage", "access.manage", "metadata.manage", "metadata.read", "protocol.manage", "telemetry.read", "alerts.acknowledge"]).annotate({ "identifier": "TenantAction" })
+export type TenantAction = "alerts.read" | "alerts.manage" | "analytics.manage" | "access.manage" | "metadata.manage" | "metadata.read" | "protocol.manage" | "telemetry.read" | "alerts.acknowledge" | "operations.read" | "operations.manage"
+export const TenantAction = Schema.Literals(["alerts.read", "alerts.manage", "analytics.manage", "access.manage", "metadata.manage", "metadata.read", "protocol.manage", "telemetry.read", "alerts.acknowledge", "operations.read", "operations.manage"]).annotate({ "identifier": "TenantAction" })
 export type ApiDescription = { readonly "service": "FleetIQ", readonly "version": "v1" } & { readonly [x: string]: Schema.Json }
 export const ApiDescription = Schema.StructWithRest(Schema.Struct({ "service": Schema.Literal("FleetIQ"), "version": Schema.Literal("v1") }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "ApiDescription" })
-export type BrowserPrimitiveConstraint14 = string
-export const BrowserPrimitiveConstraint14 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1", "identifier": "BrowserPrimitiveConstraint14" }))
-export type BrowserPrimitiveConstraint21 = string
-export const BrowserPrimitiveConstraint21 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(512).annotate({ "expected": "a string with at most 512 code points", "identifier": "BrowserPrimitiveConstraint21" }))
-export type BrowserPrimitiveConstraint15 = string
-export const BrowserPrimitiveConstraint15 = Schema.String.check(Schema.isPattern(new RegExp("^[A-Za-z0-9_.-]{1,128}$", "u")).annotate({ "expected": "a string matching the RegExp ^[A-Za-z0-9_.-]{1,128}$", "identifier": "BrowserPrimitiveConstraint15" }))
-export type BrowserPrimitiveConstraint16 = number
-export const BrowserPrimitiveConstraint16 = Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0", "identifier": "BrowserPrimitiveConstraint16" }))
+export type BrowserPrimitiveConstraint17 = string
+export const BrowserPrimitiveConstraint17 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1", "identifier": "BrowserPrimitiveConstraint17" }))
+export type BrowserPrimitiveConstraint24 = string
+export const BrowserPrimitiveConstraint24 = Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(512).annotate({ "expected": "a string with at most 512 code points", "identifier": "BrowserPrimitiveConstraint24" }))
+export type BrowserPrimitiveConstraint18 = string
+export const BrowserPrimitiveConstraint18 = Schema.String.check(Schema.isPattern(new RegExp("^[A-Za-z0-9_.-]{1,128}$", "u")).annotate({ "expected": "a string matching the RegExp ^[A-Za-z0-9_.-]{1,128}$", "identifier": "BrowserPrimitiveConstraint18" }))
+export type BrowserPrimitiveConstraint19 = number
+export const BrowserPrimitiveConstraint19 = Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0", "identifier": "BrowserPrimitiveConstraint19" }))
 export type IngestionDiagnosticCoverage = { readonly "frame_limit": 64, readonly "output_limit_per_frame": 64, readonly "source_limit": 128, readonly "frames_truncated": boolean, readonly "observations_truncated": boolean, readonly "sources_truncated": boolean }
 export const IngestionDiagnosticCoverage = Schema.Struct({ "frame_limit": Schema.Literal(64), "output_limit_per_frame": Schema.Literal(64), "source_limit": Schema.Literal(128), "frames_truncated": Schema.Boolean, "observations_truncated": Schema.Boolean, "sources_truncated": Schema.Boolean }).annotate({ "identifier": "IngestionDiagnosticCoverage" })
-export type Problem = { readonly "type": BrowserPrimitiveConstraint2, readonly "title": BrowserPrimitiveConstraint2, readonly "status": number } & { readonly [x: string]: Schema.Json }
-export const Problem = Schema.StructWithRest(Schema.Struct({ "type": BrowserPrimitiveConstraint2, "title": BrowserPrimitiveConstraint2, "status": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(400).annotate({ "expected": "a value greater than or equal to 400" })).check(Schema.isLessThanOrEqualTo(599).annotate({ "expected": "a value less than or equal to 599" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "Problem" })
-export type ProtocolPackageRelease = { readonly "package_id": BrowserPrimitiveConstraint2, readonly "package_version": BrowserPrimitiveConstraint2, readonly "artifact_sha256": string, readonly "artifact_size_bytes": number }
-export const ProtocolPackageRelease = Schema.Struct({ "package_id": BrowserPrimitiveConstraint2, "package_version": BrowserPrimitiveConstraint2, "artifact_sha256": Schema.String.check(Schema.isPattern(new RegExp("^[a-f0-9]{64}$", "u")).annotate({ "expected": "a string matching the RegExp ^[a-f0-9]{64}$" })), "artifact_size_bytes": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(8388608).annotate({ "expected": "a value less than or equal to 8388608" })) }).annotate({ "identifier": "ProtocolPackageRelease" })
-export type AlertAcknowledgementRequest = { readonly "expected_version": AlertLifecycleVersion }
-export const AlertAcknowledgementRequest = Schema.Struct({ "expected_version": AlertLifecycleVersion }).annotate({ "identifier": "AlertAcknowledgementRequest" })
-export type CalculatorEvidenceRelease = { readonly "id": AdministrationIdentifier, readonly "version": AdministrationIdentifier, readonly "implementation": "window-mean-v1" | "window-mad-v1" }
-export const CalculatorEvidenceRelease = Schema.Struct({ "id": AdministrationIdentifier, "version": AdministrationIdentifier, "implementation": Schema.Literals(["window-mean-v1", "window-mad-v1"]) }).annotate({ "identifier": "CalculatorEvidenceRelease" })
-export type RegistrationExternalIdentifier = { readonly "kind": AdministrationIdentifier, readonly "authority"?: AdministrationIdentifier | null, readonly "value": AdministrationIdentifier }
-export const RegistrationExternalIdentifier = Schema.Struct({ "kind": AdministrationIdentifier, "authority": Schema.optionalKey(Schema.Union([AdministrationIdentifier, Schema.Null])), "value": AdministrationIdentifier }).annotate({ "identifier": "RegistrationExternalIdentifier" })
-export type AlertAcknowledgement = { readonly "version": AlertLifecycleVersion, readonly "actor_id": AdministrationIdentifier, readonly "recorded_at_ms": HistoryMillis }
-export const AlertAcknowledgement = Schema.Struct({ "version": AlertLifecycleVersion, "actor_id": AdministrationIdentifier, "recorded_at_ms": HistoryMillis }).annotate({ "identifier": "AlertAcknowledgement" })
 export type CalculatorEvidenceWindow = { readonly "start_at_ms": HistoryMillis, readonly "end_at_ms": HistoryMillis, readonly "finalize_at_ms": HistoryMillis, readonly "known_at_ms": HistoryMillis }
 export const CalculatorEvidenceWindow = Schema.Struct({ "start_at_ms": HistoryMillis, "end_at_ms": HistoryMillis, "finalize_at_ms": HistoryMillis, "known_at_ms": HistoryMillis }).annotate({ "identifier": "CalculatorEvidenceWindow" })
 export type CalculatorInputReference = { readonly "evidence_id": string, readonly "event_at_ms": HistoryMillis }
 export const CalculatorInputReference = Schema.Struct({ "evidence_id": Schema.String.check(Schema.isPattern(new RegExp("^[0-9a-f]{64}$", "u")).annotate({ "expected": "a string matching the RegExp ^[0-9a-f]{64}$" })), "event_at_ms": HistoryMillis }).annotate({ "identifier": "CalculatorInputReference" })
-export type AlertRuleRevisionReceipt = { readonly "revision": BrowserPrimitiveConstraint3 }
-export const AlertRuleRevisionReceipt = Schema.Struct({ "revision": BrowserPrimitiveConstraint3 }).annotate({ "identifier": "AlertRuleRevisionReceipt" })
-export type CalculatorEvidenceProperty = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint3 }
-export const CalculatorEvidenceProperty = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint3 }).annotate({ "identifier": "CalculatorEvidenceProperty" })
-export type SemanticDefinitionPosition = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint3 }
-export const SemanticDefinitionPosition = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint3 }).annotate({ "identifier": "SemanticDefinitionPosition" })
-export type RegistrationAssetType = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint3 }
-export const RegistrationAssetType = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint3 }).annotate({ "identifier": "RegistrationAssetType" })
-export type AlertRuleActivationState = { readonly "generation": BrowserPrimitiveConstraint4, readonly "revision": number | null, readonly "actor_id": AdministrationIdentifier | null, readonly "recorded_at_ms": number | null }
-export const AlertRuleActivationState = Schema.Struct({ "generation": BrowserPrimitiveConstraint4, "revision": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), Schema.Null]), "actor_id": Schema.Union([AdministrationIdentifier, Schema.Null]), "recorded_at_ms": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(-9223372036854776000).annotate({ "expected": "a value greater than or equal to -9223372036854776000" })).check(Schema.isLessThanOrEqualTo(9223372036854776000).annotate({ "expected": "a value less than or equal to 9223372036854776000" })), Schema.Null]).annotate({ "format": "int64" }) }).annotate({ "identifier": "AlertRuleActivationState" })
-export type AlertRuleActivationRequest = { readonly "expected_generation": BrowserPrimitiveConstraint4, readonly "revision": number | null }
-export const AlertRuleActivationRequest = Schema.Struct({ "expected_generation": BrowserPrimitiveConstraint4, "revision": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), Schema.Null]) }).annotate({ "identifier": "AlertRuleActivationRequest" })
-export type AlertEvaluationRef = { readonly "evaluation_id": AdministrationIdentifier, readonly "scope_asset_id": AdministrationIdentifier, readonly "output_index": BrowserPrimitiveConstraint5 | null }
-export const AlertEvaluationRef = Schema.Struct({ "evaluation_id": AdministrationIdentifier, "scope_asset_id": AdministrationIdentifier, "output_index": Schema.Union([BrowserPrimitiveConstraint5, Schema.Null]) }).annotate({ "identifier": "AlertEvaluationRef" })
-export type AlertRuleDefinition = { readonly "kind": "numeric-threshold-v1", readonly "calculator": AdministrationIdentifier, readonly "version": AdministrationIdentifier, readonly "scope": AdministrationIdentifier, readonly "target": AdministrationIdentifier, readonly "output_property": AdministrationIdentifier, readonly "output_version": BrowserPrimitiveConstraint3, readonly "output_index": BrowserPrimitiveConstraint5, readonly "comparison": "gt" | "gte" | "lt" | "lte", readonly "threshold": string, readonly "threshold_unit": AdministrationIdentifier | null, readonly "hold_ms": BrowserPrimitiveConstraint6, readonly "resolution": "resolve_on_false", readonly "resolve_after_ms": BrowserPrimitiveConstraint6 }
-export const AlertRuleDefinition = Schema.Struct({ "kind": Schema.Literal("numeric-threshold-v1"), "calculator": AdministrationIdentifier, "version": AdministrationIdentifier, "scope": AdministrationIdentifier, "target": AdministrationIdentifier, "output_property": AdministrationIdentifier, "output_version": BrowserPrimitiveConstraint3, "output_index": BrowserPrimitiveConstraint5, "comparison": Schema.Literals(["gt", "gte", "lt", "lte"]), "threshold": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(256).annotate({ "expected": "a string with at most 256 code points" })).check(Schema.isPattern(new RegExp("^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$", "u")).annotate({ "expected": "a string matching the RegExp ^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$" })), "threshold_unit": Schema.Union([AdministrationIdentifier, Schema.Null]), "hold_ms": BrowserPrimitiveConstraint6, "resolution": Schema.Literal("resolve_on_false"), "resolve_after_ms": BrowserPrimitiveConstraint6 }).annotate({ "identifier": "AlertRuleDefinition" })
-export type CalculatorOutputEvidence = { readonly "evaluation_id": AdministrationIdentifier, readonly "calculator_id": AdministrationIdentifier, readonly "calculator_version": AdministrationIdentifier, readonly "output_index": BrowserPrimitiveConstraint5, readonly "asset_id": AdministrationIdentifier, readonly "property_id": AdministrationIdentifier, readonly "property_version": BrowserPrimitiveConstraint3, readonly "kind": "decimal", readonly "value": BrowserPrimitiveConstraint9, readonly "unit": AdministrationIdentifier | null }
-export const CalculatorOutputEvidence = Schema.Struct({ "evaluation_id": AdministrationIdentifier, "calculator_id": AdministrationIdentifier, "calculator_version": AdministrationIdentifier, "output_index": BrowserPrimitiveConstraint5, "asset_id": AdministrationIdentifier, "property_id": AdministrationIdentifier, "property_version": BrowserPrimitiveConstraint3, "kind": Schema.Literal("decimal"), "value": BrowserPrimitiveConstraint9, "unit": Schema.Union([AdministrationIdentifier, Schema.Null]) }).annotate({ "identifier": "CalculatorOutputEvidence" })
-export type SignalSource = { readonly "device_asset_id": BrowserPrimitiveConstraint10, readonly "endpoint_id": BrowserPrimitiveConstraint10, readonly "signal_id": BrowserPrimitiveConstraint10 } & { readonly [x: string]: Schema.Json }
-export const SignalSource = Schema.StructWithRest(Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint10, "endpoint_id": BrowserPrimitiveConstraint10, "signal_id": BrowserPrimitiveConstraint10 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SignalSource" })
-export type PropertyReference = { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3 } & { readonly [x: string]: Schema.Json }
-export const PropertyReference = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "PropertyReference" })
-export type FleetLocationMapping = { readonly "latitude": { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3 }, readonly "longitude": { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3 }, readonly "encoding": "degrees" | "e7" }
-export const FleetLocationMapping = Schema.Struct({ "latitude": Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3 }), "longitude": Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3 }), "encoding": Schema.Literals(["degrees", "e7"]) }).annotate({ "identifier": "FleetLocationMapping" })
-export type AssetTypeRef = { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3 } & { readonly [x: string]: Schema.Json }
-export const AssetTypeRef = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetTypeRef" })
-export type PropertyHistorySource = { readonly "message_id": BrowserPrimitiveConstraint10, readonly "protocol_package_id": BrowserPrimitiveConstraint10, readonly "protocol_package_version": BrowserPrimitiveConstraint10, readonly "device_asset_id": BrowserPrimitiveConstraint10, readonly "endpoint_id": BrowserPrimitiveConstraint10, readonly "signal_id": BrowserPrimitiveConstraint10, readonly "output_index": BrowserPrimitiveConstraint4, readonly "device_recorded_at_ms": HistoryMillis | null, readonly "received_at_ms": HistoryMillis }
-export const PropertyHistorySource = Schema.Struct({ "message_id": BrowserPrimitiveConstraint10, "protocol_package_id": BrowserPrimitiveConstraint10, "protocol_package_version": BrowserPrimitiveConstraint10, "device_asset_id": BrowserPrimitiveConstraint10, "endpoint_id": BrowserPrimitiveConstraint10, "signal_id": BrowserPrimitiveConstraint10, "output_index": BrowserPrimitiveConstraint4, "device_recorded_at_ms": Schema.Union([HistoryMillis, Schema.Null], { mode: "oneOf" }), "received_at_ms": HistoryMillis }).annotate({ "identifier": "PropertyHistorySource" })
-export type RelationshipTypeRef = { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3 } & { readonly [x: string]: Schema.Json }
-export const RelationshipTypeRef = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "RelationshipTypeRef" })
-export type ProtocolRouteSelection = { readonly "package_id": BrowserPrimitiveConstraint10, readonly "package_version": BrowserPrimitiveConstraint10, readonly "world": "runtime-v1" | "identity-v1" }
-export const ProtocolRouteSelection = Schema.Struct({ "package_id": BrowserPrimitiveConstraint10, "package_version": BrowserPrimitiveConstraint10, "world": Schema.Literals(["runtime-v1", "identity-v1"]) }).annotate({ "identifier": "ProtocolRouteSelection" })
-export type IngestionObservedSource = { readonly "package_id": BrowserPrimitiveConstraint10, readonly "package_version": BrowserPrimitiveConstraint10, readonly "endpoint_id": BrowserPrimitiveConstraint10, readonly "signal_id": BrowserPrimitiveConstraint10 }
-export const IngestionObservedSource = Schema.Struct({ "package_id": BrowserPrimitiveConstraint10, "package_version": BrowserPrimitiveConstraint10, "endpoint_id": BrowserPrimitiveConstraint10, "signal_id": BrowserPrimitiveConstraint10 }).annotate({ "identifier": "IngestionObservedSource" })
-export type EffectiveInterval = { readonly "start_ms": BrowserPrimitiveConstraint12, readonly "end_ms": number | null } & { readonly [x: string]: Schema.Json }
-export const EffectiveInterval = Schema.StructWithRest(Schema.Struct({ "start_ms": BrowserPrimitiveConstraint12, "end_ms": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })), Schema.Null]).annotate({ "format": "int64" }) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "EffectiveInterval" })
-export type RevisionEffectiveInterval = { readonly "start_ms": BrowserPrimitiveConstraint12, readonly "end_ms"?: number | null }
-export const RevisionEffectiveInterval = Schema.Struct({ "start_ms": BrowserPrimitiveConstraint12, "end_ms": Schema.optionalKey(Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })), Schema.Null]).annotate({ "format": "int64" })) }).annotate({ "identifier": "RevisionEffectiveInterval" })
-export type MetadataRegistrationResult = { readonly "outcome": "registered" | "already_registered", readonly "registered_by": AdministrationIdentifier, readonly "recorded_at_ms": BrowserPrimitiveConstraint12 }
-export const MetadataRegistrationResult = Schema.Struct({ "outcome": Schema.Literals(["registered", "already_registered"]), "registered_by": AdministrationIdentifier, "recorded_at_ms": BrowserPrimitiveConstraint12 }).annotate({ "identifier": "MetadataRegistrationResult" })
-export type IngestionDiagnosticFrame = { readonly "message_id": BrowserPrimitiveConstraint10, readonly "package_id": BrowserPrimitiveConstraint10, readonly "package_version": BrowserPrimitiveConstraint10, readonly "received_at_ms": BrowserPrimitiveConstraint12, readonly "processing": "accepted" | "queued" | "leased" | "expired" | "poisoned" | "decoded", readonly "observation_count": number | null }
-export const IngestionDiagnosticFrame = Schema.Struct({ "message_id": BrowserPrimitiveConstraint10, "package_id": BrowserPrimitiveConstraint10, "package_version": BrowserPrimitiveConstraint10, "received_at_ms": BrowserPrimitiveConstraint12, "processing": Schema.Literals(["accepted", "queued", "leased", "expired", "poisoned", "decoded"]), "observation_count": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(4294967296).annotate({ "expected": "a value less than or equal to 4294967296" })), Schema.Null]) }).annotate({ "identifier": "IngestionDiagnosticFrame" })
-export type RevisionSource = { readonly "device_asset_id": BrowserPrimitiveConstraint13, readonly "endpoint_id": BrowserPrimitiveConstraint13, readonly "signal_id": BrowserPrimitiveConstraint13 }
-export const RevisionSource = Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint13, "endpoint_id": BrowserPrimitiveConstraint13, "signal_id": BrowserPrimitiveConstraint13 }).annotate({ "identifier": "RevisionSource" })
-export type RevisionProperty = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint3 }
-export const RevisionProperty = Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint3 }).annotate({ "identifier": "RevisionProperty" })
-export type MetadataRevisionResult = { readonly "outcome": "appended" | "already_appended", readonly "id": BrowserPrimitiveConstraint13, readonly "revision": BrowserPrimitiveConstraint11, readonly "recorded_by": BrowserPrimitiveConstraint13, readonly "recorded_at_ms": BrowserPrimitiveConstraint12 }
-export const MetadataRevisionResult = Schema.Struct({ "outcome": Schema.Literals(["appended", "already_appended"]), "id": BrowserPrimitiveConstraint13, "revision": BrowserPrimitiveConstraint11, "recorded_by": BrowserPrimitiveConstraint13, "recorded_at_ms": BrowserPrimitiveConstraint12 }).annotate({ "identifier": "MetadataRevisionResult" })
-export type RevisionRelationshipType = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint3 }
-export const RevisionRelationshipType = Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint3 }).annotate({ "identifier": "RevisionRelationshipType" })
-export type SemanticDefinitionSummary = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint3, readonly "name": SemanticDefinitionName }
-export const SemanticDefinitionSummary = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint3, "name": SemanticDefinitionName }).annotate({ "identifier": "SemanticDefinitionSummary" })
+export type WorkQueueEvidence = { readonly "kind": "replay" | "calculator" | "alert_evaluation" | "notification", readonly "sampled": BrowserPrimitiveConstraint2, readonly "eligible": BrowserPrimitiveConstraint2, readonly "leased": BrowserPrimitiveConstraint2, readonly "failed": BrowserPrimitiveConstraint2, readonly "blocked": BrowserPrimitiveConstraint2, readonly "deferred": BrowserPrimitiveConstraint2, readonly "max_attempts": number, readonly "oldest_sampled_eligible_at_ms": HistoryMillis | null, readonly "failure_categories": ReadonlyArray<"attempts_exhausted" | "transport" | "rejected" | "response_limit" | "invalid_payload">, readonly "truncated": boolean }
+export const WorkQueueEvidence = Schema.Struct({ "kind": Schema.Literals(["replay", "calculator", "alert_evaluation", "notification"]), "sampled": BrowserPrimitiveConstraint2, "eligible": BrowserPrimitiveConstraint2, "leased": BrowserPrimitiveConstraint2, "failed": BrowserPrimitiveConstraint2, "blocked": BrowserPrimitiveConstraint2, "deferred": BrowserPrimitiveConstraint2, "max_attempts": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(5).annotate({ "expected": "a value less than or equal to 5" })), "oldest_sampled_eligible_at_ms": Schema.Union([HistoryMillis, Schema.Null]), "failure_categories": Schema.Array(Schema.Literals(["attempts_exhausted", "transport", "rejected", "response_limit", "invalid_payload"])).check(Schema.isMaxLength(5).annotate({ "expected": "a value with a length of at most 5" })).check(Schema.isUnique().annotate({ "expected": "an array with unique items" })), "truncated": Schema.Boolean }).annotate({ "identifier": "WorkQueueEvidence" })
+export type Problem = { readonly "type": BrowserPrimitiveConstraint3, readonly "title": BrowserPrimitiveConstraint3, readonly "status": number } & { readonly [x: string]: Schema.Json }
+export const Problem = Schema.StructWithRest(Schema.Struct({ "type": BrowserPrimitiveConstraint3, "title": BrowserPrimitiveConstraint3, "status": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(400).annotate({ "expected": "a value greater than or equal to 400" })).check(Schema.isLessThanOrEqualTo(599).annotate({ "expected": "a value less than or equal to 599" })) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "Problem" })
+export type WorkControl = { readonly "generation": WorkGeneration, readonly "paused": boolean }
+export const WorkControl = Schema.Struct({ "generation": WorkGeneration, "paused": Schema.Boolean }).annotate({ "identifier": "WorkControl" })
+export type WorkRecoveryReceipt = { readonly "request_id": AdministrationIdentifier, readonly "generation": WorkGeneration, readonly "actor_id": AdministrationIdentifier, readonly "recorded_at_ms": HistoryMillis }
+export const WorkRecoveryReceipt = Schema.Struct({ "request_id": AdministrationIdentifier, "generation": WorkGeneration, "actor_id": AdministrationIdentifier, "recorded_at_ms": HistoryMillis }).annotate({ "identifier": "WorkRecoveryReceipt" })
+export type CalculatorEvidenceRelease = { readonly "id": AdministrationIdentifier, readonly "version": AdministrationIdentifier, readonly "implementation": "window-mean-v1" | "window-mad-v1" }
+export const CalculatorEvidenceRelease = Schema.Struct({ "id": AdministrationIdentifier, "version": AdministrationIdentifier, "implementation": Schema.Literals(["window-mean-v1", "window-mad-v1"]) }).annotate({ "identifier": "CalculatorEvidenceRelease" })
+export type RegistrationExternalIdentifier = { readonly "kind": AdministrationIdentifier, readonly "authority"?: AdministrationIdentifier | null, readonly "value": AdministrationIdentifier }
+export const RegistrationExternalIdentifier = Schema.Struct({ "kind": AdministrationIdentifier, "authority": Schema.optionalKey(Schema.Union([AdministrationIdentifier, Schema.Null])), "value": AdministrationIdentifier }).annotate({ "identifier": "RegistrationExternalIdentifier" })
+export type WorkRetryTarget = { readonly "id": AdministrationIdentifier } | { readonly "destination": BrowserPrimitiveConstraint5, readonly "rule_id": AdministrationIdentifier, readonly "revision": string, readonly "firing_version": string }
+export const WorkRetryTarget = Schema.Union([Schema.Struct({ "id": AdministrationIdentifier }), Schema.Struct({ "destination": BrowserPrimitiveConstraint5, "rule_id": AdministrationIdentifier, "revision": Schema.String.check(Schema.isPattern(new RegExp("^[1-9][0-9]{0,9}$", "u")).annotate({ "expected": "a string matching the RegExp ^[1-9][0-9]{0,9}$" })), "firing_version": Schema.String.check(Schema.isPattern(new RegExp("^[1-9][0-9]{0,18}$", "u")).annotate({ "expected": "a string matching the RegExp ^[1-9][0-9]{0,18}$" })) })], { mode: "oneOf" }).annotate({ "identifier": "WorkRetryTarget" })
+export type ProtocolPackageRelease = { readonly "package_id": BrowserPrimitiveConstraint3, readonly "package_version": BrowserPrimitiveConstraint3, readonly "artifact_sha256": BrowserPrimitiveConstraint5, readonly "artifact_size_bytes": number }
+export const ProtocolPackageRelease = Schema.Struct({ "package_id": BrowserPrimitiveConstraint3, "package_version": BrowserPrimitiveConstraint3, "artifact_sha256": BrowserPrimitiveConstraint5, "artifact_size_bytes": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(8388608).annotate({ "expected": "a value less than or equal to 8388608" })) }).annotate({ "identifier": "ProtocolPackageRelease" })
+export type AlertAcknowledgementRequest = { readonly "expected_version": AlertLifecycleVersion }
+export const AlertAcknowledgementRequest = Schema.Struct({ "expected_version": AlertLifecycleVersion }).annotate({ "identifier": "AlertAcknowledgementRequest" })
+export type AlertAcknowledgement = { readonly "version": AlertLifecycleVersion, readonly "actor_id": AdministrationIdentifier, readonly "recorded_at_ms": HistoryMillis }
+export const AlertAcknowledgement = Schema.Struct({ "version": AlertLifecycleVersion, "actor_id": AdministrationIdentifier, "recorded_at_ms": HistoryMillis }).annotate({ "identifier": "AlertAcknowledgement" })
+export type AlertRuleRevisionReceipt = { readonly "revision": BrowserPrimitiveConstraint6 }
+export const AlertRuleRevisionReceipt = Schema.Struct({ "revision": BrowserPrimitiveConstraint6 }).annotate({ "identifier": "AlertRuleRevisionReceipt" })
+export type CalculatorEvidenceProperty = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint6 }
+export const CalculatorEvidenceProperty = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint6 }).annotate({ "identifier": "CalculatorEvidenceProperty" })
+export type SemanticDefinitionPosition = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint6 }
+export const SemanticDefinitionPosition = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint6 }).annotate({ "identifier": "SemanticDefinitionPosition" })
+export type RegistrationAssetType = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint6 }
+export const RegistrationAssetType = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint6 }).annotate({ "identifier": "RegistrationAssetType" })
+export type AlertRuleActivationState = { readonly "generation": BrowserPrimitiveConstraint7, readonly "revision": number | null, readonly "actor_id": AdministrationIdentifier | null, readonly "recorded_at_ms": number | null }
+export const AlertRuleActivationState = Schema.Struct({ "generation": BrowserPrimitiveConstraint7, "revision": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), Schema.Null]), "actor_id": Schema.Union([AdministrationIdentifier, Schema.Null]), "recorded_at_ms": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(-9223372036854776000).annotate({ "expected": "a value greater than or equal to -9223372036854776000" })).check(Schema.isLessThanOrEqualTo(9223372036854776000).annotate({ "expected": "a value less than or equal to 9223372036854776000" })), Schema.Null]).annotate({ "format": "int64" }) }).annotate({ "identifier": "AlertRuleActivationState" })
+export type AlertRuleActivationRequest = { readonly "expected_generation": BrowserPrimitiveConstraint7, readonly "revision": number | null }
+export const AlertRuleActivationRequest = Schema.Struct({ "expected_generation": BrowserPrimitiveConstraint7, "revision": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(4294967295).annotate({ "expected": "a value less than or equal to 4294967295" })), Schema.Null]) }).annotate({ "identifier": "AlertRuleActivationRequest" })
+export type AlertEvaluationRef = { readonly "evaluation_id": AdministrationIdentifier, readonly "scope_asset_id": AdministrationIdentifier, readonly "output_index": BrowserPrimitiveConstraint8 | null }
+export const AlertEvaluationRef = Schema.Struct({ "evaluation_id": AdministrationIdentifier, "scope_asset_id": AdministrationIdentifier, "output_index": Schema.Union([BrowserPrimitiveConstraint8, Schema.Null]) }).annotate({ "identifier": "AlertEvaluationRef" })
+export type AlertRuleDefinition = { readonly "kind": "numeric-threshold-v1", readonly "calculator": AdministrationIdentifier, readonly "version": AdministrationIdentifier, readonly "scope": AdministrationIdentifier, readonly "target": AdministrationIdentifier, readonly "output_property": AdministrationIdentifier, readonly "output_version": BrowserPrimitiveConstraint6, readonly "output_index": BrowserPrimitiveConstraint8, readonly "comparison": "gt" | "gte" | "lt" | "lte", readonly "threshold": string, readonly "threshold_unit": AdministrationIdentifier | null, readonly "hold_ms": BrowserPrimitiveConstraint9, readonly "resolution": "resolve_on_false", readonly "resolve_after_ms": BrowserPrimitiveConstraint9 }
+export const AlertRuleDefinition = Schema.Struct({ "kind": Schema.Literal("numeric-threshold-v1"), "calculator": AdministrationIdentifier, "version": AdministrationIdentifier, "scope": AdministrationIdentifier, "target": AdministrationIdentifier, "output_property": AdministrationIdentifier, "output_version": BrowserPrimitiveConstraint6, "output_index": BrowserPrimitiveConstraint8, "comparison": Schema.Literals(["gt", "gte", "lt", "lte"]), "threshold": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(256).annotate({ "expected": "a string with at most 256 code points" })).check(Schema.isPattern(new RegExp("^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$", "u")).annotate({ "expected": "a string matching the RegExp ^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$" })), "threshold_unit": Schema.Union([AdministrationIdentifier, Schema.Null]), "hold_ms": BrowserPrimitiveConstraint9, "resolution": Schema.Literal("resolve_on_false"), "resolve_after_ms": BrowserPrimitiveConstraint9 }).annotate({ "identifier": "AlertRuleDefinition" })
+export type CalculatorOutputEvidence = { readonly "evaluation_id": AdministrationIdentifier, readonly "calculator_id": AdministrationIdentifier, readonly "calculator_version": AdministrationIdentifier, readonly "output_index": BrowserPrimitiveConstraint8, readonly "asset_id": AdministrationIdentifier, readonly "property_id": AdministrationIdentifier, readonly "property_version": BrowserPrimitiveConstraint6, readonly "kind": "decimal", readonly "value": BrowserPrimitiveConstraint12, readonly "unit": AdministrationIdentifier | null }
+export const CalculatorOutputEvidence = Schema.Struct({ "evaluation_id": AdministrationIdentifier, "calculator_id": AdministrationIdentifier, "calculator_version": AdministrationIdentifier, "output_index": BrowserPrimitiveConstraint8, "asset_id": AdministrationIdentifier, "property_id": AdministrationIdentifier, "property_version": BrowserPrimitiveConstraint6, "kind": Schema.Literal("decimal"), "value": BrowserPrimitiveConstraint12, "unit": Schema.Union([AdministrationIdentifier, Schema.Null]) }).annotate({ "identifier": "CalculatorOutputEvidence" })
+export type SignalSource = { readonly "device_asset_id": BrowserPrimitiveConstraint13, readonly "endpoint_id": BrowserPrimitiveConstraint13, readonly "signal_id": BrowserPrimitiveConstraint13 } & { readonly [x: string]: Schema.Json }
+export const SignalSource = Schema.StructWithRest(Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint13, "endpoint_id": BrowserPrimitiveConstraint13, "signal_id": BrowserPrimitiveConstraint13 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SignalSource" })
+export type PropertyReference = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6 } & { readonly [x: string]: Schema.Json }
+export const PropertyReference = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "PropertyReference" })
+export type FleetLocationMapping = { readonly "latitude": { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6 }, readonly "longitude": { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6 }, readonly "encoding": "degrees" | "e7" }
+export const FleetLocationMapping = Schema.Struct({ "latitude": Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6 }), "longitude": Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6 }), "encoding": Schema.Literals(["degrees", "e7"]) }).annotate({ "identifier": "FleetLocationMapping" })
+export type AssetTypeRef = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6 } & { readonly [x: string]: Schema.Json }
+export const AssetTypeRef = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetTypeRef" })
+export type PropertyHistorySource = { readonly "message_id": BrowserPrimitiveConstraint13, readonly "protocol_package_id": BrowserPrimitiveConstraint13, readonly "protocol_package_version": BrowserPrimitiveConstraint13, readonly "device_asset_id": BrowserPrimitiveConstraint13, readonly "endpoint_id": BrowserPrimitiveConstraint13, readonly "signal_id": BrowserPrimitiveConstraint13, readonly "output_index": BrowserPrimitiveConstraint7, readonly "device_recorded_at_ms": HistoryMillis | null, readonly "received_at_ms": HistoryMillis }
+export const PropertyHistorySource = Schema.Struct({ "message_id": BrowserPrimitiveConstraint13, "protocol_package_id": BrowserPrimitiveConstraint13, "protocol_package_version": BrowserPrimitiveConstraint13, "device_asset_id": BrowserPrimitiveConstraint13, "endpoint_id": BrowserPrimitiveConstraint13, "signal_id": BrowserPrimitiveConstraint13, "output_index": BrowserPrimitiveConstraint7, "device_recorded_at_ms": Schema.Union([HistoryMillis, Schema.Null], { mode: "oneOf" }), "received_at_ms": HistoryMillis }).annotate({ "identifier": "PropertyHistorySource" })
+export type RelationshipTypeRef = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6 } & { readonly [x: string]: Schema.Json }
+export const RelationshipTypeRef = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "RelationshipTypeRef" })
+export type ProtocolRouteSelection = { readonly "package_id": BrowserPrimitiveConstraint13, readonly "package_version": BrowserPrimitiveConstraint13, readonly "world": "runtime-v1" | "identity-v1" }
+export const ProtocolRouteSelection = Schema.Struct({ "package_id": BrowserPrimitiveConstraint13, "package_version": BrowserPrimitiveConstraint13, "world": Schema.Literals(["runtime-v1", "identity-v1"]) }).annotate({ "identifier": "ProtocolRouteSelection" })
+export type IngestionObservedSource = { readonly "package_id": BrowserPrimitiveConstraint13, readonly "package_version": BrowserPrimitiveConstraint13, readonly "endpoint_id": BrowserPrimitiveConstraint13, readonly "signal_id": BrowserPrimitiveConstraint13 }
+export const IngestionObservedSource = Schema.Struct({ "package_id": BrowserPrimitiveConstraint13, "package_version": BrowserPrimitiveConstraint13, "endpoint_id": BrowserPrimitiveConstraint13, "signal_id": BrowserPrimitiveConstraint13 }).annotate({ "identifier": "IngestionObservedSource" })
+export type EffectiveInterval = { readonly "start_ms": BrowserPrimitiveConstraint15, readonly "end_ms": number | null } & { readonly [x: string]: Schema.Json }
+export const EffectiveInterval = Schema.StructWithRest(Schema.Struct({ "start_ms": BrowserPrimitiveConstraint15, "end_ms": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })), Schema.Null]).annotate({ "format": "int64" }) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "EffectiveInterval" })
+export type RevisionEffectiveInterval = { readonly "start_ms": BrowserPrimitiveConstraint15, readonly "end_ms"?: number | null }
+export const RevisionEffectiveInterval = Schema.Struct({ "start_ms": BrowserPrimitiveConstraint15, "end_ms": Schema.optionalKey(Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })), Schema.Null]).annotate({ "format": "int64" })) }).annotate({ "identifier": "RevisionEffectiveInterval" })
+export type MetadataRegistrationResult = { readonly "outcome": "registered" | "already_registered", readonly "registered_by": AdministrationIdentifier, readonly "recorded_at_ms": BrowserPrimitiveConstraint15 }
+export const MetadataRegistrationResult = Schema.Struct({ "outcome": Schema.Literals(["registered", "already_registered"]), "registered_by": AdministrationIdentifier, "recorded_at_ms": BrowserPrimitiveConstraint15 }).annotate({ "identifier": "MetadataRegistrationResult" })
+export type IngestionDiagnosticFrame = { readonly "message_id": BrowserPrimitiveConstraint13, readonly "package_id": BrowserPrimitiveConstraint13, readonly "package_version": BrowserPrimitiveConstraint13, readonly "received_at_ms": BrowserPrimitiveConstraint15, readonly "processing": "accepted" | "queued" | "leased" | "expired" | "poisoned" | "decoded", readonly "observation_count": number | null }
+export const IngestionDiagnosticFrame = Schema.Struct({ "message_id": BrowserPrimitiveConstraint13, "package_id": BrowserPrimitiveConstraint13, "package_version": BrowserPrimitiveConstraint13, "received_at_ms": BrowserPrimitiveConstraint15, "processing": Schema.Literals(["accepted", "queued", "leased", "expired", "poisoned", "decoded"]), "observation_count": Schema.Union([Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(0).annotate({ "expected": "a value greater than or equal to 0" })).check(Schema.isLessThanOrEqualTo(4294967296).annotate({ "expected": "a value less than or equal to 4294967296" })), Schema.Null]) }).annotate({ "identifier": "IngestionDiagnosticFrame" })
+export type RevisionSource = { readonly "device_asset_id": BrowserPrimitiveConstraint16, readonly "endpoint_id": BrowserPrimitiveConstraint16, readonly "signal_id": BrowserPrimitiveConstraint16 }
+export const RevisionSource = Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint16, "endpoint_id": BrowserPrimitiveConstraint16, "signal_id": BrowserPrimitiveConstraint16 }).annotate({ "identifier": "RevisionSource" })
+export type RevisionProperty = { readonly "id": BrowserPrimitiveConstraint16, readonly "version": BrowserPrimitiveConstraint6 }
+export const RevisionProperty = Schema.Struct({ "id": BrowserPrimitiveConstraint16, "version": BrowserPrimitiveConstraint6 }).annotate({ "identifier": "RevisionProperty" })
+export type MetadataRevisionResult = { readonly "outcome": "appended" | "already_appended", readonly "id": BrowserPrimitiveConstraint16, readonly "revision": BrowserPrimitiveConstraint14, readonly "recorded_by": BrowserPrimitiveConstraint16, readonly "recorded_at_ms": BrowserPrimitiveConstraint15 }
+export const MetadataRevisionResult = Schema.Struct({ "outcome": Schema.Literals(["appended", "already_appended"]), "id": BrowserPrimitiveConstraint16, "revision": BrowserPrimitiveConstraint14, "recorded_by": BrowserPrimitiveConstraint16, "recorded_at_ms": BrowserPrimitiveConstraint15 }).annotate({ "identifier": "MetadataRevisionResult" })
+export type RevisionRelationshipType = { readonly "id": BrowserPrimitiveConstraint16, readonly "version": BrowserPrimitiveConstraint6 }
+export const RevisionRelationshipType = Schema.Struct({ "id": BrowserPrimitiveConstraint16, "version": BrowserPrimitiveConstraint6 }).annotate({ "identifier": "RevisionRelationshipType" })
+export type SemanticDefinitionSummary = { readonly "id": AdministrationIdentifier, readonly "version": BrowserPrimitiveConstraint6, readonly "name": SemanticDefinitionName }
+export const SemanticDefinitionSummary = Schema.Struct({ "id": AdministrationIdentifier, "version": BrowserPrimitiveConstraint6, "name": SemanticDefinitionName }).annotate({ "identifier": "SemanticDefinitionSummary" })
 export type DeviceEndpoint = { readonly "id": AdministrationIdentifier, readonly "kind": AdministrationIdentifier, readonly "name": SemanticDefinitionName }
 export const DeviceEndpoint = Schema.Struct({ "id": AdministrationIdentifier, "kind": AdministrationIdentifier, "name": SemanticDefinitionName }).annotate({ "identifier": "DeviceEndpoint" })
 export type FleetSummary = { readonly "assets": ProjectionCounter, readonly "communication_devices": ProjectionCounter, readonly "mapped_assets": ProjectionCounter, readonly "assets_with_current_properties": ProjectionCounter }
 export const FleetSummary = Schema.Struct({ "assets": ProjectionCounter, "communication_devices": ProjectionCounter, "mapped_assets": ProjectionCounter, "assets_with_current_properties": ProjectionCounter }).annotate({ "identifier": "FleetSummary" })
-export type HistoryValue = { readonly "kind": "boolean", readonly "value": boolean } | { readonly "kind": "integer", readonly "value": BrowserPrimitiveConstraint1 } | { readonly "kind": "decimal", readonly "value": string } | { readonly "kind": "text", readonly "value": BrowserPrimitiveConstraint2 }
-export const HistoryValue = Schema.Union([Schema.Struct({ "kind": Schema.Literal("boolean"), "value": Schema.Boolean }), Schema.Struct({ "kind": Schema.Literal("integer"), "value": BrowserPrimitiveConstraint1 }), Schema.Struct({ "kind": Schema.Literal("decimal"), "value": Schema.String.check(Schema.isPattern(new RegExp("^-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?$", "u")).annotate({ "expected": "a string matching the RegExp ^-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?$" })) }), Schema.Struct({ "kind": Schema.Literal("text"), "value": BrowserPrimitiveConstraint2 })], { mode: "oneOf" }).annotate({ "identifier": "HistoryValue" })
-export type OperatorTenant = { readonly "tenant_id": BrowserPrimitiveConstraint10, readonly "actions": ReadonlyArray<TenantAction> }
-export const OperatorTenant = Schema.Struct({ "tenant_id": BrowserPrimitiveConstraint10, "actions": Schema.Array(TenantAction).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxLength(9).annotate({ "expected": "a value with a length of at most 9" })).check(Schema.isUnique().annotate({ "expected": "an array with unique items" })) }).annotate({ "identifier": "OperatorTenant" })
-export type ExternalIdentifier = { readonly "kind": BrowserPrimitiveConstraint10, readonly "authority": string | null, readonly "value": BrowserPrimitiveConstraint14 } & { readonly [x: string]: Schema.Json }
-export const ExternalIdentifier = Schema.StructWithRest(Schema.Struct({ "kind": BrowserPrimitiveConstraint10, "authority": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]), "value": BrowserPrimitiveConstraint14 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "ExternalIdentifier" })
-export type PropertyDefinition = { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3, readonly "name": BrowserPrimitiveConstraint14, readonly "value_kind": "boolean" | "integer" | "decimal" | "text", readonly "canonical_unit": string | null } & { readonly [x: string]: Schema.Json }
-export const PropertyDefinition = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3, "name": BrowserPrimitiveConstraint14, "value_kind": Schema.Literals(["boolean", "integer", "decimal", "text"]), "canonical_unit": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "PropertyDefinition" })
-export type RelationshipTypeDefinition = { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3, readonly "name": BrowserPrimitiveConstraint14 } & { readonly [x: string]: Schema.Json }
-export const RelationshipTypeDefinition = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3, "name": BrowserPrimitiveConstraint14 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "RelationshipTypeDefinition" })
-export type OperatorSession = { readonly "actor_id": BrowserPrimitiveConstraint14, readonly "expires_at_ms": number }
-export const OperatorSession = Schema.Struct({ "actor_id": BrowserPrimitiveConstraint14, "expires_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })) }).annotate({ "identifier": "OperatorSession" })
-export type CalculatorEvaluationSummary = { readonly "evaluation_id": AdministrationIdentifier, readonly "scope_asset_id": AdministrationIdentifier, readonly "calculator": CalculatorEvidenceRelease, readonly "configuration_id": AdministrationIdentifier, readonly "input_property": CalculatorEvidenceProperty, readonly "window": CalculatorEvidenceWindow, readonly "evaluated_at_ms": HistoryMillis, readonly "outcome": "complete" | "insufficient" | "incompatible_input" | "invalid_output" | "resource_limit", readonly "minimum_samples": number, readonly "input_count": BrowserPrimitiveConstraint8, readonly "output_count": BrowserPrimitiveConstraint8 }
-export const CalculatorEvaluationSummary = Schema.Struct({ "evaluation_id": AdministrationIdentifier, "scope_asset_id": AdministrationIdentifier, "calculator": CalculatorEvidenceRelease, "configuration_id": AdministrationIdentifier, "input_property": CalculatorEvidenceProperty, "window": CalculatorEvidenceWindow, "evaluated_at_ms": HistoryMillis, "outcome": Schema.Literals(["complete", "insufficient", "incompatible_input", "invalid_output", "resource_limit"]), "minimum_samples": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(1024).annotate({ "expected": "a value less than or equal to 1024" })), "input_count": BrowserPrimitiveConstraint8, "output_count": BrowserPrimitiveConstraint8 }).annotate({ "identifier": "CalculatorEvaluationSummary" })
+export type HistoryValue = { readonly "kind": "boolean", readonly "value": boolean } | { readonly "kind": "integer", readonly "value": BrowserPrimitiveConstraint1 } | { readonly "kind": "decimal", readonly "value": string } | { readonly "kind": "text", readonly "value": BrowserPrimitiveConstraint3 }
+export const HistoryValue = Schema.Union([Schema.Struct({ "kind": Schema.Literal("boolean"), "value": Schema.Boolean }), Schema.Struct({ "kind": Schema.Literal("integer"), "value": BrowserPrimitiveConstraint1 }), Schema.Struct({ "kind": Schema.Literal("decimal"), "value": Schema.String.check(Schema.isPattern(new RegExp("^-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?$", "u")).annotate({ "expected": "a string matching the RegExp ^-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?$" })) }), Schema.Struct({ "kind": Schema.Literal("text"), "value": BrowserPrimitiveConstraint3 })], { mode: "oneOf" }).annotate({ "identifier": "HistoryValue" })
+export type OperatorTenant = { readonly "tenant_id": BrowserPrimitiveConstraint13, readonly "actions": ReadonlyArray<TenantAction> }
+export const OperatorTenant = Schema.Struct({ "tenant_id": BrowserPrimitiveConstraint13, "actions": Schema.Array(TenantAction).check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxLength(11).annotate({ "expected": "a value with a length of at most 11" })).check(Schema.isUnique().annotate({ "expected": "an array with unique items" })) }).annotate({ "identifier": "OperatorTenant" })
+export type ExternalIdentifier = { readonly "kind": BrowserPrimitiveConstraint13, readonly "authority": string | null, readonly "value": BrowserPrimitiveConstraint17 } & { readonly [x: string]: Schema.Json }
+export const ExternalIdentifier = Schema.StructWithRest(Schema.Struct({ "kind": BrowserPrimitiveConstraint13, "authority": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]), "value": BrowserPrimitiveConstraint17 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "ExternalIdentifier" })
+export type PropertyDefinition = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6, readonly "name": BrowserPrimitiveConstraint17, readonly "value_kind": "boolean" | "integer" | "decimal" | "text", readonly "canonical_unit": string | null } & { readonly [x: string]: Schema.Json }
+export const PropertyDefinition = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6, "name": BrowserPrimitiveConstraint17, "value_kind": Schema.Literals(["boolean", "integer", "decimal", "text"]), "canonical_unit": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "PropertyDefinition" })
+export type RelationshipTypeDefinition = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6, readonly "name": BrowserPrimitiveConstraint17 } & { readonly [x: string]: Schema.Json }
+export const RelationshipTypeDefinition = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6, "name": BrowserPrimitiveConstraint17 }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "RelationshipTypeDefinition" })
+export type OperatorSession = { readonly "actor_id": BrowserPrimitiveConstraint17, readonly "expires_at_ms": number }
+export const OperatorSession = Schema.Struct({ "actor_id": BrowserPrimitiveConstraint17, "expires_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })) }).annotate({ "identifier": "OperatorSession" })
+export type WorkDiagnostics = { readonly "observed_at_ms": HistoryMillis, readonly "worker_liveness": "not_observed", readonly "notification_seeding": "not_observed", readonly "sample_limit": 64, readonly "queues": ReadonlyArray<WorkQueueEvidence> }
+export const WorkDiagnostics = Schema.Struct({ "observed_at_ms": HistoryMillis, "worker_liveness": Schema.Literal("not_observed"), "notification_seeding": Schema.Literal("not_observed"), "sample_limit": Schema.Literal(64), "queues": Schema.Array(WorkQueueEvidence).check(Schema.isMinLength(4).annotate({ "expected": "a value with a length of at least 4" })).check(Schema.isMaxLength(4).annotate({ "expected": "a value with a length of at most 4" })) }).annotate({ "identifier": "WorkDiagnostics" })
+export type WorkRecoveryCandidate = { readonly "target": WorkRetryTarget, readonly "expected_generation": WorkGeneration }
+export const WorkRecoveryCandidate = Schema.Struct({ "target": WorkRetryTarget, "expected_generation": WorkGeneration }).annotate({ "identifier": "WorkRecoveryCandidate" })
+export type WorkRecoveryCommand = { readonly "operation": "retry", readonly "expected_generation": WorkGeneration, readonly "target": WorkRetryTarget } | { readonly "operation": "pause" | "resume", readonly "expected_generation": WorkGeneration, readonly "target": { readonly [x: string]: never } }
+export const WorkRecoveryCommand = Schema.Union([Schema.Struct({ "operation": Schema.Literal("retry"), "expected_generation": WorkGeneration, "target": WorkRetryTarget }), Schema.Struct({ "operation": Schema.Literals(["pause", "resume"]), "expected_generation": WorkGeneration, "target": Schema.Record(Schema.String, Schema.Never) })], { mode: "oneOf" }).annotate({ "identifier": "WorkRecoveryCommand" })
+export type CalculatorEvaluationSummary = { readonly "evaluation_id": AdministrationIdentifier, readonly "scope_asset_id": AdministrationIdentifier, readonly "calculator": CalculatorEvidenceRelease, readonly "configuration_id": AdministrationIdentifier, readonly "input_property": CalculatorEvidenceProperty, readonly "window": CalculatorEvidenceWindow, readonly "evaluated_at_ms": HistoryMillis, readonly "outcome": "complete" | "insufficient" | "incompatible_input" | "invalid_output" | "resource_limit", readonly "minimum_samples": number, readonly "input_count": BrowserPrimitiveConstraint11, readonly "output_count": BrowserPrimitiveConstraint11 }
+export const CalculatorEvaluationSummary = Schema.Struct({ "evaluation_id": AdministrationIdentifier, "scope_asset_id": AdministrationIdentifier, "calculator": CalculatorEvidenceRelease, "configuration_id": AdministrationIdentifier, "input_property": CalculatorEvidenceProperty, "window": CalculatorEvidenceWindow, "evaluated_at_ms": HistoryMillis, "outcome": Schema.Literals(["complete", "insufficient", "incompatible_input", "invalid_output", "resource_limit"]), "minimum_samples": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })).check(Schema.isLessThanOrEqualTo(1024).annotate({ "expected": "a value less than or equal to 1024" })), "input_count": BrowserPrimitiveConstraint11, "output_count": BrowserPrimitiveConstraint11 }).annotate({ "identifier": "CalculatorEvaluationSummary" })
 export type RegisterAssetRequest = { readonly "id": AdministrationIdentifier, readonly "name": SemanticDefinitionName, readonly "asset_type": RegistrationAssetType, readonly "external_identifiers": ReadonlyArray<RegistrationExternalIdentifier> }
 export const RegisterAssetRequest = Schema.Struct({ "id": AdministrationIdentifier, "name": SemanticDefinitionName, "asset_type": RegistrationAssetType, "external_identifiers": Schema.Array(RegistrationExternalIdentifier).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })).check(Schema.isUnique().annotate({ "expected": "an array with unique items" })) }).annotate({ "identifier": "RegisterAssetRequest" })
-export type AlertRuleHead = { readonly "latest_revision": BrowserPrimitiveConstraint3, readonly "activation": AlertRuleActivationState }
-export const AlertRuleHead = Schema.Struct({ "latest_revision": BrowserPrimitiveConstraint3, "activation": AlertRuleActivationState }).annotate({ "identifier": "AlertRuleHead" })
-export type AlertTransition = { readonly "version": AlertLifecycleVersion, readonly "phase": AlertPhase, readonly "event_at_ms": HistoryMillis, readonly "recorded_at_ms": HistoryMillis, readonly "activation_generation": BrowserPrimitiveConstraint3, readonly "evidence": AlertEvaluationRef, readonly "acknowledgement"?: AlertAcknowledgement | null }
-export const AlertTransition = Schema.Struct({ "version": AlertLifecycleVersion, "phase": AlertPhase, "event_at_ms": HistoryMillis, "recorded_at_ms": HistoryMillis, "activation_generation": BrowserPrimitiveConstraint3, "evidence": AlertEvaluationRef, "acknowledgement": Schema.optionalKey(Schema.Union([AlertAcknowledgement, Schema.Null])) }).annotate({ "identifier": "AlertTransition" })
-export type AlertRuleRevision = { readonly "revision": BrowserPrimitiveConstraint3, readonly "definition": AlertRuleDefinition, readonly "actor_id": AdministrationIdentifier, readonly "recorded_at_ms": number }
-export const AlertRuleRevision = Schema.Struct({ "revision": BrowserPrimitiveConstraint3, "definition": AlertRuleDefinition, "actor_id": AdministrationIdentifier, "recorded_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(-9223372036854776000).annotate({ "expected": "a value greater than or equal to -9223372036854776000" })).check(Schema.isLessThanOrEqualTo(9223372036854776000).annotate({ "expected": "a value less than or equal to 9223372036854776000" })) }).annotate({ "identifier": "AlertRuleRevision" })
+export type AlertRuleHead = { readonly "latest_revision": BrowserPrimitiveConstraint6, readonly "activation": AlertRuleActivationState }
+export const AlertRuleHead = Schema.Struct({ "latest_revision": BrowserPrimitiveConstraint6, "activation": AlertRuleActivationState }).annotate({ "identifier": "AlertRuleHead" })
+export type AlertTransition = { readonly "version": AlertLifecycleVersion, readonly "phase": AlertPhase, readonly "event_at_ms": HistoryMillis, readonly "recorded_at_ms": HistoryMillis, readonly "activation_generation": BrowserPrimitiveConstraint6, readonly "evidence": AlertEvaluationRef, readonly "acknowledgement"?: AlertAcknowledgement | null }
+export const AlertTransition = Schema.Struct({ "version": AlertLifecycleVersion, "phase": AlertPhase, "event_at_ms": HistoryMillis, "recorded_at_ms": HistoryMillis, "activation_generation": BrowserPrimitiveConstraint6, "evidence": AlertEvaluationRef, "acknowledgement": Schema.optionalKey(Schema.Union([AlertAcknowledgement, Schema.Null])) }).annotate({ "identifier": "AlertTransition" })
+export type AlertRuleRevision = { readonly "revision": BrowserPrimitiveConstraint6, readonly "definition": AlertRuleDefinition, readonly "actor_id": AdministrationIdentifier, readonly "recorded_at_ms": number }
+export const AlertRuleRevision = Schema.Struct({ "revision": BrowserPrimitiveConstraint6, "definition": AlertRuleDefinition, "actor_id": AdministrationIdentifier, "recorded_at_ms": Schema.Number.annotate({ "format": "int64" }).check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(-9223372036854776000).annotate({ "expected": "a value greater than or equal to -9223372036854776000" })).check(Schema.isLessThanOrEqualTo(9223372036854776000).annotate({ "expected": "a value less than or equal to 9223372036854776000" })) }).annotate({ "identifier": "AlertRuleRevision" })
 export type CalculatorOutputPage = { readonly "outputs": ReadonlyArray<CalculatorOutputEvidence>, readonly "next_after": CalculatorEvidenceCursor | null }
 export const CalculatorOutputPage = Schema.Struct({ "outputs": Schema.Array(CalculatorOutputEvidence).check(Schema.isMaxLength(20).annotate({ "expected": "a value with a length of at most 20" })), "next_after": Schema.Union([CalculatorEvidenceCursor, Schema.Null]) }).annotate({ "identifier": "CalculatorOutputPage" })
-export type SignalTarget = { readonly "asset_id": BrowserPrimitiveConstraint10, readonly "property": PropertyReference } & { readonly [x: string]: Schema.Json }
-export const SignalTarget = Schema.StructWithRest(Schema.Struct({ "asset_id": BrowserPrimitiveConstraint10, "property": PropertyReference }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SignalTarget" })
-export type AssetTypeDefinition = { readonly "id": BrowserPrimitiveConstraint10, readonly "version": BrowserPrimitiveConstraint3, readonly "name": BrowserPrimitiveConstraint14, readonly "supported_properties": ReadonlyArray<PropertyReference> } & { readonly [x: string]: Schema.Json }
-export const AssetTypeDefinition = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "version": BrowserPrimitiveConstraint3, "name": BrowserPrimitiveConstraint14, "supported_properties": Schema.Array(PropertyReference) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetTypeDefinition" })
-export type AssetSummary = { readonly "id": BrowserPrimitiveConstraint10, readonly "tenant_id": BrowserPrimitiveConstraint10, readonly "name": BrowserPrimitiveConstraint14, readonly "asset_type": AssetTypeRef } & { readonly [x: string]: Schema.Json }
-export const AssetSummary = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "tenant_id": BrowserPrimitiveConstraint10, "name": BrowserPrimitiveConstraint14, "asset_type": AssetTypeRef }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetSummary" })
-export type ProtocolDeviceRoute = { readonly "device_asset_id": BrowserPrimitiveConstraint10, readonly "channel_id": BrowserPrimitiveConstraint15, readonly "revision": BrowserPrimitiveConstraint3, readonly "selection": ProtocolRouteSelection, readonly "policy_version": number, readonly "actor_id": BrowserPrimitiveConstraint10, readonly "recorded_at_ms": BrowserPrimitiveConstraint16 } | { readonly "device_asset_id": BrowserPrimitiveConstraint10, readonly "channel_id": BrowserPrimitiveConstraint15, readonly "revision": BrowserPrimitiveConstraint3, readonly "selection": null, readonly "policy_version": null, readonly "actor_id": BrowserPrimitiveConstraint10, readonly "recorded_at_ms": BrowserPrimitiveConstraint16 }
-export const ProtocolDeviceRoute = Schema.Union([Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint10, "channel_id": BrowserPrimitiveConstraint15, "revision": BrowserPrimitiveConstraint3, "selection": ProtocolRouteSelection, "policy_version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })), "actor_id": BrowserPrimitiveConstraint10, "recorded_at_ms": BrowserPrimitiveConstraint16 }), Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint10, "channel_id": BrowserPrimitiveConstraint15, "revision": BrowserPrimitiveConstraint3, "selection": Schema.Null, "policy_version": Schema.Null, "actor_id": BrowserPrimitiveConstraint10, "recorded_at_ms": BrowserPrimitiveConstraint16 })]).annotate({ "identifier": "ProtocolDeviceRoute" })
-export type ChangeProtocolRouteRequest = { readonly "expected_revision": BrowserPrimitiveConstraint4, readonly "selection": ProtocolRouteSelection | null }
-export const ChangeProtocolRouteRequest = Schema.Struct({ "expected_revision": BrowserPrimitiveConstraint4, "selection": Schema.Union([ProtocolRouteSelection, Schema.Null]) }).annotate({ "identifier": "ChangeProtocolRouteRequest" })
-export type Relationship = { readonly "id": BrowserPrimitiveConstraint10, readonly "tenant_id": BrowserPrimitiveConstraint10, readonly "revision": BrowserPrimitiveConstraint11, readonly "recorded_at_ms": BrowserPrimitiveConstraint12, readonly "relationship_type": RelationshipTypeRef, readonly "source_asset_id": BrowserPrimitiveConstraint10, readonly "target_asset_id": BrowserPrimitiveConstraint10, readonly "effective_interval": EffectiveInterval } & { readonly [x: string]: Schema.Json }
-export const Relationship = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "tenant_id": BrowserPrimitiveConstraint10, "revision": BrowserPrimitiveConstraint11, "recorded_at_ms": BrowserPrimitiveConstraint12, "relationship_type": RelationshipTypeRef, "source_asset_id": BrowserPrimitiveConstraint10, "target_asset_id": BrowserPrimitiveConstraint10, "effective_interval": EffectiveInterval }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "Relationship" })
-export type IngestionDiagnostics = { readonly "observed_at_ms": BrowserPrimitiveConstraint12, readonly "connection_liveness": "not_observed", readonly "worker_liveness": "not_observed", readonly "coverage": IngestionDiagnosticCoverage, readonly "frames": ReadonlyArray<IngestionDiagnosticFrame>, readonly "sources": ReadonlyArray<IngestionObservedSource> }
-export const IngestionDiagnostics = Schema.Struct({ "observed_at_ms": BrowserPrimitiveConstraint12, "connection_liveness": Schema.Literal("not_observed"), "worker_liveness": Schema.Literal("not_observed"), "coverage": IngestionDiagnosticCoverage, "frames": Schema.Array(IngestionDiagnosticFrame).check(Schema.isMaxLength(64).annotate({ "expected": "a value with a length of at most 64" })), "sources": Schema.Array(IngestionObservedSource).check(Schema.isMaxLength(128).annotate({ "expected": "a value with a length of at most 128" })) }).annotate({ "identifier": "IngestionDiagnostics" })
-export type RevisionTarget = { readonly "asset_id": BrowserPrimitiveConstraint13, readonly "property": RevisionProperty }
-export const RevisionTarget = Schema.Struct({ "asset_id": BrowserPrimitiveConstraint13, "property": RevisionProperty }).annotate({ "identifier": "RevisionTarget" })
-export type AppendRelationshipRevisionRequest = { readonly "relationship_type": RevisionRelationshipType, readonly "source_asset_id": BrowserPrimitiveConstraint13, readonly "target_asset_id": BrowserPrimitiveConstraint13, readonly "effective_interval": RevisionEffectiveInterval }
-export const AppendRelationshipRevisionRequest = Schema.Struct({ "relationship_type": RevisionRelationshipType, "source_asset_id": BrowserPrimitiveConstraint13, "target_asset_id": BrowserPrimitiveConstraint13, "effective_interval": RevisionEffectiveInterval }).annotate({ "identifier": "AppendRelationshipRevisionRequest" })
+export type SignalTarget = { readonly "asset_id": BrowserPrimitiveConstraint13, readonly "property": PropertyReference } & { readonly [x: string]: Schema.Json }
+export const SignalTarget = Schema.StructWithRest(Schema.Struct({ "asset_id": BrowserPrimitiveConstraint13, "property": PropertyReference }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SignalTarget" })
+export type AssetTypeDefinition = { readonly "id": BrowserPrimitiveConstraint13, readonly "version": BrowserPrimitiveConstraint6, readonly "name": BrowserPrimitiveConstraint17, readonly "supported_properties": ReadonlyArray<PropertyReference> } & { readonly [x: string]: Schema.Json }
+export const AssetTypeDefinition = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "version": BrowserPrimitiveConstraint6, "name": BrowserPrimitiveConstraint17, "supported_properties": Schema.Array(PropertyReference) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetTypeDefinition" })
+export type AssetSummary = { readonly "id": BrowserPrimitiveConstraint13, readonly "tenant_id": BrowserPrimitiveConstraint13, readonly "name": BrowserPrimitiveConstraint17, readonly "asset_type": AssetTypeRef } & { readonly [x: string]: Schema.Json }
+export const AssetSummary = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "tenant_id": BrowserPrimitiveConstraint13, "name": BrowserPrimitiveConstraint17, "asset_type": AssetTypeRef }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetSummary" })
+export type ProtocolDeviceRoute = { readonly "device_asset_id": BrowserPrimitiveConstraint13, readonly "channel_id": BrowserPrimitiveConstraint18, readonly "revision": BrowserPrimitiveConstraint6, readonly "selection": ProtocolRouteSelection, readonly "policy_version": number, readonly "actor_id": BrowserPrimitiveConstraint13, readonly "recorded_at_ms": BrowserPrimitiveConstraint19 } | { readonly "device_asset_id": BrowserPrimitiveConstraint13, readonly "channel_id": BrowserPrimitiveConstraint18, readonly "revision": BrowserPrimitiveConstraint6, readonly "selection": null, readonly "policy_version": null, readonly "actor_id": BrowserPrimitiveConstraint13, readonly "recorded_at_ms": BrowserPrimitiveConstraint19 }
+export const ProtocolDeviceRoute = Schema.Union([Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint13, "channel_id": BrowserPrimitiveConstraint18, "revision": BrowserPrimitiveConstraint6, "selection": ProtocolRouteSelection, "policy_version": Schema.Number.check(Schema.isInt().annotate({ "expected": "an integer" })).check(Schema.isGreaterThanOrEqualTo(1).annotate({ "expected": "a value greater than or equal to 1" })), "actor_id": BrowserPrimitiveConstraint13, "recorded_at_ms": BrowserPrimitiveConstraint19 }), Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint13, "channel_id": BrowserPrimitiveConstraint18, "revision": BrowserPrimitiveConstraint6, "selection": Schema.Null, "policy_version": Schema.Null, "actor_id": BrowserPrimitiveConstraint13, "recorded_at_ms": BrowserPrimitiveConstraint19 })]).annotate({ "identifier": "ProtocolDeviceRoute" })
+export type ChangeProtocolRouteRequest = { readonly "expected_revision": BrowserPrimitiveConstraint7, readonly "selection": ProtocolRouteSelection | null }
+export const ChangeProtocolRouteRequest = Schema.Struct({ "expected_revision": BrowserPrimitiveConstraint7, "selection": Schema.Union([ProtocolRouteSelection, Schema.Null]) }).annotate({ "identifier": "ChangeProtocolRouteRequest" })
+export type Relationship = { readonly "id": BrowserPrimitiveConstraint13, readonly "tenant_id": BrowserPrimitiveConstraint13, readonly "revision": BrowserPrimitiveConstraint14, readonly "recorded_at_ms": BrowserPrimitiveConstraint15, readonly "relationship_type": RelationshipTypeRef, readonly "source_asset_id": BrowserPrimitiveConstraint13, readonly "target_asset_id": BrowserPrimitiveConstraint13, readonly "effective_interval": EffectiveInterval } & { readonly [x: string]: Schema.Json }
+export const Relationship = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "tenant_id": BrowserPrimitiveConstraint13, "revision": BrowserPrimitiveConstraint14, "recorded_at_ms": BrowserPrimitiveConstraint15, "relationship_type": RelationshipTypeRef, "source_asset_id": BrowserPrimitiveConstraint13, "target_asset_id": BrowserPrimitiveConstraint13, "effective_interval": EffectiveInterval }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "Relationship" })
+export type IngestionDiagnostics = { readonly "observed_at_ms": BrowserPrimitiveConstraint15, readonly "connection_liveness": "not_observed", readonly "worker_liveness": "not_observed", readonly "coverage": IngestionDiagnosticCoverage, readonly "frames": ReadonlyArray<IngestionDiagnosticFrame>, readonly "sources": ReadonlyArray<IngestionObservedSource> }
+export const IngestionDiagnostics = Schema.Struct({ "observed_at_ms": BrowserPrimitiveConstraint15, "connection_liveness": Schema.Literal("not_observed"), "worker_liveness": Schema.Literal("not_observed"), "coverage": IngestionDiagnosticCoverage, "frames": Schema.Array(IngestionDiagnosticFrame).check(Schema.isMaxLength(64).annotate({ "expected": "a value with a length of at most 64" })), "sources": Schema.Array(IngestionObservedSource).check(Schema.isMaxLength(128).annotate({ "expected": "a value with a length of at most 128" })) }).annotate({ "identifier": "IngestionDiagnostics" })
+export type RevisionTarget = { readonly "asset_id": BrowserPrimitiveConstraint16, readonly "property": RevisionProperty }
+export const RevisionTarget = Schema.Struct({ "asset_id": BrowserPrimitiveConstraint16, "property": RevisionProperty }).annotate({ "identifier": "RevisionTarget" })
+export type AppendRelationshipRevisionRequest = { readonly "relationship_type": RevisionRelationshipType, readonly "source_asset_id": BrowserPrimitiveConstraint16, readonly "target_asset_id": BrowserPrimitiveConstraint16, readonly "effective_interval": RevisionEffectiveInterval }
+export const AppendRelationshipRevisionRequest = Schema.Struct({ "relationship_type": RevisionRelationshipType, "source_asset_id": BrowserPrimitiveConstraint16, "target_asset_id": BrowserPrimitiveConstraint16, "effective_interval": RevisionEffectiveInterval }).annotate({ "identifier": "AppendRelationshipRevisionRequest" })
 export type DefinitionCataloguePage = { readonly "definitions": ReadonlyArray<SemanticDefinitionSummary>, readonly "next_after": SemanticDefinitionPosition | null }
 export const DefinitionCataloguePage = Schema.Struct({ "definitions": Schema.Array(SemanticDefinitionSummary).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([SemanticDefinitionPosition, Schema.Null]) }).annotate({ "identifier": "DefinitionCataloguePage" })
-export type CommunicationDevice = { readonly "tenant_id": BrowserPrimitiveConstraint10, readonly "asset_id": BrowserPrimitiveConstraint10, readonly "endpoints": ReadonlyArray<DeviceEndpoint> } & { readonly [x: string]: Schema.Json }
-export const CommunicationDevice = Schema.StructWithRest(Schema.Struct({ "tenant_id": BrowserPrimitiveConstraint10, "asset_id": BrowserPrimitiveConstraint10, "endpoints": Schema.Array(DeviceEndpoint) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "CommunicationDevice" })
+export type CommunicationDevice = { readonly "tenant_id": BrowserPrimitiveConstraint13, readonly "asset_id": BrowserPrimitiveConstraint13, readonly "endpoints": ReadonlyArray<DeviceEndpoint> } & { readonly [x: string]: Schema.Json }
+export const CommunicationDevice = Schema.StructWithRest(Schema.Struct({ "tenant_id": BrowserPrimitiveConstraint13, "asset_id": BrowserPrimitiveConstraint13, "endpoints": Schema.Array(DeviceEndpoint) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "CommunicationDevice" })
 export type RegisterCommunicationDeviceRequest = { readonly "endpoints": ReadonlyArray<DeviceEndpoint> }
 export const RegisterCommunicationDeviceRequest = Schema.Struct({ "endpoints": Schema.Array(DeviceEndpoint).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })) }).annotate({ "identifier": "RegisterCommunicationDeviceRequest" })
-export type PropertyHistoryChange = { readonly "tenant_id": BrowserPrimitiveConstraint10, readonly "asset_id": BrowserPrimitiveConstraint10, readonly "property_id": BrowserPrimitiveConstraint10, readonly "binding_id": BrowserPrimitiveConstraint10, readonly "interpretation": HistoryToken, readonly "property_version": BrowserPrimitiveConstraint3, readonly "binding_revision": BrowserPrimitiveConstraint11, readonly "event_time_basis": "device_recorded" | "received_at", readonly "event_at_ms": HistoryMillis, readonly "first_resolution_effective_at_ms": HistoryMillis, readonly "first_resolution_known_at_ms": HistoryMillis, readonly "value": HistoryValue, readonly "source_unit": string | null, readonly "quality": "good" | "uncertain" | "invalid", readonly "source": PropertyHistorySource }
-export const PropertyHistoryChange = Schema.Struct({ "tenant_id": BrowserPrimitiveConstraint10, "asset_id": BrowserPrimitiveConstraint10, "property_id": BrowserPrimitiveConstraint10, "binding_id": BrowserPrimitiveConstraint10, "interpretation": HistoryToken, "property_version": BrowserPrimitiveConstraint3, "binding_revision": BrowserPrimitiveConstraint11, "event_time_basis": Schema.Literals(["device_recorded", "received_at"]), "event_at_ms": HistoryMillis, "first_resolution_effective_at_ms": HistoryMillis, "first_resolution_known_at_ms": HistoryMillis, "value": HistoryValue, "source_unit": Schema.Union([Schema.String, Schema.Null]), "quality": Schema.Literals(["good", "uncertain", "invalid"]), "source": PropertyHistorySource }).annotate({ "identifier": "PropertyHistoryChange" })
+export type PropertyHistoryChange = { readonly "tenant_id": BrowserPrimitiveConstraint13, readonly "asset_id": BrowserPrimitiveConstraint13, readonly "property_id": BrowserPrimitiveConstraint13, readonly "binding_id": BrowserPrimitiveConstraint13, readonly "interpretation": HistoryToken, readonly "property_version": BrowserPrimitiveConstraint6, readonly "binding_revision": BrowserPrimitiveConstraint14, readonly "event_time_basis": "device_recorded" | "received_at", readonly "event_at_ms": HistoryMillis, readonly "first_resolution_effective_at_ms": HistoryMillis, readonly "first_resolution_known_at_ms": HistoryMillis, readonly "value": HistoryValue, readonly "source_unit": string | null, readonly "quality": "good" | "uncertain" | "invalid", readonly "source": PropertyHistorySource }
+export const PropertyHistoryChange = Schema.Struct({ "tenant_id": BrowserPrimitiveConstraint13, "asset_id": BrowserPrimitiveConstraint13, "property_id": BrowserPrimitiveConstraint13, "binding_id": BrowserPrimitiveConstraint13, "interpretation": HistoryToken, "property_version": BrowserPrimitiveConstraint6, "binding_revision": BrowserPrimitiveConstraint14, "event_time_basis": Schema.Literals(["device_recorded", "received_at"]), "event_at_ms": HistoryMillis, "first_resolution_effective_at_ms": HistoryMillis, "first_resolution_known_at_ms": HistoryMillis, "value": HistoryValue, "source_unit": Schema.Union([Schema.String, Schema.Null]), "quality": Schema.Literals(["good", "uncertain", "invalid"]), "source": PropertyHistorySource }).annotate({ "identifier": "PropertyHistoryChange" })
 export type OperatorTenantPage = { readonly "tenants": ReadonlyArray<OperatorTenant>, readonly "next_after": string | null }
 export const OperatorTenantPage = Schema.Struct({ "tenants": Schema.Array(OperatorTenant).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }).annotate({ "identifier": "OperatorTenantPage" })
-export type Asset = { readonly "id": BrowserPrimitiveConstraint10, readonly "tenant_id": BrowserPrimitiveConstraint10, readonly "name": BrowserPrimitiveConstraint14, readonly "asset_type": AssetTypeRef, readonly "external_identifiers": ReadonlyArray<ExternalIdentifier> } & { readonly [x: string]: Schema.Json }
-export const Asset = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "tenant_id": BrowserPrimitiveConstraint10, "name": BrowserPrimitiveConstraint14, "asset_type": AssetTypeRef, "external_identifiers": Schema.Array(ExternalIdentifier) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "Asset" })
+export type Asset = { readonly "id": BrowserPrimitiveConstraint13, readonly "tenant_id": BrowserPrimitiveConstraint13, readonly "name": BrowserPrimitiveConstraint17, readonly "asset_type": AssetTypeRef, readonly "external_identifiers": ReadonlyArray<ExternalIdentifier> } & { readonly [x: string]: Schema.Json }
+export const Asset = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "tenant_id": BrowserPrimitiveConstraint13, "name": BrowserPrimitiveConstraint17, "asset_type": AssetTypeRef, "external_identifiers": Schema.Array(ExternalIdentifier) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "Asset" })
+export type WorkRecoveryTargets = { readonly "kind": WorkKind, readonly "control": WorkControl, readonly "targets": ReadonlyArray<WorkRecoveryCandidate>, readonly "truncated": boolean }
+export const WorkRecoveryTargets = Schema.Struct({ "kind": WorkKind, "control": WorkControl, "targets": Schema.Array(WorkRecoveryCandidate).check(Schema.isMaxLength(32).annotate({ "expected": "a value with a length of at most 32" })), "truncated": Schema.Boolean }).annotate({ "identifier": "WorkRecoveryTargets" })
 export type CalculatorEvaluationEvidence = { readonly "evaluation": CalculatorEvaluationSummary, readonly "inputs": ReadonlyArray<CalculatorInputReference> }
 export const CalculatorEvaluationEvidence = Schema.Struct({ "evaluation": CalculatorEvaluationSummary, "inputs": Schema.Array(CalculatorInputReference).check(Schema.isMaxLength(1024).annotate({ "expected": "a value with a length of at most 1024" })) }).annotate({ "identifier": "CalculatorEvaluationEvidence" })
-export type AlertSummary = { readonly "rule_id": AdministrationIdentifier, readonly "rule_revision": BrowserPrimitiveConstraint3, readonly "scope_asset_id": AdministrationIdentifier, readonly "target_asset_id": AdministrationIdentifier, readonly "version": AlertLifecycleVersion, readonly "phase": AlertPhase, readonly "selected": boolean, readonly "candidate_since_ms": HistoryMillis | null, readonly "last_event_at_ms": HistoryMillis, readonly "latest_transition": AlertTransition }
-export const AlertSummary = Schema.Struct({ "rule_id": AdministrationIdentifier, "rule_revision": BrowserPrimitiveConstraint3, "scope_asset_id": AdministrationIdentifier, "target_asset_id": AdministrationIdentifier, "version": AlertLifecycleVersion, "phase": AlertPhase, "selected": Schema.Boolean, "candidate_since_ms": Schema.Union([HistoryMillis, Schema.Null]), "last_event_at_ms": HistoryMillis, "latest_transition": AlertTransition }).annotate({ "identifier": "AlertSummary" })
+export type AlertSummary = { readonly "rule_id": AdministrationIdentifier, readonly "rule_revision": BrowserPrimitiveConstraint6, readonly "scope_asset_id": AdministrationIdentifier, readonly "target_asset_id": AdministrationIdentifier, readonly "version": AlertLifecycleVersion, readonly "phase": AlertPhase, readonly "selected": boolean, readonly "candidate_since_ms": HistoryMillis | null, readonly "last_event_at_ms": HistoryMillis, readonly "latest_transition": AlertTransition }
+export const AlertSummary = Schema.Struct({ "rule_id": AdministrationIdentifier, "rule_revision": BrowserPrimitiveConstraint6, "scope_asset_id": AdministrationIdentifier, "target_asset_id": AdministrationIdentifier, "version": AlertLifecycleVersion, "phase": AlertPhase, "selected": Schema.Boolean, "candidate_since_ms": Schema.Union([HistoryMillis, Schema.Null]), "last_event_at_ms": HistoryMillis, "latest_transition": AlertTransition }).annotate({ "identifier": "AlertSummary" })
 export type AlertTransitionPage = { readonly "transitions": ReadonlyArray<AlertTransition>, readonly "next_after": AlertReadCursor | null }
 export const AlertTransitionPage = Schema.Struct({ "transitions": Schema.Array(AlertTransition).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([AlertReadCursor, Schema.Null]) }).annotate({ "identifier": "AlertTransitionPage" })
-export type SignalBinding = { readonly "id": BrowserPrimitiveConstraint10, readonly "tenant_id": BrowserPrimitiveConstraint10, readonly "revision": BrowserPrimitiveConstraint11, readonly "recorded_at_ms": BrowserPrimitiveConstraint12, readonly "source": SignalSource, readonly "target": SignalTarget, readonly "effective_interval": EffectiveInterval } & { readonly [x: string]: Schema.Json }
-export const SignalBinding = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint10, "tenant_id": BrowserPrimitiveConstraint10, "revision": BrowserPrimitiveConstraint11, "recorded_at_ms": BrowserPrimitiveConstraint12, "source": SignalSource, "target": SignalTarget, "effective_interval": EffectiveInterval }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SignalBinding" })
+export type SignalBinding = { readonly "id": BrowserPrimitiveConstraint13, readonly "tenant_id": BrowserPrimitiveConstraint13, readonly "revision": BrowserPrimitiveConstraint14, readonly "recorded_at_ms": BrowserPrimitiveConstraint15, readonly "source": SignalSource, readonly "target": SignalTarget, readonly "effective_interval": EffectiveInterval } & { readonly [x: string]: Schema.Json }
+export const SignalBinding = Schema.StructWithRest(Schema.Struct({ "id": BrowserPrimitiveConstraint13, "tenant_id": BrowserPrimitiveConstraint13, "revision": BrowserPrimitiveConstraint14, "recorded_at_ms": BrowserPrimitiveConstraint15, "source": SignalSource, "target": SignalTarget, "effective_interval": EffectiveInterval }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SignalBinding" })
 export type AssetPage = { readonly "assets": ReadonlyArray<AssetSummary>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
 export const AssetPage = Schema.StructWithRest(Schema.Struct({ "assets": Schema.Array(AssetSummary).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetPage" })
-export type RelationshipSnapshot = { readonly "asset_id": BrowserPrimitiveConstraint10, readonly "effective_at_ms": BrowserPrimitiveConstraint12, readonly "known_at_ms": BrowserPrimitiveConstraint12, readonly "relationships": ReadonlyArray<Relationship>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
-export const RelationshipSnapshot = Schema.StructWithRest(Schema.Struct({ "asset_id": BrowserPrimitiveConstraint10, "effective_at_ms": BrowserPrimitiveConstraint12, "known_at_ms": BrowserPrimitiveConstraint12, "relationships": Schema.Array(Relationship).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "RelationshipSnapshot" })
+export type RelationshipSnapshot = { readonly "asset_id": BrowserPrimitiveConstraint13, readonly "effective_at_ms": BrowserPrimitiveConstraint15, readonly "known_at_ms": BrowserPrimitiveConstraint15, readonly "relationships": ReadonlyArray<Relationship>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
+export const RelationshipSnapshot = Schema.StructWithRest(Schema.Struct({ "asset_id": BrowserPrimitiveConstraint13, "effective_at_ms": BrowserPrimitiveConstraint15, "known_at_ms": BrowserPrimitiveConstraint15, "relationships": Schema.Array(Relationship).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "RelationshipSnapshot" })
 export type AppendSignalBindingRevisionRequest = { readonly "source": RevisionSource, readonly "target": RevisionTarget, readonly "effective_interval": RevisionEffectiveInterval }
 export const AppendSignalBindingRevisionRequest = Schema.Struct({ "source": RevisionSource, "target": RevisionTarget, "effective_interval": RevisionEffectiveInterval }).annotate({ "identifier": "AppendSignalBindingRevisionRequest" })
-export type FleetPoint = { readonly "latitude": BrowserPrimitiveConstraint10, readonly "longitude": BrowserPrimitiveConstraint10, readonly "quality": "good" | "uncertain", readonly "freshness": "fresh" | "stale" | "future", readonly "latitude_change": PropertyHistoryChange, readonly "longitude_change": PropertyHistoryChange }
-export const FleetPoint = Schema.Struct({ "latitude": BrowserPrimitiveConstraint10, "longitude": BrowserPrimitiveConstraint10, "quality": Schema.Literals(["good", "uncertain"]), "freshness": Schema.Literals(["fresh", "stale", "future"]), "latitude_change": PropertyHistoryChange, "longitude_change": PropertyHistoryChange }).annotate({ "identifier": "FleetPoint" })
+export type FleetPoint = { readonly "latitude": BrowserPrimitiveConstraint13, readonly "longitude": BrowserPrimitiveConstraint13, readonly "quality": "good" | "uncertain", readonly "freshness": "fresh" | "stale" | "future", readonly "latitude_change": PropertyHistoryChange, readonly "longitude_change": PropertyHistoryChange }
+export const FleetPoint = Schema.Struct({ "latitude": BrowserPrimitiveConstraint13, "longitude": BrowserPrimitiveConstraint13, "quality": Schema.Literals(["good", "uncertain"]), "freshness": Schema.Literals(["fresh", "stale", "future"]), "latitude_change": PropertyHistoryChange, "longitude_change": PropertyHistoryChange }).annotate({ "identifier": "FleetPoint" })
 export type CurrentPropertyItem = { readonly "freshness": "fresh" | "stale" | "future", readonly "change": PropertyHistoryChange }
 export const CurrentPropertyItem = Schema.Struct({ "freshness": Schema.Literals(["fresh", "stale", "future"]), "change": PropertyHistoryChange }).annotate({ "identifier": "CurrentPropertyItem" })
 export type PropertyHistoryPage = { readonly "changes": ReadonlyArray<PropertyHistoryChange>, readonly "next_after": HistoryToken | null }
@@ -223,21 +247,61 @@ export type AlertPage = { readonly "alerts": ReadonlyArray<AlertSummary>, readon
 export const AlertPage = Schema.Struct({ "alerts": Schema.Array(AlertSummary).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([AlertReadCursor, Schema.Null]) }).annotate({ "identifier": "AlertPage" })
 export type AlertDetail = { readonly "alert": AlertSummary, readonly "definition": AlertRuleDefinition }
 export const AlertDetail = Schema.Struct({ "alert": AlertSummary, "definition": AlertRuleDefinition }).annotate({ "identifier": "AlertDetail" })
-export type AssetBindingSnapshot = { readonly "asset_id": BrowserPrimitiveConstraint10, readonly "effective_at_ms": BrowserPrimitiveConstraint12, readonly "known_at_ms": BrowserPrimitiveConstraint12, readonly "bindings": ReadonlyArray<SignalBinding>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
-export const AssetBindingSnapshot = Schema.StructWithRest(Schema.Struct({ "asset_id": BrowserPrimitiveConstraint10, "effective_at_ms": BrowserPrimitiveConstraint12, "known_at_ms": BrowserPrimitiveConstraint12, "bindings": Schema.Array(SignalBinding).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetBindingSnapshot" })
-export type SourceBindingSnapshot = { readonly "source": SignalSource, readonly "effective_at_ms": BrowserPrimitiveConstraint12, readonly "known_at_ms": BrowserPrimitiveConstraint12, readonly "bindings": ReadonlyArray<SignalBinding>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
-export const SourceBindingSnapshot = Schema.StructWithRest(Schema.Struct({ "source": SignalSource, "effective_at_ms": BrowserPrimitiveConstraint12, "known_at_ms": BrowserPrimitiveConstraint12, "bindings": Schema.Array(SignalBinding).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SourceBindingSnapshot" })
+export type AssetBindingSnapshot = { readonly "asset_id": BrowserPrimitiveConstraint13, readonly "effective_at_ms": BrowserPrimitiveConstraint15, readonly "known_at_ms": BrowserPrimitiveConstraint15, readonly "bindings": ReadonlyArray<SignalBinding>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
+export const AssetBindingSnapshot = Schema.StructWithRest(Schema.Struct({ "asset_id": BrowserPrimitiveConstraint13, "effective_at_ms": BrowserPrimitiveConstraint15, "known_at_ms": BrowserPrimitiveConstraint15, "bindings": Schema.Array(SignalBinding).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "AssetBindingSnapshot" })
+export type SourceBindingSnapshot = { readonly "source": SignalSource, readonly "effective_at_ms": BrowserPrimitiveConstraint15, readonly "known_at_ms": BrowserPrimitiveConstraint15, readonly "bindings": ReadonlyArray<SignalBinding>, readonly "next_after": string | null } & { readonly [x: string]: Schema.Json }
+export const SourceBindingSnapshot = Schema.StructWithRest(Schema.Struct({ "source": SignalSource, "effective_at_ms": BrowserPrimitiveConstraint15, "known_at_ms": BrowserPrimitiveConstraint15, "bindings": Schema.Array(SignalBinding).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }), [Schema.Record(Schema.String, Schema.Json.annotate({ "expected": "JSON value" }))]).annotate({ "identifier": "SourceBindingSnapshot" })
 export type FleetLocation = { readonly "status": "unmapped" | "incompatible_mapping" | "missing" | "incoherent" | "invalid_coordinates" | "invalid_quality" } | { readonly "status": "observed", readonly "point": FleetPoint }
 export const FleetLocation = Schema.Union([Schema.Struct({ "status": Schema.Literals(["unmapped", "incompatible_mapping", "missing", "incoherent", "invalid_coordinates", "invalid_quality"]) }), Schema.Struct({ "status": Schema.Literal("observed"), "point": FleetPoint })], { mode: "oneOf" }).annotate({ "identifier": "FleetLocation" })
 export type CurrentPropertySnapshot = { readonly "generation": ProjectionCounter, readonly "revision": ProjectionCounter, readonly "processed_count": ProjectionCounter, readonly "pending": boolean, readonly "evaluated_at_ms": HistoryMillis, readonly "stale_after_ms": 30000, readonly "items": ReadonlyArray<CurrentPropertyItem> }
 export const CurrentPropertySnapshot = Schema.Struct({ "generation": ProjectionCounter, "revision": ProjectionCounter, "processed_count": ProjectionCounter, "pending": Schema.Boolean, "evaluated_at_ms": HistoryMillis, "stale_after_ms": Schema.Literal(30000), "items": Schema.Array(CurrentPropertyItem).check(Schema.isMaxLength(1).annotate({ "expected": "a value with a length of at most 1" })) }).annotate({ "identifier": "CurrentPropertySnapshot" })
-export type FleetAsset = { readonly "asset_id": BrowserPrimitiveConstraint10, readonly "display_name": string, readonly "asset_type": AssetTypeRef, readonly "location": FleetLocation }
-export const FleetAsset = Schema.Struct({ "asset_id": BrowserPrimitiveConstraint10, "display_name": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(200).annotate({ "expected": "a string with at most 200 code points" })), "asset_type": AssetTypeRef, "location": FleetLocation }).annotate({ "identifier": "FleetAsset" })
+export type FleetAsset = { readonly "asset_id": BrowserPrimitiveConstraint13, readonly "display_name": string, readonly "asset_type": AssetTypeRef, readonly "location": FleetLocation }
+export const FleetAsset = Schema.Struct({ "asset_id": BrowserPrimitiveConstraint13, "display_name": Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(200).annotate({ "expected": "a string with at most 200 code points" })), "asset_type": AssetTypeRef, "location": FleetLocation }).annotate({ "identifier": "FleetAsset" })
 export type FleetSnapshot = { readonly "generation": ProjectionCounter, readonly "revision": ProjectionCounter, readonly "pending": boolean, readonly "evaluated_at_ms": HistoryMillis, readonly "stale_after_ms": 30000, readonly "mapping": FleetLocationMapping, readonly "mapping_supported": boolean, readonly "summary": FleetSummary, readonly "assets": ReadonlyArray<FleetAsset>, readonly "next_after": string | null }
 export const FleetSnapshot = Schema.Struct({ "generation": ProjectionCounter, "revision": ProjectionCounter, "pending": Schema.Boolean, "evaluated_at_ms": HistoryMillis, "stale_after_ms": Schema.Literal(30000), "mapping": FleetLocationMapping, "mapping_supported": Schema.Boolean, "summary": FleetSummary, "assets": Schema.Array(FleetAsset).check(Schema.isMaxLength(100).annotate({ "expected": "a value with a length of at most 100" })), "next_after": Schema.Union([Schema.String.check(Schema.isMinLength(1).annotate({ "expected": "a value with a length of at least 1" })).check(Schema.isMaxCodePoints(128).annotate({ "expected": "a string with at most 128 code points" })), Schema.Null]) }).annotate({ "identifier": "FleetSnapshot" })
 // schemas
-export type AcknowledgeAlertParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const AcknowledgeAlertParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type GetWorkDiagnostics200 = WorkDiagnostics
+export const GetWorkDiagnostics200 = WorkDiagnostics
+export type GetWorkDiagnostics401 = Problem
+export const GetWorkDiagnostics401 = Problem
+export type GetWorkDiagnostics403 = Problem
+export const GetWorkDiagnostics403 = Problem
+export type GetWorkDiagnostics405 = Problem
+export const GetWorkDiagnostics405 = Problem
+export type GetWorkDiagnostics500 = Problem
+export const GetWorkDiagnostics500 = Problem
+export type GetWorkRecoveryTargets200 = WorkRecoveryTargets
+export const GetWorkRecoveryTargets200 = WorkRecoveryTargets
+export type GetWorkRecoveryTargets400 = Problem
+export const GetWorkRecoveryTargets400 = Problem
+export type GetWorkRecoveryTargets401 = Problem
+export const GetWorkRecoveryTargets401 = Problem
+export type GetWorkRecoveryTargets403 = Problem
+export const GetWorkRecoveryTargets403 = Problem
+export type GetWorkRecoveryTargets405 = Problem
+export const GetWorkRecoveryTargets405 = Problem
+export type GetWorkRecoveryTargets500 = Problem
+export const GetWorkRecoveryTargets500 = Problem
+export type ApplyWorkRecoveryParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const ApplyWorkRecoveryParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type ApplyWorkRecoveryRequestJson = WorkRecoveryCommand
+export const ApplyWorkRecoveryRequestJson = WorkRecoveryCommand
+export type ApplyWorkRecovery200 = WorkRecoveryReceipt
+export const ApplyWorkRecovery200 = WorkRecoveryReceipt
+export type ApplyWorkRecovery400 = Problem
+export const ApplyWorkRecovery400 = Problem
+export type ApplyWorkRecovery401 = Problem
+export const ApplyWorkRecovery401 = Problem
+export type ApplyWorkRecovery403 = Problem
+export const ApplyWorkRecovery403 = Problem
+export type ApplyWorkRecovery405 = Problem
+export const ApplyWorkRecovery405 = Problem
+export type ApplyWorkRecovery409 = Problem
+export const ApplyWorkRecovery409 = Problem
+export type ApplyWorkRecovery500 = Problem
+export const ApplyWorkRecovery500 = Problem
+export type AcknowledgeAlertParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const AcknowledgeAlertParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type AcknowledgeAlertRequestJson = AlertAcknowledgementRequest
 export const AcknowledgeAlertRequestJson = AlertAcknowledgementRequest
 export type AcknowledgeAlert200 = AlertAcknowledgement
@@ -282,8 +346,8 @@ export type GetAlertRuleRevision405 = Problem
 export const GetAlertRuleRevision405 = Problem
 export type GetAlertRuleRevision500 = Problem
 export const GetAlertRuleRevision500 = Problem
-export type CreateAlertRuleRevisionParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const CreateAlertRuleRevisionParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type CreateAlertRuleRevisionParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const CreateAlertRuleRevisionParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type CreateAlertRuleRevisionRequestJson = AlertRuleDefinition
 export const CreateAlertRuleRevisionRequestJson = AlertRuleDefinition
 export type CreateAlertRuleRevision200 = AlertRuleRevisionReceipt
@@ -300,8 +364,8 @@ export type CreateAlertRuleRevision409 = Problem
 export const CreateAlertRuleRevision409 = Problem
 export type CreateAlertRuleRevision500 = Problem
 export const CreateAlertRuleRevision500 = Problem
-export type ChangeAlertRuleActivationParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const ChangeAlertRuleActivationParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type ChangeAlertRuleActivationParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const ChangeAlertRuleActivationParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type ChangeAlertRuleActivationRequestJson = AlertRuleActivationRequest
 export const ChangeAlertRuleActivationRequestJson = AlertRuleActivationRequest
 export type ChangeAlertRuleActivation200 = AlertRuleActivationState
@@ -318,8 +382,8 @@ export type ChangeAlertRuleActivation409 = Problem
 export const ChangeAlertRuleActivation409 = Problem
 export type ChangeAlertRuleActivation500 = Problem
 export const ChangeAlertRuleActivation500 = Problem
-export type ListAlertsParams = { readonly "phase"?: AlertPhase, readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: AlertReadCursor }
-export const ListAlertsParams = Schema.Struct({ "phase": Schema.optionalKey(AlertPhase), "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(AlertReadCursor) })
+export type ListAlertsParams = { readonly "phase"?: AlertPhase, readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: AlertReadCursor }
+export const ListAlertsParams = Schema.Struct({ "phase": Schema.optionalKey(AlertPhase), "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(AlertReadCursor) })
 export type ListAlerts200 = AlertPage
 export const ListAlerts200 = AlertPage
 export type ListAlerts400 = Problem
@@ -346,8 +410,8 @@ export type GetAlert405 = Problem
 export const GetAlert405 = Problem
 export type GetAlert500 = Problem
 export const GetAlert500 = Problem
-export type ListAlertTransitionsParams = { readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: AlertReadCursor }
-export const ListAlertTransitionsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(AlertReadCursor) })
+export type ListAlertTransitionsParams = { readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: AlertReadCursor }
+export const ListAlertTransitionsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(AlertReadCursor) })
 export type ListAlertTransitions200 = AlertTransitionPage
 export const ListAlertTransitions200 = AlertTransitionPage
 export type ListAlertTransitions400 = Problem
@@ -376,8 +440,8 @@ export type GetCalculatorEvaluationEvidence405 = Problem
 export const GetCalculatorEvaluationEvidence405 = Problem
 export type GetCalculatorEvaluationEvidence500 = Problem
 export const GetCalculatorEvaluationEvidence500 = Problem
-export type ListCalculatorEvaluationOutputsParams = { readonly "limit"?: BrowserPrimitiveConstraint18, readonly "after"?: CalculatorEvidenceCursor }
-export const ListCalculatorEvaluationOutputsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint18), "after": Schema.optionalKey(CalculatorEvidenceCursor) })
+export type ListCalculatorEvaluationOutputsParams = { readonly "limit"?: BrowserPrimitiveConstraint21, readonly "after"?: CalculatorEvidenceCursor }
+export const ListCalculatorEvaluationOutputsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint21), "after": Schema.optionalKey(CalculatorEvidenceCursor) })
 export type ListCalculatorEvaluationOutputs200 = CalculatorOutputPage
 export const ListCalculatorEvaluationOutputs200 = CalculatorOutputPage
 export type ListCalculatorEvaluationOutputs400 = Problem
@@ -406,8 +470,8 @@ export type GetSignalBindingRevision405 = Problem
 export const GetSignalBindingRevision405 = Problem
 export type GetSignalBindingRevision500 = Problem
 export const GetSignalBindingRevision500 = Problem
-export type AppendSignalBindingRevisionParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const AppendSignalBindingRevisionParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type AppendSignalBindingRevisionParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const AppendSignalBindingRevisionParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type AppendSignalBindingRevisionRequestJson = AppendSignalBindingRevisionRequest
 export const AppendSignalBindingRevisionRequestJson = AppendSignalBindingRevisionRequest
 export type AppendSignalBindingRevision200 = MetadataRevisionResult
@@ -428,8 +492,8 @@ export type AppendSignalBindingRevision409 = Problem
 export const AppendSignalBindingRevision409 = Problem
 export type AppendSignalBindingRevision500 = Problem
 export const AppendSignalBindingRevision500 = Problem
-export type ListRelationshipTypeDefinitionsParams = { readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after_id"?: AdministrationIdentifier, readonly "after_version"?: BrowserPrimitiveConstraint3 }
-export const ListRelationshipTypeDefinitionsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after_id": Schema.optionalKey(AdministrationIdentifier), "after_version": Schema.optionalKey(BrowserPrimitiveConstraint3) })
+export type ListRelationshipTypeDefinitionsParams = { readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after_id"?: AdministrationIdentifier, readonly "after_version"?: BrowserPrimitiveConstraint6 }
+export const ListRelationshipTypeDefinitionsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after_id": Schema.optionalKey(AdministrationIdentifier), "after_version": Schema.optionalKey(BrowserPrimitiveConstraint6) })
 export type ListRelationshipTypeDefinitions200 = DefinitionCataloguePage
 export const ListRelationshipTypeDefinitions200 = DefinitionCataloguePage
 export type ListRelationshipTypeDefinitions400 = Problem
@@ -442,8 +506,8 @@ export type ListRelationshipTypeDefinitions405 = Problem
 export const ListRelationshipTypeDefinitions405 = Problem
 export type ListRelationshipTypeDefinitions500 = Problem
 export const ListRelationshipTypeDefinitions500 = Problem
-export type AppendRelationshipRevisionParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const AppendRelationshipRevisionParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type AppendRelationshipRevisionParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const AppendRelationshipRevisionParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type AppendRelationshipRevisionRequestJson = AppendRelationshipRevisionRequest
 export const AppendRelationshipRevisionRequestJson = AppendRelationshipRevisionRequest
 export type AppendRelationshipRevision200 = MetadataRevisionResult
@@ -464,8 +528,8 @@ export type AppendRelationshipRevision409 = Problem
 export const AppendRelationshipRevision409 = Problem
 export type AppendRelationshipRevision500 = Problem
 export const AppendRelationshipRevision500 = Problem
-export type GetFleetSnapshotParams = { readonly "latitude_property": BrowserPrimitiveConstraint10, readonly "longitude_property": BrowserPrimitiveConstraint10, readonly "latitude_version": BrowserPrimitiveConstraint3, readonly "longitude_version": BrowserPrimitiveConstraint3, readonly "encoding": "degrees" | "e7", readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: BrowserPrimitiveConstraint10 }
-export const GetFleetSnapshotParams = Schema.Struct({ "latitude_property": BrowserPrimitiveConstraint10, "longitude_property": BrowserPrimitiveConstraint10, "latitude_version": BrowserPrimitiveConstraint3, "longitude_version": BrowserPrimitiveConstraint3, "encoding": Schema.Literals(["degrees", "e7"]), "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(BrowserPrimitiveConstraint10) })
+export type GetFleetSnapshotParams = { readonly "latitude_property": BrowserPrimitiveConstraint13, readonly "longitude_property": BrowserPrimitiveConstraint13, readonly "latitude_version": BrowserPrimitiveConstraint6, readonly "longitude_version": BrowserPrimitiveConstraint6, readonly "encoding": "degrees" | "e7", readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: BrowserPrimitiveConstraint13 }
+export const GetFleetSnapshotParams = Schema.Struct({ "latitude_property": BrowserPrimitiveConstraint13, "longitude_property": BrowserPrimitiveConstraint13, "latitude_version": BrowserPrimitiveConstraint6, "longitude_version": BrowserPrimitiveConstraint6, "encoding": Schema.Literals(["degrees", "e7"]), "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(BrowserPrimitiveConstraint13) })
 export type GetFleetSnapshot200 = FleetSnapshot
 export const GetFleetSnapshot200 = FleetSnapshot
 export type GetFleetSnapshot400 = Problem
@@ -478,8 +542,8 @@ export type GetFleetSnapshot404 = Problem
 export const GetFleetSnapshot404 = Problem
 export type GetFleetSnapshot500 = Problem
 export const GetFleetSnapshot500 = Problem
-export type StreamCurrentPropertyParams = { readonly "Last-Event-ID"?: BrowserPrimitiveConstraint20 }
-export const StreamCurrentPropertyParams = Schema.Struct({ "Last-Event-ID": Schema.optionalKey(BrowserPrimitiveConstraint20) })
+export type StreamCurrentPropertyParams = { readonly "Last-Event-ID"?: BrowserPrimitiveConstraint23 }
+export const StreamCurrentPropertyParams = Schema.Struct({ "Last-Event-ID": Schema.optionalKey(BrowserPrimitiveConstraint23) })
 export type StreamCurrentProperty200Sse = PropertyLiveStream
 export const StreamCurrentProperty200Sse = PropertyLiveStream
 export type StreamCurrentProperty400 = Problem
@@ -506,8 +570,8 @@ export type GetCurrentPropertySnapshot404 = Problem
 export const GetCurrentPropertySnapshot404 = Problem
 export type GetCurrentPropertySnapshot500 = Problem
 export const GetCurrentPropertySnapshot500 = Problem
-export type ListPropertyHistoryParams = { readonly "start_at_ms": HistoryMillis, readonly "end_at_ms": HistoryMillis, readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: HistoryToken }
-export const ListPropertyHistoryParams = Schema.Struct({ "start_at_ms": HistoryMillis, "end_at_ms": HistoryMillis, "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(HistoryToken) })
+export type ListPropertyHistoryParams = { readonly "start_at_ms": HistoryMillis, readonly "end_at_ms": HistoryMillis, readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: HistoryToken }
+export const ListPropertyHistoryParams = Schema.Struct({ "start_at_ms": HistoryMillis, "end_at_ms": HistoryMillis, "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(HistoryToken) })
 export type ListPropertyHistory200 = PropertyHistoryPage
 export const ListPropertyHistory200 = PropertyHistoryPage
 export type ListPropertyHistory400 = Problem
@@ -530,8 +594,8 @@ export type GetPropertyInterpretation404 = Problem
 export const GetPropertyInterpretation404 = Problem
 export type GetPropertyInterpretation500 = Problem
 export const GetPropertyInterpretation500 = Problem
-export type ListOperatorTenantsParams = { readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: BrowserPrimitiveConstraint10 }
-export const ListOperatorTenantsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(BrowserPrimitiveConstraint10) })
+export type ListOperatorTenantsParams = { readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: BrowserPrimitiveConstraint13 }
+export const ListOperatorTenantsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(BrowserPrimitiveConstraint13) })
 export type ListOperatorTenants200 = OperatorTenantPage
 export const ListOperatorTenants200 = OperatorTenantPage
 export type ListOperatorTenants400 = Problem
@@ -542,8 +606,8 @@ export type ListOperatorTenants500 = Problem
 export const ListOperatorTenants500 = Problem
 export type GetApiVersion200 = ApiDescription
 export const GetApiVersion200 = ApiDescription
-export type ListAssetsParams = { readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: BrowserPrimitiveConstraint10 }
-export const ListAssetsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(BrowserPrimitiveConstraint10) })
+export type ListAssetsParams = { readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: BrowserPrimitiveConstraint13 }
+export const ListAssetsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(BrowserPrimitiveConstraint13) })
 export type ListAssets200 = AssetPage
 export const ListAssets200 = AssetPage
 export type ListAssets400 = Problem
@@ -554,8 +618,8 @@ export type ListAssets403 = Problem
 export const ListAssets403 = Problem
 export type ListAssets500 = Problem
 export const ListAssets500 = Problem
-export type RegisterAssetParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const RegisterAssetParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type RegisterAssetParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const RegisterAssetParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type RegisterAssetRequestJson = RegisterAssetRequest
 export const RegisterAssetRequestJson = RegisterAssetRequest
 export type RegisterAsset200 = MetadataRegistrationResult
@@ -588,8 +652,8 @@ export type GetAsset404 = Problem
 export const GetAsset404 = Problem
 export type GetAsset500 = Problem
 export const GetAsset500 = Problem
-export type ListAssetRelationshipsParams = { readonly "effective_at_ms": BrowserPrimitiveConstraint12, readonly "known_at_ms": BrowserPrimitiveConstraint12, readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: BrowserPrimitiveConstraint10 }
-export const ListAssetRelationshipsParams = Schema.Struct({ "effective_at_ms": BrowserPrimitiveConstraint12, "known_at_ms": BrowserPrimitiveConstraint12, "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(BrowserPrimitiveConstraint10) })
+export type ListAssetRelationshipsParams = { readonly "effective_at_ms": BrowserPrimitiveConstraint15, readonly "known_at_ms": BrowserPrimitiveConstraint15, readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: BrowserPrimitiveConstraint13 }
+export const ListAssetRelationshipsParams = Schema.Struct({ "effective_at_ms": BrowserPrimitiveConstraint15, "known_at_ms": BrowserPrimitiveConstraint15, "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(BrowserPrimitiveConstraint13) })
 export type ListAssetRelationships200 = RelationshipSnapshot
 export const ListAssetRelationships200 = RelationshipSnapshot
 export type ListAssetRelationships400 = Problem
@@ -602,8 +666,8 @@ export type ListAssetRelationships404 = Problem
 export const ListAssetRelationships404 = Problem
 export type ListAssetRelationships500 = Problem
 export const ListAssetRelationships500 = Problem
-export type ListAssetSignalBindingsParams = { readonly "effective_at_ms": BrowserPrimitiveConstraint12, readonly "known_at_ms": BrowserPrimitiveConstraint12, readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: BrowserPrimitiveConstraint10 }
-export const ListAssetSignalBindingsParams = Schema.Struct({ "effective_at_ms": BrowserPrimitiveConstraint12, "known_at_ms": BrowserPrimitiveConstraint12, "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(BrowserPrimitiveConstraint10) })
+export type ListAssetSignalBindingsParams = { readonly "effective_at_ms": BrowserPrimitiveConstraint15, readonly "known_at_ms": BrowserPrimitiveConstraint15, readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: BrowserPrimitiveConstraint13 }
+export const ListAssetSignalBindingsParams = Schema.Struct({ "effective_at_ms": BrowserPrimitiveConstraint15, "known_at_ms": BrowserPrimitiveConstraint15, "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(BrowserPrimitiveConstraint13) })
 export type ListAssetSignalBindings200 = AssetBindingSnapshot
 export const ListAssetSignalBindings200 = AssetBindingSnapshot
 export type ListAssetSignalBindings400 = Problem
@@ -616,8 +680,8 @@ export type ListAssetSignalBindings404 = Problem
 export const ListAssetSignalBindings404 = Problem
 export type ListAssetSignalBindings500 = Problem
 export const ListAssetSignalBindings500 = Problem
-export type ListSourceSignalBindingsParams = { readonly "device_asset_id": BrowserPrimitiveConstraint10, readonly "endpoint_id": BrowserPrimitiveConstraint10, readonly "signal_id": BrowserPrimitiveConstraint10, readonly "effective_at_ms": BrowserPrimitiveConstraint12, readonly "known_at_ms": BrowserPrimitiveConstraint12, readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after"?: BrowserPrimitiveConstraint10 }
-export const ListSourceSignalBindingsParams = Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint10, "endpoint_id": BrowserPrimitiveConstraint10, "signal_id": BrowserPrimitiveConstraint10, "effective_at_ms": BrowserPrimitiveConstraint12, "known_at_ms": BrowserPrimitiveConstraint12, "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after": Schema.optionalKey(BrowserPrimitiveConstraint10) })
+export type ListSourceSignalBindingsParams = { readonly "device_asset_id": BrowserPrimitiveConstraint13, readonly "endpoint_id": BrowserPrimitiveConstraint13, readonly "signal_id": BrowserPrimitiveConstraint13, readonly "effective_at_ms": BrowserPrimitiveConstraint15, readonly "known_at_ms": BrowserPrimitiveConstraint15, readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after"?: BrowserPrimitiveConstraint13 }
+export const ListSourceSignalBindingsParams = Schema.Struct({ "device_asset_id": BrowserPrimitiveConstraint13, "endpoint_id": BrowserPrimitiveConstraint13, "signal_id": BrowserPrimitiveConstraint13, "effective_at_ms": BrowserPrimitiveConstraint15, "known_at_ms": BrowserPrimitiveConstraint15, "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after": Schema.optionalKey(BrowserPrimitiveConstraint13) })
 export type ListSourceSignalBindings200 = SourceBindingSnapshot
 export const ListSourceSignalBindings200 = SourceBindingSnapshot
 export type ListSourceSignalBindings400 = Problem
@@ -670,8 +734,8 @@ export type BeginOperatorLogin405 = Problem
 export const BeginOperatorLogin405 = Problem
 export type BeginOperatorLogin500 = Problem
 export const BeginOperatorLogin500 = Problem
-export type CompleteOperatorLoginParams = { readonly "code"?: BrowserPrimitiveConstraint9, readonly "state": BrowserPrimitiveConstraint21, readonly "error"?: BrowserPrimitiveConstraint2 }
-export const CompleteOperatorLoginParams = Schema.Struct({ "code": Schema.optionalKey(BrowserPrimitiveConstraint9), "state": BrowserPrimitiveConstraint21, "error": Schema.optionalKey(BrowserPrimitiveConstraint2) })
+export type CompleteOperatorLoginParams = { readonly "code"?: BrowserPrimitiveConstraint12, readonly "state": BrowserPrimitiveConstraint24, readonly "error"?: BrowserPrimitiveConstraint3 }
+export const CompleteOperatorLoginParams = Schema.Struct({ "code": Schema.optionalKey(BrowserPrimitiveConstraint12), "state": BrowserPrimitiveConstraint24, "error": Schema.optionalKey(BrowserPrimitiveConstraint3) })
 export type CompleteOperatorLogin400 = Problem
 export const CompleteOperatorLogin400 = Problem
 export type CompleteOperatorLogin401 = Problem
@@ -688,8 +752,8 @@ export type GetOperatorSession405 = Problem
 export const GetOperatorSession405 = Problem
 export type GetOperatorSession500 = Problem
 export const GetOperatorSession500 = Problem
-export type EndOperatorSessionParams = { readonly "Origin": BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF": "1" }
-export const EndOperatorSessionParams = Schema.Struct({ "Origin": BrowserPrimitiveConstraint2, "X-FleetIQ-CSRF": Schema.Literal("1") })
+export type EndOperatorSessionParams = { readonly "Origin": BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF": "1" }
+export const EndOperatorSessionParams = Schema.Struct({ "Origin": BrowserPrimitiveConstraint3, "X-FleetIQ-CSRF": Schema.Literal("1") })
 export type EndOperatorSession401 = Problem
 export const EndOperatorSession401 = Problem
 export type EndOperatorSession403 = Problem
@@ -712,8 +776,8 @@ export type GetCommunicationDevice405 = Problem
 export const GetCommunicationDevice405 = Problem
 export type GetCommunicationDevice500 = Problem
 export const GetCommunicationDevice500 = Problem
-export type RegisterCommunicationDeviceParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const RegisterCommunicationDeviceParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type RegisterCommunicationDeviceParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const RegisterCommunicationDeviceParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type RegisterCommunicationDeviceRequestJson = RegisterCommunicationDeviceRequest
 export const RegisterCommunicationDeviceRequestJson = RegisterCommunicationDeviceRequest
 export type RegisterCommunicationDevice200 = MetadataRegistrationResult
@@ -734,8 +798,8 @@ export type RegisterCommunicationDevice409 = Problem
 export const RegisterCommunicationDevice409 = Problem
 export type RegisterCommunicationDevice500 = Problem
 export const RegisterCommunicationDevice500 = Problem
-export type ListAssetTypeDefinitionsParams = { readonly "limit"?: BrowserPrimitiveConstraint17, readonly "after_id"?: AdministrationIdentifier, readonly "after_version"?: BrowserPrimitiveConstraint3 }
-export const ListAssetTypeDefinitionsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint17), "after_id": Schema.optionalKey(AdministrationIdentifier), "after_version": Schema.optionalKey(BrowserPrimitiveConstraint3) })
+export type ListAssetTypeDefinitionsParams = { readonly "limit"?: BrowserPrimitiveConstraint20, readonly "after_id"?: AdministrationIdentifier, readonly "after_version"?: BrowserPrimitiveConstraint6 }
+export const ListAssetTypeDefinitionsParams = Schema.Struct({ "limit": Schema.optionalKey(BrowserPrimitiveConstraint20), "after_id": Schema.optionalKey(AdministrationIdentifier), "after_version": Schema.optionalKey(BrowserPrimitiveConstraint6) })
 export type ListAssetTypeDefinitions200 = DefinitionCataloguePage
 export const ListAssetTypeDefinitions200 = DefinitionCataloguePage
 export type ListAssetTypeDefinitions400 = Problem
@@ -760,8 +824,8 @@ export type GetDeviceProtocolRoute404 = Problem
 export const GetDeviceProtocolRoute404 = Problem
 export type GetDeviceProtocolRoute500 = Problem
 export const GetDeviceProtocolRoute500 = Problem
-export type ChangeDeviceProtocolRouteParams = { readonly "Origin"?: BrowserPrimitiveConstraint2, readonly "X-FleetIQ-CSRF"?: "1" }
-export const ChangeDeviceProtocolRouteParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint2), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
+export type ChangeDeviceProtocolRouteParams = { readonly "Origin"?: BrowserPrimitiveConstraint3, readonly "X-FleetIQ-CSRF"?: "1" }
+export const ChangeDeviceProtocolRouteParams = Schema.Struct({ "Origin": Schema.optionalKey(BrowserPrimitiveConstraint3), "X-FleetIQ-CSRF": Schema.optionalKey(Schema.Literal("1")) })
 export type ChangeDeviceProtocolRouteRequestJson = ChangeProtocolRouteRequest
 export const ChangeDeviceProtocolRouteRequestJson = ChangeProtocolRouteRequest
 export type ChangeDeviceProtocolRoute200 = ProtocolDeviceRoute
@@ -926,20 +990,50 @@ export const make = (
         HttpClientResponse.schemaBodyJson(schema)(response),
         (cause) => Effect.fail(FleetIqApiError(tag, cause, response)),
       )
+  function decodeProblems<Prefix extends string, Status extends number>(prefix: Prefix, statuses: readonly Status[]) {
+    const entries = statuses.map((status) =>
+      [status, decodeError((prefix + status) as `${Prefix}${Status}`, Problem)] as const
+    );
+    return Object.fromEntries(entries) as Record<Status, (typeof entries)[number][1]>;
+  }
   return {
     httpClient,
+    "getWorkDiagnostics": (tenantId, options: Parameters<FleetIqApi["getWorkDiagnostics"]>[1]) => __makePathRequest(HttpClientRequest.get, [tenantId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/work-diagnostics").pipe(
+    Effect.flatMap((request) => request.pipe(
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(GetWorkDiagnostics200),
+      ...decodeProblems("GetWorkDiagnostics", [401, 403, 405, 500]),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "getWorkRecoveryTargets": (tenantId, kind, options: Parameters<FleetIqApi["getWorkRecoveryTargets"]>[2]) => __makePathRequest(HttpClientRequest.get, [tenantId, kind], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/work-recovery/" + __encodePathParam(kind) + "").pipe(
+    Effect.flatMap((request) => request.pipe(
+      withResponse(options?.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(GetWorkRecoveryTargets200),
+      ...decodeProblems("GetWorkRecoveryTargets", [400, 401, 403, 405, 500]),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
+    "applyWorkRecovery": (tenantId, kind, requestId, options: Parameters<FleetIqApi["applyWorkRecovery"]>[3]) => __makePathRequest(HttpClientRequest.put, [tenantId, kind, requestId], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/work-recovery/" + __encodePathParam(kind) + "/commands/" + __encodePathParam(requestId) + "").pipe(
+    Effect.flatMap((request) => request.pipe(
+      HttpClientRequest.setHeaders({ "Origin": options.params?.["Origin"] ?? undefined, "X-FleetIQ-CSRF": options.params?.["X-FleetIQ-CSRF"] ?? undefined }),
+      HttpClientRequest.bodyJsonUnsafe(options.payload),
+      withResponse(options.config)(HttpClientResponse.matchStatus({
+      "2xx": decodeSuccess(ApplyWorkRecovery200),
+      ...decodeProblems("ApplyWorkRecovery", [400, 401, 403, 405, 409, 500]),
+      orElse: unexpectedStatus
+    }))
+    ))
+  ),
     "acknowledgeAlert": (tenantId, ruleId, revision, options: Parameters<FleetIqApi["acknowledgeAlert"]>[3]) => __makePathRequest(HttpClientRequest.put, [tenantId, ruleId, revision], () => "/api/v1/tenants/" + __encodePathParam(tenantId) + "/alerts/" + __encodePathParam(ruleId) + "/revisions/" + __encodePathParam(revision) + "/acknowledgement").pipe(
     Effect.flatMap((request) => request.pipe(
       HttpClientRequest.setHeaders({ "Origin": options.params?.["Origin"] ?? undefined, "X-FleetIQ-CSRF": options.params?.["X-FleetIQ-CSRF"] ?? undefined }),
       HttpClientRequest.bodyJsonUnsafe(options.payload),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(AcknowledgeAlert200),
-      "400": decodeError("AcknowledgeAlert400", AcknowledgeAlert400),
-      "401": decodeError("AcknowledgeAlert401", AcknowledgeAlert401),
-      "403": decodeError("AcknowledgeAlert403", AcknowledgeAlert403),
-      "405": decodeError("AcknowledgeAlert405", AcknowledgeAlert405),
-      "409": decodeError("AcknowledgeAlert409", AcknowledgeAlert409),
-      "500": decodeError("AcknowledgeAlert500", AcknowledgeAlert500),
+      ...decodeProblems("AcknowledgeAlert", [400, 401, 403, 405, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -948,12 +1042,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetAlertRuleHead200),
-      "400": decodeError("GetAlertRuleHead400", GetAlertRuleHead400),
-      "401": decodeError("GetAlertRuleHead401", GetAlertRuleHead401),
-      "403": decodeError("GetAlertRuleHead403", GetAlertRuleHead403),
-      "404": decodeError("GetAlertRuleHead404", GetAlertRuleHead404),
-      "405": decodeError("GetAlertRuleHead405", GetAlertRuleHead405),
-      "500": decodeError("GetAlertRuleHead500", GetAlertRuleHead500),
+      ...decodeProblems("GetAlertRuleHead", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -962,12 +1051,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetAlertRuleRevision200),
-      "400": decodeError("GetAlertRuleRevision400", GetAlertRuleRevision400),
-      "401": decodeError("GetAlertRuleRevision401", GetAlertRuleRevision401),
-      "403": decodeError("GetAlertRuleRevision403", GetAlertRuleRevision403),
-      "404": decodeError("GetAlertRuleRevision404", GetAlertRuleRevision404),
-      "405": decodeError("GetAlertRuleRevision405", GetAlertRuleRevision405),
-      "500": decodeError("GetAlertRuleRevision500", GetAlertRuleRevision500),
+      ...decodeProblems("GetAlertRuleRevision", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -978,12 +1062,7 @@ export const make = (
       HttpClientRequest.bodyJsonUnsafe(options.payload),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(CreateAlertRuleRevision200),
-      "400": decodeError("CreateAlertRuleRevision400", CreateAlertRuleRevision400),
-      "401": decodeError("CreateAlertRuleRevision401", CreateAlertRuleRevision401),
-      "403": decodeError("CreateAlertRuleRevision403", CreateAlertRuleRevision403),
-      "405": decodeError("CreateAlertRuleRevision405", CreateAlertRuleRevision405),
-      "409": decodeError("CreateAlertRuleRevision409", CreateAlertRuleRevision409),
-      "500": decodeError("CreateAlertRuleRevision500", CreateAlertRuleRevision500),
+      ...decodeProblems("CreateAlertRuleRevision", [400, 401, 403, 405, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -994,12 +1073,7 @@ export const make = (
       HttpClientRequest.bodyJsonUnsafe(options.payload),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ChangeAlertRuleActivation200),
-      "400": decodeError("ChangeAlertRuleActivation400", ChangeAlertRuleActivation400),
-      "401": decodeError("ChangeAlertRuleActivation401", ChangeAlertRuleActivation401),
-      "403": decodeError("ChangeAlertRuleActivation403", ChangeAlertRuleActivation403),
-      "405": decodeError("ChangeAlertRuleActivation405", ChangeAlertRuleActivation405),
-      "409": decodeError("ChangeAlertRuleActivation409", ChangeAlertRuleActivation409),
-      "500": decodeError("ChangeAlertRuleActivation500", ChangeAlertRuleActivation500),
+      ...decodeProblems("ChangeAlertRuleActivation", [400, 401, 403, 405, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1009,11 +1083,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "phase": options?.params?.["phase"] as any, "limit": options?.params?.["limit"] as any, "after": options?.params?.["after"] as any }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListAlerts200),
-      "400": decodeError("ListAlerts400", ListAlerts400),
-      "401": decodeError("ListAlerts401", ListAlerts401),
-      "403": decodeError("ListAlerts403", ListAlerts403),
-      "405": decodeError("ListAlerts405", ListAlerts405),
-      "500": decodeError("ListAlerts500", ListAlerts500),
+      ...decodeProblems("ListAlerts", [400, 401, 403, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1022,12 +1092,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetAlert200),
-      "400": decodeError("GetAlert400", GetAlert400),
-      "401": decodeError("GetAlert401", GetAlert401),
-      "403": decodeError("GetAlert403", GetAlert403),
-      "404": decodeError("GetAlert404", GetAlert404),
-      "405": decodeError("GetAlert405", GetAlert405),
-      "500": decodeError("GetAlert500", GetAlert500),
+      ...decodeProblems("GetAlert", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1037,12 +1102,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "limit": options?.params?.["limit"] as any, "after": options?.params?.["after"] as any }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListAlertTransitions200),
-      "400": decodeError("ListAlertTransitions400", ListAlertTransitions400),
-      "401": decodeError("ListAlertTransitions401", ListAlertTransitions401),
-      "403": decodeError("ListAlertTransitions403", ListAlertTransitions403),
-      "404": decodeError("ListAlertTransitions404", ListAlertTransitions404),
-      "405": decodeError("ListAlertTransitions405", ListAlertTransitions405),
-      "500": decodeError("ListAlertTransitions500", ListAlertTransitions500),
+      ...decodeProblems("ListAlertTransitions", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1051,12 +1111,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetCalculatorEvaluationEvidence200),
-      "400": decodeError("GetCalculatorEvaluationEvidence400", GetCalculatorEvaluationEvidence400),
-      "401": decodeError("GetCalculatorEvaluationEvidence401", GetCalculatorEvaluationEvidence401),
-      "403": decodeError("GetCalculatorEvaluationEvidence403", GetCalculatorEvaluationEvidence403),
-      "404": decodeError("GetCalculatorEvaluationEvidence404", GetCalculatorEvaluationEvidence404),
-      "405": decodeError("GetCalculatorEvaluationEvidence405", GetCalculatorEvaluationEvidence405),
-      "500": decodeError("GetCalculatorEvaluationEvidence500", GetCalculatorEvaluationEvidence500),
+      ...decodeProblems("GetCalculatorEvaluationEvidence", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1066,12 +1121,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "limit": options?.params?.["limit"] as any, "after": options?.params?.["after"] as any }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListCalculatorEvaluationOutputs200),
-      "400": decodeError("ListCalculatorEvaluationOutputs400", ListCalculatorEvaluationOutputs400),
-      "401": decodeError("ListCalculatorEvaluationOutputs401", ListCalculatorEvaluationOutputs401),
-      "403": decodeError("ListCalculatorEvaluationOutputs403", ListCalculatorEvaluationOutputs403),
-      "404": decodeError("ListCalculatorEvaluationOutputs404", ListCalculatorEvaluationOutputs404),
-      "405": decodeError("ListCalculatorEvaluationOutputs405", ListCalculatorEvaluationOutputs405),
-      "500": decodeError("ListCalculatorEvaluationOutputs500", ListCalculatorEvaluationOutputs500),
+      ...decodeProblems("ListCalculatorEvaluationOutputs", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1080,12 +1130,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetSignalBindingRevision200),
-      "400": decodeError("GetSignalBindingRevision400", GetSignalBindingRevision400),
-      "401": decodeError("GetSignalBindingRevision401", GetSignalBindingRevision401),
-      "403": decodeError("GetSignalBindingRevision403", GetSignalBindingRevision403),
-      "404": decodeError("GetSignalBindingRevision404", GetSignalBindingRevision404),
-      "405": decodeError("GetSignalBindingRevision405", GetSignalBindingRevision405),
-      "500": decodeError("GetSignalBindingRevision500", GetSignalBindingRevision500),
+      ...decodeProblems("GetSignalBindingRevision", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1097,13 +1142,7 @@ export const make = (
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "200": decodeSuccess(AppendSignalBindingRevision200),
       "201": decodeSuccess(AppendSignalBindingRevision201),
-      "400": decodeError("AppendSignalBindingRevision400", AppendSignalBindingRevision400),
-      "401": decodeError("AppendSignalBindingRevision401", AppendSignalBindingRevision401),
-      "403": decodeError("AppendSignalBindingRevision403", AppendSignalBindingRevision403),
-      "404": decodeError("AppendSignalBindingRevision404", AppendSignalBindingRevision404),
-      "405": decodeError("AppendSignalBindingRevision405", AppendSignalBindingRevision405),
-      "409": decodeError("AppendSignalBindingRevision409", AppendSignalBindingRevision409),
-      "500": decodeError("AppendSignalBindingRevision500", AppendSignalBindingRevision500),
+      ...decodeProblems("AppendSignalBindingRevision", [400, 401, 403, 404, 405, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1113,11 +1152,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "limit": options?.params?.["limit"] as any, "after_id": options?.params?.["after_id"] as any, "after_version": options?.params?.["after_version"] as any }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListRelationshipTypeDefinitions200),
-      "400": decodeError("ListRelationshipTypeDefinitions400", ListRelationshipTypeDefinitions400),
-      "401": decodeError("ListRelationshipTypeDefinitions401", ListRelationshipTypeDefinitions401),
-      "403": decodeError("ListRelationshipTypeDefinitions403", ListRelationshipTypeDefinitions403),
-      "405": decodeError("ListRelationshipTypeDefinitions405", ListRelationshipTypeDefinitions405),
-      "500": decodeError("ListRelationshipTypeDefinitions500", ListRelationshipTypeDefinitions500),
+      ...decodeProblems("ListRelationshipTypeDefinitions", [400, 401, 403, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1129,13 +1164,7 @@ export const make = (
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "200": decodeSuccess(AppendRelationshipRevision200),
       "201": decodeSuccess(AppendRelationshipRevision201),
-      "400": decodeError("AppendRelationshipRevision400", AppendRelationshipRevision400),
-      "401": decodeError("AppendRelationshipRevision401", AppendRelationshipRevision401),
-      "403": decodeError("AppendRelationshipRevision403", AppendRelationshipRevision403),
-      "404": decodeError("AppendRelationshipRevision404", AppendRelationshipRevision404),
-      "405": decodeError("AppendRelationshipRevision405", AppendRelationshipRevision405),
-      "409": decodeError("AppendRelationshipRevision409", AppendRelationshipRevision409),
-      "500": decodeError("AppendRelationshipRevision500", AppendRelationshipRevision500),
+      ...decodeProblems("AppendRelationshipRevision", [400, 401, 403, 404, 405, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1145,11 +1174,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "latitude_property": options.params["latitude_property"] as any, "longitude_property": options.params["longitude_property"] as any, "latitude_version": options.params["latitude_version"] as any, "longitude_version": options.params["longitude_version"] as any, "encoding": options.params["encoding"] as any, "limit": options.params["limit"] as any, "after": options.params["after"] as any }),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetFleetSnapshot200),
-      "400": decodeError("GetFleetSnapshot400", GetFleetSnapshot400),
-      "401": decodeError("GetFleetSnapshot401", GetFleetSnapshot401),
-      "403": decodeError("GetFleetSnapshot403", GetFleetSnapshot403),
-      "404": decodeError("GetFleetSnapshot404", GetFleetSnapshot404),
-      "500": decodeError("GetFleetSnapshot500", GetFleetSnapshot500),
+      ...decodeProblems("GetFleetSnapshot", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1158,12 +1183,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       HttpClientRequest.setHeaders({ "Last-Event-ID": options?.params?.["Last-Event-ID"] ?? undefined }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
-      "400": decodeError("StreamCurrentProperty400", StreamCurrentProperty400),
-      "401": decodeError("StreamCurrentProperty401", StreamCurrentProperty401),
-      "403": decodeError("StreamCurrentProperty403", StreamCurrentProperty403),
-      "404": decodeError("StreamCurrentProperty404", StreamCurrentProperty404),
-      "429": decodeError("StreamCurrentProperty429", StreamCurrentProperty429),
-      "500": decodeError("StreamCurrentProperty500", StreamCurrentProperty500),
+      ...decodeProblems("StreamCurrentProperty", [400, 401, 403, 404, 429, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1178,11 +1198,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetCurrentPropertySnapshot200),
-      "400": decodeError("GetCurrentPropertySnapshot400", GetCurrentPropertySnapshot400),
-      "401": decodeError("GetCurrentPropertySnapshot401", GetCurrentPropertySnapshot401),
-      "403": decodeError("GetCurrentPropertySnapshot403", GetCurrentPropertySnapshot403),
-      "404": decodeError("GetCurrentPropertySnapshot404", GetCurrentPropertySnapshot404),
-      "500": decodeError("GetCurrentPropertySnapshot500", GetCurrentPropertySnapshot500),
+      ...decodeProblems("GetCurrentPropertySnapshot", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1192,10 +1208,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "start_at_ms": options.params["start_at_ms"] as any, "end_at_ms": options.params["end_at_ms"] as any, "limit": options.params["limit"] as any, "after": options.params["after"] as any }),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListPropertyHistory200),
-      "400": decodeError("ListPropertyHistory400", ListPropertyHistory400),
-      "401": decodeError("ListPropertyHistory401", ListPropertyHistory401),
-      "403": decodeError("ListPropertyHistory403", ListPropertyHistory403),
-      "500": decodeError("ListPropertyHistory500", ListPropertyHistory500),
+      ...decodeProblems("ListPropertyHistory", [400, 401, 403, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1204,11 +1217,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetPropertyInterpretation200),
-      "400": decodeError("GetPropertyInterpretation400", GetPropertyInterpretation400),
-      "401": decodeError("GetPropertyInterpretation401", GetPropertyInterpretation401),
-      "403": decodeError("GetPropertyInterpretation403", GetPropertyInterpretation403),
-      "404": decodeError("GetPropertyInterpretation404", GetPropertyInterpretation404),
-      "500": decodeError("GetPropertyInterpretation500", GetPropertyInterpretation500),
+      ...decodeProblems("GetPropertyInterpretation", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1217,9 +1226,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "limit": options?.params?.["limit"] as any, "after": options?.params?.["after"] as any }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListOperatorTenants200),
-      "400": decodeError("ListOperatorTenants400", ListOperatorTenants400),
-      "401": decodeError("ListOperatorTenants401", ListOperatorTenants401),
-      "500": decodeError("ListOperatorTenants500", ListOperatorTenants500),
+      ...decodeProblems("ListOperatorTenants", [400, 401, 500]),
       orElse: unexpectedStatus
     }))
     ),
@@ -1234,10 +1241,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "limit": options?.params?.["limit"] as any, "after": options?.params?.["after"] as any }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListAssets200),
-      "400": decodeError("ListAssets400", ListAssets400),
-      "401": decodeError("ListAssets401", ListAssets401),
-      "403": decodeError("ListAssets403", ListAssets403),
-      "500": decodeError("ListAssets500", ListAssets500),
+      ...decodeProblems("ListAssets", [400, 401, 403, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1249,13 +1253,7 @@ export const make = (
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "200": decodeSuccess(RegisterAsset200),
       "201": decodeSuccess(RegisterAsset201),
-      "400": decodeError("RegisterAsset400", RegisterAsset400),
-      "401": decodeError("RegisterAsset401", RegisterAsset401),
-      "403": decodeError("RegisterAsset403", RegisterAsset403),
-      "404": decodeError("RegisterAsset404", RegisterAsset404),
-      "405": decodeError("RegisterAsset405", RegisterAsset405),
-      "409": decodeError("RegisterAsset409", RegisterAsset409),
-      "500": decodeError("RegisterAsset500", RegisterAsset500),
+      ...decodeProblems("RegisterAsset", [400, 401, 403, 404, 405, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1264,11 +1262,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetAsset200),
-      "400": decodeError("GetAsset400", GetAsset400),
-      "401": decodeError("GetAsset401", GetAsset401),
-      "403": decodeError("GetAsset403", GetAsset403),
-      "404": decodeError("GetAsset404", GetAsset404),
-      "500": decodeError("GetAsset500", GetAsset500),
+      ...decodeProblems("GetAsset", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1278,11 +1272,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "effective_at_ms": options.params["effective_at_ms"] as any, "known_at_ms": options.params["known_at_ms"] as any, "limit": options.params["limit"] as any, "after": options.params["after"] as any }),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListAssetRelationships200),
-      "400": decodeError("ListAssetRelationships400", ListAssetRelationships400),
-      "401": decodeError("ListAssetRelationships401", ListAssetRelationships401),
-      "403": decodeError("ListAssetRelationships403", ListAssetRelationships403),
-      "404": decodeError("ListAssetRelationships404", ListAssetRelationships404),
-      "500": decodeError("ListAssetRelationships500", ListAssetRelationships500),
+      ...decodeProblems("ListAssetRelationships", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1292,11 +1282,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "effective_at_ms": options.params["effective_at_ms"] as any, "known_at_ms": options.params["known_at_ms"] as any, "limit": options.params["limit"] as any, "after": options.params["after"] as any }),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListAssetSignalBindings200),
-      "400": decodeError("ListAssetSignalBindings400", ListAssetSignalBindings400),
-      "401": decodeError("ListAssetSignalBindings401", ListAssetSignalBindings401),
-      "403": decodeError("ListAssetSignalBindings403", ListAssetSignalBindings403),
-      "404": decodeError("ListAssetSignalBindings404", ListAssetSignalBindings404),
-      "500": decodeError("ListAssetSignalBindings500", ListAssetSignalBindings500),
+      ...decodeProblems("ListAssetSignalBindings", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1306,10 +1292,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "device_asset_id": options.params["device_asset_id"] as any, "endpoint_id": options.params["endpoint_id"] as any, "signal_id": options.params["signal_id"] as any, "effective_at_ms": options.params["effective_at_ms"] as any, "known_at_ms": options.params["known_at_ms"] as any, "limit": options.params["limit"] as any, "after": options.params["after"] as any }),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListSourceSignalBindings200),
-      "400": decodeError("ListSourceSignalBindings400", ListSourceSignalBindings400),
-      "401": decodeError("ListSourceSignalBindings401", ListSourceSignalBindings401),
-      "403": decodeError("ListSourceSignalBindings403", ListSourceSignalBindings403),
-      "500": decodeError("ListSourceSignalBindings500", ListSourceSignalBindings500),
+      ...decodeProblems("ListSourceSignalBindings", [400, 401, 403, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1318,11 +1301,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetAssetTypeDefinition200),
-      "400": decodeError("GetAssetTypeDefinition400", GetAssetTypeDefinition400),
-      "401": decodeError("GetAssetTypeDefinition401", GetAssetTypeDefinition401),
-      "403": decodeError("GetAssetTypeDefinition403", GetAssetTypeDefinition403),
-      "404": decodeError("GetAssetTypeDefinition404", GetAssetTypeDefinition404),
-      "500": decodeError("GetAssetTypeDefinition500", GetAssetTypeDefinition500),
+      ...decodeProblems("GetAssetTypeDefinition", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1331,11 +1310,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetPropertyDefinition200),
-      "400": decodeError("GetPropertyDefinition400", GetPropertyDefinition400),
-      "401": decodeError("GetPropertyDefinition401", GetPropertyDefinition401),
-      "403": decodeError("GetPropertyDefinition403", GetPropertyDefinition403),
-      "404": decodeError("GetPropertyDefinition404", GetPropertyDefinition404),
-      "500": decodeError("GetPropertyDefinition500", GetPropertyDefinition500),
+      ...decodeProblems("GetPropertyDefinition", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1344,20 +1319,14 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetRelationshipTypeDefinition200),
-      "400": decodeError("GetRelationshipTypeDefinition400", GetRelationshipTypeDefinition400),
-      "401": decodeError("GetRelationshipTypeDefinition401", GetRelationshipTypeDefinition401),
-      "403": decodeError("GetRelationshipTypeDefinition403", GetRelationshipTypeDefinition403),
-      "404": decodeError("GetRelationshipTypeDefinition404", GetRelationshipTypeDefinition404),
-      "500": decodeError("GetRelationshipTypeDefinition500", GetRelationshipTypeDefinition500),
+      ...decodeProblems("GetRelationshipTypeDefinition", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
   ),
     "beginOperatorLogin": (options: Parameters<FleetIqApi["beginOperatorLogin"]>[0]) => HttpClientRequest.get("/api/v1/auth/login").pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
-      "401": decodeError("BeginOperatorLogin401", BeginOperatorLogin401),
-      "405": decodeError("BeginOperatorLogin405", BeginOperatorLogin405),
-      "500": decodeError("BeginOperatorLogin500", BeginOperatorLogin500),
+      ...decodeProblems("BeginOperatorLogin", [401, 405, 500]),
       "303": () => Effect.void,
       orElse: unexpectedStatus
     }))
@@ -1365,10 +1334,7 @@ export const make = (
     "completeOperatorLogin": (options: Parameters<FleetIqApi["completeOperatorLogin"]>[0]) => HttpClientRequest.get("/api/v1/auth/callback").pipe(
       HttpClientRequest.setUrlParams({ "code": options.params["code"] as any, "state": options.params["state"] as any, "error": options.params["error"] as any }),
       withResponse(options.config)(HttpClientResponse.matchStatus({
-      "400": decodeError("CompleteOperatorLogin400", CompleteOperatorLogin400),
-      "401": decodeError("CompleteOperatorLogin401", CompleteOperatorLogin401),
-      "405": decodeError("CompleteOperatorLogin405", CompleteOperatorLogin405),
-      "500": decodeError("CompleteOperatorLogin500", CompleteOperatorLogin500),
+      ...decodeProblems("CompleteOperatorLogin", [400, 401, 405, 500]),
       "303": () => Effect.void,
       orElse: unexpectedStatus
     }))
@@ -1376,19 +1342,14 @@ export const make = (
     "getOperatorSession": (options: Parameters<FleetIqApi["getOperatorSession"]>[0]) => HttpClientRequest.get("/api/v1/auth/session").pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetOperatorSession200),
-      "401": decodeError("GetOperatorSession401", GetOperatorSession401),
-      "405": decodeError("GetOperatorSession405", GetOperatorSession405),
-      "500": decodeError("GetOperatorSession500", GetOperatorSession500),
+      ...decodeProblems("GetOperatorSession", [401, 405, 500]),
       orElse: unexpectedStatus
     }))
     ),
     "endOperatorSession": (options: Parameters<FleetIqApi["endOperatorSession"]>[0]) => HttpClientRequest.post("/api/v1/auth/logout").pipe(
       HttpClientRequest.setHeaders({ "Origin": options.params["Origin"] ?? undefined, "X-FleetIQ-CSRF": options.params["X-FleetIQ-CSRF"] ?? undefined }),
       withResponse(options.config)(HttpClientResponse.matchStatus({
-      "401": decodeError("EndOperatorSession401", EndOperatorSession401),
-      "403": decodeError("EndOperatorSession403", EndOperatorSession403),
-      "405": decodeError("EndOperatorSession405", EndOperatorSession405),
-      "500": decodeError("EndOperatorSession500", EndOperatorSession500),
+      ...decodeProblems("EndOperatorSession", [401, 403, 405, 500]),
       "204": () => Effect.void,
       orElse: unexpectedStatus
     }))
@@ -1397,12 +1358,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetCommunicationDevice200),
-      "400": decodeError("GetCommunicationDevice400", GetCommunicationDevice400),
-      "401": decodeError("GetCommunicationDevice401", GetCommunicationDevice401),
-      "403": decodeError("GetCommunicationDevice403", GetCommunicationDevice403),
-      "404": decodeError("GetCommunicationDevice404", GetCommunicationDevice404),
-      "405": decodeError("GetCommunicationDevice405", GetCommunicationDevice405),
-      "500": decodeError("GetCommunicationDevice500", GetCommunicationDevice500),
+      ...decodeProblems("GetCommunicationDevice", [400, 401, 403, 404, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1414,13 +1370,7 @@ export const make = (
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "200": decodeSuccess(RegisterCommunicationDevice200),
       "201": decodeSuccess(RegisterCommunicationDevice201),
-      "400": decodeError("RegisterCommunicationDevice400", RegisterCommunicationDevice400),
-      "401": decodeError("RegisterCommunicationDevice401", RegisterCommunicationDevice401),
-      "403": decodeError("RegisterCommunicationDevice403", RegisterCommunicationDevice403),
-      "404": decodeError("RegisterCommunicationDevice404", RegisterCommunicationDevice404),
-      "405": decodeError("RegisterCommunicationDevice405", RegisterCommunicationDevice405),
-      "409": decodeError("RegisterCommunicationDevice409", RegisterCommunicationDevice409),
-      "500": decodeError("RegisterCommunicationDevice500", RegisterCommunicationDevice500),
+      ...decodeProblems("RegisterCommunicationDevice", [400, 401, 403, 404, 405, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1430,11 +1380,7 @@ export const make = (
       HttpClientRequest.setUrlParams({ "limit": options?.params?.["limit"] as any, "after_id": options?.params?.["after_id"] as any, "after_version": options?.params?.["after_version"] as any }),
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ListAssetTypeDefinitions200),
-      "400": decodeError("ListAssetTypeDefinitions400", ListAssetTypeDefinitions400),
-      "401": decodeError("ListAssetTypeDefinitions401", ListAssetTypeDefinitions401),
-      "403": decodeError("ListAssetTypeDefinitions403", ListAssetTypeDefinitions403),
-      "405": decodeError("ListAssetTypeDefinitions405", ListAssetTypeDefinitions405),
-      "500": decodeError("ListAssetTypeDefinitions500", ListAssetTypeDefinitions500),
+      ...decodeProblems("ListAssetTypeDefinitions", [400, 401, 403, 405, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1443,11 +1389,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetDeviceProtocolRoute200),
-      "400": decodeError("GetDeviceProtocolRoute400", GetDeviceProtocolRoute400),
-      "401": decodeError("GetDeviceProtocolRoute401", GetDeviceProtocolRoute401),
-      "403": decodeError("GetDeviceProtocolRoute403", GetDeviceProtocolRoute403),
-      "404": decodeError("GetDeviceProtocolRoute404", GetDeviceProtocolRoute404),
-      "500": decodeError("GetDeviceProtocolRoute500", GetDeviceProtocolRoute500),
+      ...decodeProblems("GetDeviceProtocolRoute", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1458,11 +1400,7 @@ export const make = (
       HttpClientRequest.bodyJsonUnsafe(options.payload),
       withResponse(options.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(ChangeDeviceProtocolRoute200),
-      "400": decodeError("ChangeDeviceProtocolRoute400", ChangeDeviceProtocolRoute400),
-      "401": decodeError("ChangeDeviceProtocolRoute401", ChangeDeviceProtocolRoute401),
-      "403": decodeError("ChangeDeviceProtocolRoute403", ChangeDeviceProtocolRoute403),
-      "409": decodeError("ChangeDeviceProtocolRoute409", ChangeDeviceProtocolRoute409),
-      "500": decodeError("ChangeDeviceProtocolRoute500", ChangeDeviceProtocolRoute500),
+      ...decodeProblems("ChangeDeviceProtocolRoute", [400, 401, 403, 409, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1471,11 +1409,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetProtocolPackageRelease200),
-      "400": decodeError("GetProtocolPackageRelease400", GetProtocolPackageRelease400),
-      "401": decodeError("GetProtocolPackageRelease401", GetProtocolPackageRelease401),
-      "403": decodeError("GetProtocolPackageRelease403", GetProtocolPackageRelease403),
-      "404": decodeError("GetProtocolPackageRelease404", GetProtocolPackageRelease404),
-      "500": decodeError("GetProtocolPackageRelease500", GetProtocolPackageRelease500),
+      ...decodeProblems("GetProtocolPackageRelease", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1484,11 +1418,7 @@ export const make = (
     Effect.flatMap((request) => request.pipe(
       withResponse(options?.config)(HttpClientResponse.matchStatus({
       "2xx": decodeSuccess(GetDeviceIngestionDiagnostics200),
-      "400": decodeError("GetDeviceIngestionDiagnostics400", GetDeviceIngestionDiagnostics400),
-      "401": decodeError("GetDeviceIngestionDiagnostics401", GetDeviceIngestionDiagnostics401),
-      "403": decodeError("GetDeviceIngestionDiagnostics403", GetDeviceIngestionDiagnostics403),
-      "404": decodeError("GetDeviceIngestionDiagnostics404", GetDeviceIngestionDiagnostics404),
-      "500": decodeError("GetDeviceIngestionDiagnostics500", GetDeviceIngestionDiagnostics500),
+      ...decodeProblems("GetDeviceIngestionDiagnostics", [400, 401, 403, 404, 500]),
       orElse: unexpectedStatus
     }))
     ))
@@ -1498,6 +1428,27 @@ export const make = (
 
 export interface FleetIqApi {
   readonly httpClient: HttpClient.HttpClient
+  /**
+* Requires independent current operations.read before discovery. Existing metadata, protocol, analytics and alerts grants imply no access. Returns at most 64 identity-prefix observations per work family, with a sentinel for truncation; counts and oldest eligible time concern only that sample. Alert evaluation samples selected rules and their next matching evidence. Leases are database evidence, never worker health. Empty results do not prove notification seeding, absence of backlog or receiver delivery. No mutation or raw payload, request, endpoint or exception text is returned.
+*/
+readonly "getWorkDiagnostics": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetWorkDiagnostics200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetWorkDiagnostics401", GetWorkDiagnostics401> | FleetIqApiError<"GetWorkDiagnostics403", GetWorkDiagnostics403> | FleetIqApiError<"GetWorkDiagnostics405", GetWorkDiagnostics405> | FleetIqApiError<"GetWorkDiagnostics500", GetWorkDiagnostics500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetWorkDiagnostics200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetWorkDiagnostics401", GetWorkDiagnostics401> | FleetIqApiError<"GetWorkDiagnostics403", GetWorkDiagnostics403> | FleetIqApiError<"GetWorkDiagnostics405", GetWorkDiagnostics405> | FleetIqApiError<"GetWorkDiagnostics500", GetWorkDiagnostics500>>;
+  }
+  /**
+* Requires both operations.read and operations.manage under the same current actor/tenant before discovery. Returns at most 32 eligible failed targets and current control state, with explicit truncation. Keys contain only work identity and opaque destination digest, never payloads or endpoints. Alert evaluation has controls only, with no durable failed lease to retry. Absence of candidates is not health or drain. No unknown query parameters.
+*/
+readonly "getWorkRecoveryTargets": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, kind: string, options: { readonly config: Config }): Effect.Effect<WithOptionalResponse<GetWorkRecoveryTargets200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetWorkRecoveryTargets400", GetWorkRecoveryTargets400> | FleetIqApiError<"GetWorkRecoveryTargets401", GetWorkRecoveryTargets401> | FleetIqApiError<"GetWorkRecoveryTargets403", GetWorkRecoveryTargets403> | FleetIqApiError<"GetWorkRecoveryTargets405", GetWorkRecoveryTargets405> | FleetIqApiError<"GetWorkRecoveryTargets500", GetWorkRecoveryTargets500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, kind: string, options: { readonly config?: Config | undefined } | undefined): Effect.Effect<WithOptionalResponse<GetWorkRecoveryTargets200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"GetWorkRecoveryTargets400", GetWorkRecoveryTargets400> | FleetIqApiError<"GetWorkRecoveryTargets401", GetWorkRecoveryTargets401> | FleetIqApiError<"GetWorkRecoveryTargets403", GetWorkRecoveryTargets403> | FleetIqApiError<"GetWorkRecoveryTargets405", GetWorkRecoveryTargets405> | FleetIqApiError<"GetWorkRecoveryTargets500", GetWorkRecoveryTargets500>>;
+  }
+  /**
+* Requires independent current operations.manage and the listener-selected mutation guard before command validation. Browser commands require same-origin and CSRF marker. Retry supports replay/calculator id targets or an exact notification incident; alert_evaluation retry is invalid. Pause/resume require an empty target and expected control generation. Pause gates new observed scheduling/claims, not in-flight completion, ingress retention or drain. It does not resolve/silence alerts. Retry preserves original frozen inputs and identity while advancing the fence; active/completed/ineligible work and stale generations conflict. Reuse the same request_id and exact actor/body after an ambiguous response: original receipts never reapply effects even after later state changes. Changed author/body conflicts. Authority is rechecked even for repeat receipts. Generation capacity and unavailable configuration/execution policy can reject recovery. No unknown query parameters.
+*/
+readonly "applyWorkRecovery": {
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, kind: string, requestId: string, options: { readonly params?: typeof ApplyWorkRecoveryParams.Encoded | undefined; readonly payload: typeof ApplyWorkRecoveryRequestJson.Encoded; readonly config: Config }): Effect.Effect<WithOptionalResponse<ApplyWorkRecovery200, Config>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ApplyWorkRecovery400", ApplyWorkRecovery400> | FleetIqApiError<"ApplyWorkRecovery401", ApplyWorkRecovery401> | FleetIqApiError<"ApplyWorkRecovery403", ApplyWorkRecovery403> | FleetIqApiError<"ApplyWorkRecovery405", ApplyWorkRecovery405> | FleetIqApiError<"ApplyWorkRecovery409", ApplyWorkRecovery409> | FleetIqApiError<"ApplyWorkRecovery500", ApplyWorkRecovery500>>;
+    <Config extends OperationConfig | undefined = undefined>(tenantId: string, kind: string, requestId: string, options: { readonly params?: typeof ApplyWorkRecoveryParams.Encoded | undefined; readonly payload: typeof ApplyWorkRecoveryRequestJson.Encoded; readonly config?: Config | undefined }): Effect.Effect<WithOptionalResponse<ApplyWorkRecovery200, Config | undefined>, HttpClientError.HttpClientError | SchemaError | FleetIqApiError<"ApplyWorkRecovery400", ApplyWorkRecovery400> | FleetIqApiError<"ApplyWorkRecovery401", ApplyWorkRecovery401> | FleetIqApiError<"ApplyWorkRecovery403", ApplyWorkRecovery403> | FleetIqApiError<"ApplyWorkRecovery405", ApplyWorkRecovery405> | FleetIqApiError<"ApplyWorkRecovery409", ApplyWorkRecovery409> | FleetIqApiError<"ApplyWorkRecovery500", ApplyWorkRecovery500>>;
+  }
   /**
 * Requires independent current alerts.acknowledge; alerts.read/manage and other grants imply no authority. Browser mutations require exact Origin and X-FleetIQ-CSRF. Rechecks active actor, tenant and grant transactionally even for retries. First commands require the current pending/firing version. Exact same-author retries return original actor/time even after resolution; another author or stale/closed/missing/foreign/unobserved target conflicts. Pins the existing lifecycle version without incrementing it, resolving, silencing, changing timers or suppressing notification intents. Body is closed and bounded to 1024 bytes; query parameters are rejected.
 */

@@ -1,7 +1,6 @@
 import { isDeepStrictEqual } from 'node:util';
 import { BROWSER_OPERATIONS } from './asset-contract.mjs';
 import { compactBrowserSchemas } from './compact-generation.mjs';
-import { identifierGenerationPatch } from './identifier-generation.mjs';
 
 /** Equivalent disjoint union for the one conditional unsupported by Effect 4.0.5.
  * Fail on upstream drift: never silently drop an unknown schema constraint.
@@ -52,22 +51,88 @@ export function routeGenerationPatch(spec) {
   ];
 }
 
+/** Express the published retry/control conditional as disjoint closed objects. */
+export function recoveryCommandSchema(spec) {
+  const retry = { $ref: '#/components/schemas/WorkRetryTarget' };
+  const empty = { type: 'object', maxProperties: 0 };
+  const branchOnMatch = 'then';
+  const base = {
+    type: 'object',
+    additionalProperties: false,
+    required: ['operation', 'expected_generation', 'target'],
+    properties: {
+      operation: { type: 'string', enum: ['retry', 'pause', 'resume'] },
+      expected_generation: { $ref: '#/components/schemas/WorkGeneration' },
+      target: { oneOf: [retry, empty] },
+    },
+  };
+  if (
+    !isDeepStrictEqual(spec.components.schemas.WorkRecoveryCommand, {
+      ...base,
+      allOf: [
+        {
+          if: { properties: { operation: { const: 'retry' } } },
+          [branchOnMatch]: { properties: { target: retry } },
+          else: { properties: { target: empty } },
+        },
+      ],
+    })
+  )
+    throw new Error(
+      'Work recovery command constraint changed; review its equivalent union.',
+    );
+  return {
+    oneOf: [
+      {
+        ...base,
+        properties: {
+          ...base.properties,
+          operation: { const: 'retry' },
+          target: retry,
+        },
+      },
+      {
+        ...base,
+        properties: {
+          ...base.properties,
+          operation: { enum: ['pause', 'resume'] },
+          target: {
+            type: 'object',
+            properties: {},
+            additionalProperties: false,
+          },
+        },
+      },
+    ],
+  };
+}
+
 /** Generate only consumed operations and their transitive component closure.
- * The upstream artifact stays byte-identical; no selected operation is altered.
+ * The upstream artifact stays byte-identical. Browser-only header parameters
+ * make the published recovery prose executable in the private client.
  */
 export function browserGenerationPatch(spec) {
   if (!spec.paths) return [];
   const source = structuredClone(spec);
   for (const patch of routeGenerationPatch(spec))
     source.components.schemas.ProtocolDeviceRoute = patch.value;
-  for (const patch of identifierGenerationPatch(spec))
-    source.components.schemas[patch.path.split('/').at(-1)] = patch.value;
+  source.components.schemas.WorkRecoveryCommand = recoveryCommandSchema(spec);
   const paths = {};
   for (const { path, method, id } of BROWSER_OPERATIONS) {
     if (source.paths[path]?.[method]?.operationId !== id)
       throw new Error('Missing consumed browser operation.');
     paths[path] ??= {};
     paths[path][method] = source.paths[path][method];
+    // The published operation describes the browser guard in prose. The
+    // private browser client sends the same marker as other protected writes.
+    if (id === 'applyWorkRecovery') {
+      const parameters = paths[path][method].parameters;
+      for (const header of ['admin-mutation-origin', 'admin-mutation-csrf']) {
+        const $ref = `#/components/parameters/${header}`;
+        if (!parameters.some((parameter) => parameter.$ref === $ref))
+          parameters.push({ $ref });
+      }
+    }
     if (source.paths[path].parameters)
       paths[path].parameters = source.paths[path].parameters;
   }

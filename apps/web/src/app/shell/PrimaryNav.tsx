@@ -10,6 +10,7 @@ const ICON_PATHS = {
   assets: 'M4 5h16v14H4z M4 9h16 M8 13h4 M8 16h7',
   devices: 'M8 8h8v8H8z M4 8v8 M20 8v8 M8 4h8 M8 20h8 M3 3l3 3 M21 3l-3 3',
   alerts: 'M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6z M10 20h4',
+  operations: 'M3 12h4l3-7 4 14 3-7h4',
   insights: 'M3 20h18 M5 16l4-5 4 3 6-8 M17 6h2v2',
   admin:
     'M12 3l2 2 3-.5.5 3L20 9l-1 3 1 3-2.5 1.5-.5 3-3-.5-2 2-2-2-3 .5-.5-3L4 15l1-3-1-3 2.5-1.5.5-3L10 5z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',

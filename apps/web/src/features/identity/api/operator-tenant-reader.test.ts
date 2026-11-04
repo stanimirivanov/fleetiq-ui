@@ -16,6 +16,8 @@ const completeActions = [
   'alerts.read',
   'alerts.manage',
   'alerts.acknowledge',
+  'operations.read',
+  'operations.manage',
 ] as const;
 const payload = {
   tenants: [{ tenant_id: 'tenant-a', actions: ['metadata.read'] }],
@@ -50,7 +52,7 @@ test('uses the shared generated client with bounded params and no credentials in
   });
 });
 
-test.each([4, 5, 9])(
+test.each([4, 5, 9, 10, 11])(
   'accepts complete %i-grant discovery without dropping advertised actions',
   async (count) => {
     const actions = completeActions.slice(0, count);

@@ -53,3 +53,11 @@ The deployment repository must adapt its owned TLS config and pin this merged UI
 source before completing real device-to-web acceptance. D06/full-profile work stays
 deferred. This decision supersedes only the runtime choice in [0005](0005-immutable-ux-delivery.md),
 not immutable-publication ownership or release/promotion boundaries.
+
+The exact login and OIDC callback routes share two admission buckets in each
+edge instance. The immediate transport peer gets 5 requests per second with
+a burst allowance of 10. The instance gets 20 requests per second with a burst
+allowance of 24. NGINX returns a noncacheable HTTP 429 before forwarding
+requests beyond either budget. A gateway connection can represent several
+users sharing one peer bucket. Forwarded client headers do not select that
+bucket, and the instance budget does not coordinate across replicas.

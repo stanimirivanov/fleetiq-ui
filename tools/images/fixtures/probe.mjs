@@ -151,6 +151,52 @@ if (mode === 'http') {
   assert.equal(echo.headers['x-forwarded-host'], 'fleet.test');
   assert.ok(!echo.headers['x-forwarded-for']?.includes('203.0.113.13'));
   checks++;
+  // The disposable upstream proves redirect, query and cookie transport.
+  // A real provider remains the installed product qualification's boundary.
+  const login = await request('/api/v1/auth/login');
+  assert.equal(login.status, 302);
+  assert.equal(login.headers['x-fixture-auth'], 'login');
+  assert.equal(
+    login.headers.location,
+    '/api/v1/auth/callback?code=fixture&state=fixture',
+  );
+  const cookie = login.headers['set-cookie'][0].split(';')[0];
+  const callback = await request(login.headers.location, {
+    headers: { Cookie: cookie },
+  });
+  assert.equal(callback.status, 302);
+  assert.equal(callback.headers['x-fixture-auth'], 'callback');
+  for (const [route, admittedStatus] of [
+    ['login', 302],
+    ['callback', 400],
+  ]) {
+    const replies = await Promise.all(
+      Array.from({ length: 18 }, (_, i) =>
+        request(`/api/v1/auth/${route}?probe=${i}`, {
+          headers: {
+            Forwarded: `for=198.51.100.${i + 1}`,
+            'X-Forwarded-For': `203.0.113.${i + 1}`,
+            'X-Real-IP': `192.0.2.${i + 1}`,
+          },
+        }),
+      ),
+    );
+    assert(
+      replies.some(({ status }) => status === 429),
+      `Expected ${route} overload rejection`,
+    );
+    for (const reply of replies) {
+      if (reply.status === 429) {
+        assert.equal(reply.headers['x-fixture-auth'], undefined);
+        assert.equal(reply.headers['cache-control'], 'no-store');
+      } else {
+        assert.equal(reply.status, admittedStatus);
+        assert.equal(reply.headers['x-fixture-auth'], route);
+      }
+    }
+  }
+  assert.equal((await request('/api/echo')).status, 200);
+  checks += 5;
   // A response is deliberately held open until the client receives its first
   // event and sends an independent acknowledgement. Buffered proxies deadlock
   // at the bounded deadline instead of producing a false streaming pass.

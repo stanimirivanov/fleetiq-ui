@@ -41,6 +41,28 @@ const server = createServer((request, response) => {
       response.end();
       return;
     }
+    const target = new URL(request.url, 'http://fixture.invalid');
+    if (target.pathname === '/api/v1/auth/login') {
+      response.writeHead(302, {
+        Location: '/api/v1/auth/callback?code=fixture&state=fixture',
+        'Set-Cookie': 'fixture.state=fixture; Path=/; HttpOnly; Secure',
+        'X-Fixture-Auth': 'login',
+      });
+      response.end();
+      return;
+    }
+    if (target.pathname === '/api/v1/auth/callback') {
+      const valid =
+        target.searchParams.get('code') === 'fixture' &&
+        target.searchParams.get('state') === 'fixture' &&
+        request.headers.cookie === 'fixture.state=fixture';
+      response.writeHead(valid ? 302 : 400, {
+        Location: '/',
+        'X-Fixture-Auth': 'callback',
+      });
+      response.end();
+      return;
+    }
     if (request.url === '/api/v1/auth/session') {
       response.writeHead(401, {
         'Content-Type': 'application/json',

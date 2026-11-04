@@ -14,7 +14,9 @@ import {
   OperatorSessionProvider,
   useOperatorSession,
 } from '#features/identity';
+import { createOperationsGateway } from '#features/operations';
 import { createBrowserApi } from '#shared/api';
+import { OperationsGatewayContext } from './OperationsRoute';
 import { APP_ROUTES, routeTitle } from './route-metadata';
 import { isDevelopmentSampleRoute } from './sample-route';
 import { TenantMetadataWorkspace } from './TenantMetadataWorkspace';
@@ -34,16 +36,20 @@ export function BrowserWorkspace(props: ParentProps) {
   });
   return (
     <OperatorSessionProvider service={session}>
-      <MetadataComposition
-        alerts={alerts}
-        bindings={bindings}
-        commissioning={commissioning}
-        reader={reader}
-        tenants={tenants}
-        devices={devices}
+      <OperationsGatewayContext.Provider
+        value={createOperationsGateway(browser)}
       >
-        {props.children}
-      </MetadataComposition>
+        <MetadataComposition
+          alerts={alerts}
+          bindings={bindings}
+          commissioning={commissioning}
+          reader={reader}
+          tenants={tenants}
+          devices={devices}
+        >
+          {props.children}
+        </MetadataComposition>
+      </OperationsGatewayContext.Provider>
     </OperatorSessionProvider>
   );
 }

@@ -8,7 +8,9 @@ export type TenantAction =
   | 'analytics.manage'
   | 'alerts.read'
   | 'alerts.manage'
-  | 'alerts.acknowledge';
+  | 'alerts.acknowledge'
+  | 'operations.read'
+  | 'operations.manage';
 
 export interface OperatorTenant {
   readonly id: string;

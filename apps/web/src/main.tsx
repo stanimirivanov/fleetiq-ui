@@ -14,6 +14,7 @@ import {
   MetadataAccessBoundary,
 } from './app/BrowserWorkspace';
 import { DesignSystemPage } from './app/DesignSystemPage';
+import { OperationsRoute } from './app/OperationsRoute';
 import { APP_ROUTES } from './app/route-metadata';
 import { NotFoundPage } from './app/WorkspacePages';
 import './styles.css';
@@ -63,6 +64,14 @@ render(
         component={() => (
           <MetadataAccessBoundary>
             <AlertsPage />
+          </MetadataAccessBoundary>
+        )}
+      />
+      <Route
+        path={APP_ROUTES.operations.path}
+        component={() => (
+          <MetadataAccessBoundary>
+            <OperationsRoute />
           </MetadataAccessBoundary>
         )}
       />

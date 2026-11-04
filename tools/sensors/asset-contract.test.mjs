@@ -45,7 +45,7 @@ test('the byte-identical pinned contract and provenance pass', async (context) =
   const paths = await fixture(context);
   assert.deepEqual(await checkAssetContract(paths), {
     commit: pinnedSource.commit,
-    operations: 41,
+    operations: 44,
   });
   assert.deepEqual(await readFile(paths.contractPath), pinnedBytes);
 });
@@ -167,7 +167,7 @@ const publishedOperations = BROWSER_OPERATIONS.map(
 );
 assert.equal(
   publishedOperations.length,
-  41,
+  44,
   'every consumed browser operation has a negative fixture',
 );
 for (const { route, method, id } of publishedOperations) {

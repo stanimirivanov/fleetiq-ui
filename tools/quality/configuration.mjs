@@ -76,6 +76,7 @@ export function inspectQualityConfiguration(
         '**/alerts-accessibility.spec.ts',
         '**/alert-rules-accessibility.spec.ts',
         '**/acknowledgement-accessibility.spec.ts',
+        '**/operations-accessibility.spec.ts',
       ]) ||
     JSON.stringify(performance.testMatch) !==
       JSON.stringify([

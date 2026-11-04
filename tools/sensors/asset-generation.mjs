@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtemp, readFile, rmdir, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { compactGeneratedProblems } from './compact-problems.mjs';
 import {
   checkGenerationProvenance,
   generationProvenance,
@@ -93,7 +94,9 @@ export async function generateAssetContract({
       'Effect OpenAPI generation warned on stderr; output was rejected',
     );
   }
-  const generated = bytes(result.stdout);
+  const generated = Buffer.from(
+    compactGeneratedProblems(bytes(result.stdout).toString('utf8')),
+  );
   if (!generated.includes(Buffer.from('export const AssetPage =', 'utf8'))) {
     throw new Error('Generated contract has no AssetPage schema');
   }

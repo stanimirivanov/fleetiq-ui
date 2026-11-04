@@ -35,6 +35,21 @@ const operations = {
 };
 export const BROWSER_OPERATIONS = [
   {
+    path: '/api/v1/tenants/{tenant_id}/work-diagnostics',
+    method: 'get',
+    id: 'getWorkDiagnostics',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/work-recovery/{kind}',
+    method: 'get',
+    id: 'getWorkRecoveryTargets',
+  },
+  {
+    path: '/api/v1/tenants/{tenant_id}/work-recovery/{kind}/commands/{request_id}',
+    method: 'put',
+    id: 'applyWorkRecovery',
+  },
+  {
     path: '/api/v1/tenants/{tenant_id}/alerts/{rule_id}/revisions/{revision}/acknowledgement',
     method: 'put',
     id: 'acknowledgeAlert',
@@ -228,7 +243,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.26' ||
+    contract.info?.version !== '1.0.0-baseline.28' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||

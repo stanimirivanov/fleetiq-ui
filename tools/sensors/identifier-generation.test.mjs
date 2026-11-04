@@ -1,10 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import {
-  IDENTIFIER_PATTERN,
-  identifierGenerationPatch,
-} from './identifier-generation.mjs';
 
 const spec = JSON.parse(
   readFileSync(
@@ -14,47 +10,27 @@ const spec = JSON.parse(
     ),
   ),
 );
-test('reviewed identifier translation preserves bounds and rejects whitespace/control ranges', () => {
-  const before = JSON.stringify(spec),
-    patch = identifierGenerationPatch(spec)[0];
-  assert.equal(JSON.stringify(spec), before);
-  assert.equal(patch.value.minLength, 1);
-  assert.equal(patch.value.maxLength, 128);
-  const re = new RegExp(IDENTIFIER_PATTERN, 'u');
-  for (const id of ['tenant-a', '车辆', 'é']) assert.ok(re.test(id));
-  for (const id of [
-    '',
-    ' leading',
-    'trailing ',
-    'a\n',
-    'a\0b',
-    'a\x1fb',
-    'a\x7fb',
-    'a\x85b',
-    'a\x9fb',
-  ])
-    assert.ok(!re.test(id));
-});
-test('unknown identifier constraints fail closed rather than silently dropping validation', () => {
-  for (const [key, value] of [
-    ['pattern', '.*'],
-    ['maxLength', 129],
-    ['minLength', 0],
-    ['description', 'changed'],
+test('published identifier patterns reject whitespace and control ranges', () => {
+  for (const [name, max] of [
+    ['AdministrationIdentifier', 128],
+    ['SemanticDefinitionName', 200],
   ]) {
-    const changed = structuredClone(spec);
-    changed.components.schemas.AdministrationIdentifier[key] = value;
-    assert.throws(
-      () => identifierGenerationPatch(changed),
-      /constraint changed/,
-    );
+    const schema = spec.components.schemas[name];
+    assert.equal(schema.minLength, 1);
+    assert.equal(schema.maxLength, max);
+    const pattern = new RegExp(schema.pattern, 'u');
+    for (const id of ['tenant-a', '车辆', 'é']) assert.ok(pattern.test(id));
+    for (const id of [
+      '',
+      ' leading',
+      'trailing ',
+      'a\n',
+      'a\0b',
+      'a\x1fb',
+      'a\x7fb',
+      'a\x85b',
+      'a\x9fb',
+    ])
+      assert.ok(!pattern.test(id));
   }
-});
-
-test('semantic display-name bounds are retained and drift is rejected', () => {
-  const patch = identifierGenerationPatch(spec)[1];
-  assert.equal(patch.value.maxLength, 200);
-  const changed = structuredClone(spec);
-  changed.components.schemas.SemanticDefinitionName.maxLength = 201;
-  assert.throws(() => identifierGenerationPatch(changed), /constraint changed/);
 });

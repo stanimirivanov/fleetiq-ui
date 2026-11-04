@@ -394,6 +394,7 @@ for (const defect of [
   'missing-alerts-accessibility',
   'missing-alert-rules-accessibility',
   'missing-acknowledgement-accessibility',
+  'missing-operations-accessibility',
   'trace',
   'video',
   'gc',
@@ -411,6 +412,14 @@ for (const defect of [
       profile.testMatch = profile.testMatch.filter(
         (name) => !name.includes('overview-performance'),
       );
+    if (defect === 'missing-operations-accessibility') {
+      const p = browser.projects.find(
+        (p) => p.name === 'rendered-accessibility',
+      );
+      p.testMatch = p.testMatch.filter(
+        (n) => !n.includes('operations-accessibility'),
+      );
+    }
     if (defect === 'missing-acknowledgement-accessibility') {
       const p = browser.projects.find(
         (p) => p.name === 'rendered-accessibility',

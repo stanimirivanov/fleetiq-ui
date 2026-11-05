@@ -4,8 +4,9 @@
 
 Use SolidJS for rendering and granular reactivity, Effect v4 for validated boundary
 work and managed async execution, and the router URL for shareable context.
-Connected metadata and explicit development samples share the approved shell and
-visual language, while their data sources remain separate.
+Connected fleet, metadata, alerting and work Operations share the approved shell
+and visual language. Explicit development samples have separate data sources;
+backend authorization and deployment qualification remain independent concerns.
 
 ## Stack and ownership
 
@@ -22,7 +23,7 @@ visual language, while their data sources remain separate.
 | Theme | One Light → Dark → System icon; versioned browser preference |
 | Testing | Pure rules, Vitest/Solid Testing Library, Playwright POM journeys |
 | Mocking | Explicit DEV readers plus test-only contract-valid HTTP interception |
-| Map | DEV schematic canvas; MapLibre/tiles wait for a geodetic location contract |
+| Map | Lazy MapLibre adapter for connected geodetic evidence; separate DEV schematic |
 
 Effect v4 remains pinned. Services/adapters own Effect execution and scopes; TSX
 components use validated feature ports. Atom and a Solid binding can be introduced
@@ -31,12 +32,18 @@ transport retry layer is added.
 
 ## Connected operator workspace
 
-`/assets`, `/assets/:assetId`, and `/assets/registry/review` require an inspected
-same-origin operator session. Enter the authorized tenant ID explicitly; the
-contract has no tenant enumeration or permission-administration endpoint. Sign-in
-uses native browser navigation to `/api/v1/auth/login`. Logout posts the contract's
-anti-CSRF marker while the browser supplies Origin. Tokens and workload credentials
-are never stored or accepted by the browser adapter.
+`/`, `/map`, `/assets`, `/assets/:assetId`, `/assets/registry/review`, `/devices`,
+`/alerts`, and `/operations` use the inspected same-origin operator session.
+Bounded tenant discovery and exact grant hints support explicit URL tenant
+selection; no tenant is silently selected. A manual deep link can remain
+unverified when discovery has not established its grants. Missing discovery-page
+evidence is not proof of denial, and manage hints do not imply read permission.
+The backend rechecks every operation. General Settings/Admin remains planned.
+See [tenant selection evidence](exec-plans/completed/2026-10-operator-tenant-selection.md).
+
+Sign-in uses native browser navigation to `/api/v1/auth/login`. Logout posts the
+contract's anti-CSRF marker while the browser supplies Origin. Tokens and workload
+credentials are never stored or accepted by the browser adapter.
 
 Missing credentials, denied tenant access, absent resources, malformed responses,
 and service failures remain distinct. Session expiry or metadata 401 removes
@@ -60,10 +67,16 @@ snapshot or a whole graph.
 
 Identity, type, and property definitions appear in focused evidence panels. The
 inspector connects exact current readings, bounded history and original provenance
-with independent telemetry.read. It does not synthesize health, locations, alerts
-or resumable live delivery. Pinned definition reads have no global definition-list
-contract. A source with no bindings is an empty exact-source result, not an inferred
-unassigned sensor.
+with independent telemetry.read. Exact-property live delivery uses explicit
+start/stop/retry controls, validated same-origin SSE, an opaque replay cursor and
+finite reconnect attempts. Discontinuity clears the baseline before resnapshot;
+scope changes cancel delivery. Transport state never establishes asset health.
+See [live delivery ownership](design-docs/0007-inspector-live-delivery.md).
+
+Authoring discovers bounded definition catalogues and exact versions. Discovery
+and pinned definition review do not confer telemetry access or infer physical
+inventory. A source with no bindings is an empty exact-source result, not an
+inferred unassigned sensor.
 
 ## Development previews and visual rules
 
@@ -78,8 +91,10 @@ excludes sample payloads.
 Sample operational evidence lives outside backend identity models. Quiet borders,
 tints, and visible source labels identify synthetic sections. The schematic map
 uses percentage canvas coordinates; signal playback is a finite deterministic
-example. Production overview, map and Alerts use authorized backend evidence, with
-read-only alert lifecycle and exact calculator evidence.
+example. Production overview, map and Alerts use authorized backend evidence.
+Alert review, rule authoring and acknowledgement have separate authorization
+requirements; the sample workspace does not demonstrate installed permissions or
+notification delivery.
 
 The [visual-language decision](design-docs/0001-operational-visual-language.md) and
 [shell decision](design-docs/0002-persistent-shell-theme.md) define hierarchy and
@@ -92,9 +107,16 @@ contrast, mobile overflow, charts, and screen-reader behavior.
 [Frontend structure](development/frontend-structure.md) defines decomposition,
 Solid tracking, Effect ownership, and styling rules. [Testing](development/testing.md)
 distinguishes contract-mocked production journeys from actual provider qualification.
-Both `pnpm check` and `pnpm e2e` are required for browser changes. Existing guide
-chapters cover shell orientation and labelled samples; connected procedures are the
-next planned slice.
+Browser changes require `pnpm check`, `pnpm e2e`, and
+`pnpm verify --group browser-quality`. Run `pnpm security:preflight` before opening
+a PR to check current dependency advisories, secrets and the runtime image.
+Documentation-only reconciliation uses `pnpm check` and claim/reference review;
+it does not require new behavior tests.
+
+Connected operator guide procedures are shipped alongside labelled sample chapters;
+see [guide implementation and evidence](exec-plans/completed/2026-10-connected-operator-guide.md).
+Their contract-mocked browser evidence does not qualify an installed identity
+provider, tenant grant configuration or production deployment.
 
 [Contract provenance](../contracts/http/README.md) records the merged backend pin.
 Performance claims require representative asset counts, rates, pan/zoom, input
@@ -114,9 +136,11 @@ failure retain an accessible list; no health or connectivity is inferred.
 
 The root route shares the validated fleet snapshot with the map. Whole-tenant
 counts, loaded-page location coverage and browser-clock review age are labelled
-separately. Geographic preview loads only after operator demand. M05 health,
-alerts and utilization remain unavailable. See [0009](design-docs/0009-connected-fleet-overview.md)
-and its active execution plan. Connected URLs never silently opt into samples.
+separately. Geographic preview loads only after operator demand. Overview health
+and utilization indicators remain unavailable; connected alert work has its own
+route and permissions. See [overview architecture](design-docs/0009-connected-fleet-overview.md)
+and [completed overview evidence](exec-plans/completed/2026-10-connected-fleet-overview.md).
+Connected URLs never silently opt into samples.
 
 ## Registry commissioning
 
@@ -131,3 +155,44 @@ Registry authoring distinguishes registered endpoints, optional observed samples
 configured attribution and committed telemetry. Select only exact supported target
 properties. The shared command owner and exact immutable review follow
 [decision 0011](design-docs/0011-binding-authoring.md).
+
+## Connected Alerts and work Operations
+
+Alerts provides a bounded queue, exact detail and transition history, plus exact
+calculator evidence. Alert reads and telemetry evidence require independent
+alerts.read and telemetry.read grants. Numeric rule revision authoring and
+activation use alerts.manage; exact observed-version acknowledgement uses
+alerts.acknowledge. Acknowledgement records actor/time attribution without resolving,
+silencing, assigning or suppressing delivery. The server owns authorization and
+optimistic concurrency, while uncertain commands permit explicit exact replay.
+See [alert review](exec-plans/completed/2026-10-connected-alerts.md),
+[rule authoring](exec-plans/completed/2026-10-alert-rule-authoring.md), and
+[acknowledgement evidence](exec-plans/completed/2026-10-alert-acknowledgement-ui.md).
+
+Operations exposes sampled work diagnostics and reviewed recovery with independent
+operations.read and operations.manage grants. Coverage, eligible/leased/failed/
+blocked/deferred counts and oldest eligible age describe observed work; they do
+not prove worker liveness or seeding. Recovery confirmation captures the tenant,
+target, expected fence and effect. Unknown outcomes retain the exact request for
+explicit replay within its scope; actor, tenant or family changes cancel ownership
+and suppress late completions. Feature-owned recovery models stay independent of
+generated wire shapes; API adapters validate and translate at the boundary.
+See [Operations behavior and verification](exec-plans/completed/2026-11-work-operations.md)
+and [owned recovery boundary](exec-plans/completed/2026-11-owned-recovery-model.md).
+
+## Supported static edge and deployment prerequisites
+
+The supported UI image uses the native NGINX edge for static SPA delivery,
+same-origin API proxying and bounded property SSE. The edge supplies CSP, cookie
+and forwarded-authority handling, validated configuration and restricted runtime
+permissions. Exact login/callback paths share transport-peer and per-instance
+request budgets; excess requests receive non-cacheable 429 responses. Peer limits
+can group users behind one gateway and do not coordinate across replicas.
+See [native edge ownership and qualification](design-docs/0012-native-nginx-edge.md).
+
+Deployment supplies the backend, operator OIDC/session configuration, explicit
+tenant grants, TLS/public authority and licensed self-hosted map resources.
+Missing map resources preserve the authorized evidence list rather than selecting
+an external basemap. See [map resource inputs](development/map-resources.md).
+[Immutable image publication](development/image-publication.md) produces an artifact;
+it does not promote an environment or qualify a live provider installation.

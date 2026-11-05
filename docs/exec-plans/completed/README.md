@@ -51,3 +51,5 @@ evidence and material limitations for future reviewers.
 - [Alert acknowledgement UI](2026-10-alert-acknowledgement-ui.md) — M05-PR14b, issue #107; local required groups passed.
 
 - [Work operations](2026-11-work-operations.md)
+
+- [Feature-owned Operations recovery model](2026-11-owned-recovery-model.md) — F-PR9, issue #116.

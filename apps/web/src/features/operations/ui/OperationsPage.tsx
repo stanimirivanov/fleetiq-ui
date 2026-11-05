@@ -1,6 +1,6 @@
 import { createMemo, For, type JSX, Show } from 'solid-js';
 import { PageHeader } from '#shared/ui';
-import type { OperationsGateway, WorkKind } from '../api/operations-gateway';
+import type { OperationsGateway, WorkKind } from '../model/recovery';
 import { RecoveryPanel } from './RecoveryPanel';
 import { SampledWork } from './SampledWork';
 import { useOperationRead } from './use-operation-read';

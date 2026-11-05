@@ -1,4 +1,4 @@
-import type { WorkKind } from '../api/operations-gateway';
+import type { WorkKind } from '../model/recovery';
 
 export const workFamilies = {
   replay: 'Protocol replay',

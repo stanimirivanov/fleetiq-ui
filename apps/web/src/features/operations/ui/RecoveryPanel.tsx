@@ -6,7 +6,7 @@ import type {
   RecoveryReceipt,
   RecoveryRequest,
   WorkKind,
-} from '../api/operations-gateway';
+} from '../model/recovery';
 import { operationFailure, useOperationRead } from './use-operation-read';
 
 const effects = {
@@ -21,7 +21,7 @@ const effects = {
 function targetLabel(target: RecoveryBody['target']) {
   if ('id' in target) return target.id;
   if ('destination' in target)
-    return `${target.rule_id} · revision ${target.revision} · firing ${target.firing_version} · destination ${target.destination}`;
+    return `${target.ruleId} · revision ${target.revision} · firing ${target.firingVersion} · destination ${target.destination}`;
   return 'Entire work family';
 }
 
@@ -161,7 +161,7 @@ export function RecoveryPanel(props: {
                 onClick={() =>
                   select({
                     operation: view().control.paused ? 'resume' : 'pause',
-                    expected_generation: view().control.generation,
+                    expectedGeneration: view().control.generation,
                     target: {},
                   })
                 }
@@ -215,7 +215,7 @@ export function RecoveryPanel(props: {
             <p class="break-all">
               {props.tenant} · {targetLabel(body().target)}
             </p>
-            <p>Expected generation {body().expected_generation}</p>
+            <p>Expected generation {body().expectedGeneration}</p>
             <div class="flex flex-wrap gap-3">
               <button type="submit" class="text-accent underline">
                 Confirm {body().operation}
@@ -253,8 +253,8 @@ export function RecoveryPanel(props: {
       <Show when={receipt()}>
         {(value) => (
           <p role="status" class="break-all">
-            Recorded generation {value().generation} by {value().actor_id} ·{' '}
-            {value().recorded_at_ms} ms · request {value().request_id}. This
+            Recorded generation {value().generation} by {value().actorId} ·{' '}
+            {value().recordedAtMs} ms · request {value().requestId}. This
             receipt records the original command.
           </p>
         )}

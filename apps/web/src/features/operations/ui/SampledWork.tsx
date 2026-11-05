@@ -1,6 +1,6 @@
 import { For, Show } from 'solid-js';
 import { RequestFailure } from '#shared/model';
-import type { OperationsGateway } from '../api/operations-gateway';
+import type { OperationsGateway } from '../model/recovery';
 import type { useOperationRead } from './use-operation-read';
 import { workFamilies } from './work-families';
 

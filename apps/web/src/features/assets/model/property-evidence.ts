@@ -3,6 +3,8 @@ import {
   type AssetReadOptions,
   isValidAssetIdentifier,
 } from './asset-catalogue';
+import type { HistoryExports } from './history-export';
+import type { HistoryRestores } from './history-restore';
 import { isDefinitionVersion } from './metadata';
 import type { SubscribeProperty } from './property-live';
 
@@ -25,6 +27,8 @@ import type {
 } from './property-values';
 /** Telemetry is independently authorized; metadata success cannot imply value access. */
 export interface TelemetryReader {
+  readonly exports?: HistoryExports;
+  readonly restores?: HistoryRestores;
   readonly subscribe?: SubscribeProperty;
   readonly summary?: (
     request: import('./history-review-types').SummaryRequest,

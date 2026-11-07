@@ -97,3 +97,24 @@ test('summary requests retain explicit archive scope through the managed session
   });
   expect(s.fetch).toHaveBeenCalledTimes(1);
 });
+
+test('restore requests reject a different manifest or unexpected generation', async () => {
+  const command = { tenantId: 'tenant-a', manifestId: '7', expected: '0' };
+  for (const wire of [
+    { manifest_id: '8', restore_generation: '1', state: 'ready' },
+    { manifest_id: '7', restore_generation: '2', state: 'ready' },
+  ]) {
+    const { reader, fetch } = setup(wire, 202);
+    if (!reader.restores) throw new Error('Expected restore port');
+    await expect(reader.restores.request(command, {})).rejects.toMatchObject({
+      kind: 'invalid-response',
+    });
+    await expect(
+      reader.restores.request(
+        { ...command, expected: '9223372036854775807' },
+        {},
+      ),
+    ).rejects.toMatchObject({ kind: 'invalid-request' });
+    expect(fetch).toHaveBeenCalledOnce();
+  }
+});

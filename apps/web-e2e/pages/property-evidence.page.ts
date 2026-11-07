@@ -7,6 +7,8 @@ import {
 export class PropertyEvidencePage {
   readonly readings: Locator;
   readonly history: Locator;
+  readonly exports: Locator;
+  readonly restore: Locator;
   readonly provenance: Locator;
   readonly property: Locator;
   constructor(
@@ -17,6 +19,8 @@ export class PropertyEvidencePage {
     this.history = page.getByRole('region', {
       name: /^(Hot property history|Property history review)$/u,
     });
+    this.exports = page.getByRole('region', { name: 'Historical export' });
+    this.restore = page.getByRole('region', { name: 'Archive restore' });
     this.provenance = page.getByRole('region', {
       name: 'Interpretation provenance',
     });
@@ -26,6 +30,22 @@ export class PropertyEvidencePage {
     await this.page.goto(
       '/assets/asset-1?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_start=0&history_end=3000',
     );
+  }
+  async requestRestore(manifest: string) {
+    await this.restore.getByLabel('Manifest to restore').fill(manifest);
+    await this.restoreAction('Request restore');
+  }
+  async restoreAction(name: string) {
+    await this.restore.getByRole('button', { name, exact: true }).click();
+  }
+  async exportAction(name: string) {
+    await this.exports.getByRole('button', { name, exact: true }).click();
+  }
+  downloadExport() {
+    return Promise.all([
+      this.page.waitForEvent('download'),
+      this.exportAction('Download export'),
+    ]).then(([download]) => download);
   }
   async choose(id: string, version: number) {
     await performDocumentedAction(

@@ -1,15 +1,60 @@
-import { Show } from 'solid-js';
+import { createMemo, Show } from 'solid-js';
+import type { ExportScope } from '../../../model/history-export';
+import type { AssetDetail } from '../../../model/metadata';
 import { MetadataPanel } from '../MetadataPanel';
+import { useMetadataReader } from '../MetadataReaderProvider';
 import type { useMetadataWorkspace } from '../useMetadataWorkspace';
 import { EvidenceReadContent } from './EvidenceReadContent';
 import { HistoryEvidence } from './HistoryEvidence';
+import { HistoryExportActions } from './HistoryExportActions';
+import { HistoryRestoreActions } from './HistoryRestoreActions';
 import { HistoryWindow } from './HistoryWindow';
 import { SummaryEvidence } from './SummaryEvidence';
 import type { usePropertyTelemetry } from './usePropertyTelemetry';
 export function HistoryReview(props: {
+  readonly asset: AssetDetail;
   readonly model: ReturnType<typeof usePropertyTelemetry>;
   readonly workspace: ReturnType<typeof useMetadataWorkspace>;
 }) {
+  const context = useMetadataReader();
+  const historyScope = createMemo<ExportScope | undefined>(
+    () => {
+      const selection = props.model.ready(),
+        definition = props.model.definition.state();
+      if (
+        !selection?.property ||
+        definition.kind !== 'ready' ||
+        definition.value.id !== selection.property.id ||
+        definition.value.version !== selection.property.version ||
+        props.workspace.query()?.tenantId !== props.asset.tenantId
+      )
+        return;
+      return {
+        tenantId: props.asset.tenantId,
+        assetId: props.asset.id,
+        property: definition.value,
+        start: selection.start,
+        end: selection.end,
+        ...(selection.restore ? { restore: selection.restore } : {}),
+      };
+    },
+    undefined,
+    { equals: (left, right) => JSON.stringify(left) === JSON.stringify(right) },
+  );
+  const owner = createMemo(() => {
+    const scope = historyScope();
+    const telemetry = context.reader?.telemetry;
+    const actions = context.actions?.();
+    if (
+      !scope ||
+      !telemetry ||
+      context.accessBlock?.() ||
+      !actions?.includes('telemetry.read') ||
+      !actions.includes('operations.manage')
+    )
+      return;
+    return { scope, telemetry, access: context.accessRevision?.() };
+  });
   return (
     <Show when={props.model.ready()}>
       {(s) => (
@@ -94,6 +139,34 @@ export function HistoryReview(props: {
               </EvidenceReadContent>
             </Show>
           </div>
+          <Show when={owner()} keyed>
+            {(owned) => (
+              <>
+                <Show when={owned.telemetry.restores} keyed>
+                  {(port) => (
+                    <HistoryRestoreActions
+                      tenantId={owned.scope.tenantId}
+                      port={port}
+                      review={(selection) =>
+                        props.workspace.update({
+                          history_manifest: selection.manifestId,
+                          history_generation: selection.generation,
+                          history_resolution: null,
+                          history_after: null,
+                          interpretation: null,
+                        })
+                      }
+                    />
+                  )}
+                </Show>
+                <Show when={owned.telemetry.exports} keyed>
+                  {(port) => (
+                    <HistoryExportActions scope={owned.scope} port={port} />
+                  )}
+                </Show>
+              </>
+            )}
+          </Show>
         </MetadataPanel>
       )}
     </Show>

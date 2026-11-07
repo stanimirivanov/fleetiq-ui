@@ -72,8 +72,13 @@ and restore generation; the displayed coverage applies only to that selection an
 never establishes complete interval coverage. Numeric summaries use aligned,
 bounded buckets, retain exact decimal strings and display an exact sum/count mean
 with explicit empty and excluded counts. The URL retains representation and archive
-scope; changing the property clears them and cancels outstanding reads. No restore
-or export command is offered. Exact-property live delivery uses explicit
+scope. Changing the property clears them and cancels outstanding reads. Operators
+with telemetry.read and operations.manage can request an export of the selected
+property and window, refresh or cancel the job, and download the ready attachment.
+They can also request temporary staging for an explicit archive manifest, check
+its exact generation, and select ready staging for the current window. An
+uncertain command can be retried within its original scope.
+Exact-property live delivery uses explicit
 start/stop/retry controls, validated same-origin SSE, an opaque replay cursor and
 finite reconnect attempts. Discontinuity clears the baseline before resnapshot;
 scope changes cancel delivery. Transport state never establishes asset health.

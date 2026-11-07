@@ -119,3 +119,5 @@ M05-PR19 connects the [operations workspace](exec-plans/completed/2026-11-work-o
 to bounded diagnostics and audited work recovery.
 
 M06-PR15 adds the [archive-aware history review](exec-plans/completed/2026-11-archive-history-review.md) slice.
+
+M06-PR16 adds [property history lifecycle actions](exec-plans/completed/2026-11-history-actions.md).

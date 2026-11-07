@@ -25,7 +25,14 @@ test('consumer generation preserves every selected operation and referenced sche
     components = patches[1].value;
   for (const { path, method, id } of BROWSER_OPERATIONS) {
     const expected = structuredClone(spec.paths[path][method]);
-    if (id === 'applyWorkRecovery')
+    if (
+      [
+        'applyWorkRecovery',
+        'createHistoricalExport',
+        'cancelHistoricalExport',
+        'requestArchiveRestore',
+      ].includes(id)
+    )
       expected.parameters.push(
         { $ref: '#/components/parameters/admin-mutation-origin' },
         { $ref: '#/components/parameters/admin-mutation-csrf' },

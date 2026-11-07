@@ -1,6 +1,7 @@
 import { createMemoryHistory, MemoryRouter, Route } from '@solidjs/router';
 import { cleanup, render, screen, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { createSignal } from 'solid-js';
 import { afterEach, expect, test, vi } from 'vitest';
 import { RequestFailure } from '#shared/model';
 import {
@@ -66,6 +67,7 @@ function ports(overrides: Partial<TelemetryReader> = {}) {
 function mount(
   p: ReturnType<typeof ports>,
   search = '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000',
+  actions?: () => readonly string[],
 ) {
   const history = createMemoryHistory();
   history.set({ value: `/assets/asset-a${search}` });
@@ -75,7 +77,11 @@ function mount(
       <Route
         path="/assets/:assetId"
         component={() => (
-          <MetadataReaderProvider reader={p.reader} onUnauthorized={expired}>
+          <MetadataReaderProvider
+            reader={p.reader}
+            onUnauthorized={expired}
+            {...(actions ? { actions } : {})}
+          >
             <Harness />
           </MetadataReaderProvider>
         )}
@@ -428,4 +434,229 @@ test('refreshing a summary continuation starts a new publication review', async 
     expect(summary.mock.calls.at(-1)?.[0].after).toBeUndefined(),
   );
   expect(view.history.get()).not.toContain('history_after=');
+});
+
+const exportSearch =
+  '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_start=0&history_end=3000';
+const exportGrants = ['telemetry.read', 'operations.manage'];
+const readyExport = {
+  id: '7',
+  state: 'ready' as const,
+  expiresAt: '4000',
+  bytes: 16,
+};
+
+test('replays an uncertain export with its original request key and window', async () => {
+  const create = vi
+    .fn()
+    .mockRejectedValueOnce(new RequestFailure('unavailable'))
+    .mockResolvedValueOnce(readyExport);
+  mount(
+    ports({
+      exports: { create, status: vi.fn(), cancel: vi.fn(), download: vi.fn() },
+    }),
+    exportSearch,
+    () => exportGrants,
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Request export' }),
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Retry exact export request' }),
+  );
+  await screen.findByRole('button', { name: 'Download export' });
+  expect(create.mock.calls[0]?.[0]).toMatchObject({
+    tenantId: 'tenant-a',
+    assetId: 'asset-a',
+    start: '0',
+    end: '3000',
+  });
+  expect(create.mock.calls[1]?.[0]).toEqual(create.mock.calls[0]?.[0]);
+});
+
+test('revocation and a changed history window discard late export completions', async () => {
+  for (const change of ['grant', 'window']) {
+    const [actions, setActions] = createSignal(exportGrants);
+    let finish!: (job: typeof readyExport) => void;
+    const create = vi.fn(
+      (_request, _options) =>
+        new Promise<typeof readyExport>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const view = mount(
+      ports({
+        exports: {
+          create,
+          status: vi.fn(),
+          cancel: vi.fn(),
+          download: vi.fn(),
+        },
+      }),
+      exportSearch,
+      actions,
+    );
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Request export' }),
+    );
+    if (change === 'grant') setActions(['telemetry.read']);
+    else
+      view.history.set({
+        value:
+          '/assets/asset-a' +
+          exportSearch.replace('history_end=3000', 'history_end=2000'),
+      });
+    await waitFor(() =>
+      expect(create.mock.calls[0]?.[1].signal.aborted).toBe(true),
+    );
+    finish(readyExport);
+    await Promise.resolve();
+    expect(
+      screen.queryByRole('button', { name: 'Download export' }),
+    ).toBeNull();
+    view.unmount();
+  }
+});
+
+test('replays a restore expectation, refreshes status and selects exact ready staging', async () => {
+  const pending = {
+    manifestId: '7',
+    generation: '1',
+    state: 'pending' as const,
+  };
+  const request = vi
+    .fn()
+    .mockRejectedValueOnce(new RequestFailure('unavailable'))
+    .mockResolvedValueOnce(pending);
+  const status = vi.fn().mockResolvedValue({ ...pending, state: 'ready' });
+  const view = mount(
+    ports({ restores: { request, status } }),
+    exportSearch,
+    () => exportGrants,
+  );
+  await userEvent.type(
+    await screen.findByLabelText('Manifest to restore'),
+    '7',
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Request restore' }),
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Retry exact restore request' }),
+  );
+  await screen.findByText(/Restore pending/);
+  expect(request.mock.calls[0]?.[0]).toEqual({
+    tenantId: 'tenant-a',
+    manifestId: '7',
+    expected: '0',
+  });
+  expect(request.mock.calls[1]?.[0]).toEqual(request.mock.calls[0]?.[0]);
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Refresh restore status' }),
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Review restored history' }),
+  );
+  expect(view.history.get()).toContain('history_manifest=7');
+  expect(view.history.get()).toContain('history_generation=1');
+});
+
+test('a late ready restore cannot select staging after permission revocation', async () => {
+  const [actions, setActions] = createSignal(exportGrants);
+  let complete!: (job: {
+    manifestId: string;
+    generation: string;
+    state: 'ready';
+  }) => void;
+  const request = vi.fn(
+    (_command, _options) =>
+      new Promise<{ manifestId: string; generation: string; state: 'ready' }>(
+        (resolve) => {
+          complete = resolve;
+        },
+      ),
+  );
+  const view = mount(
+    ports({ restores: { request, status: vi.fn() } }),
+    exportSearch,
+    actions,
+  );
+  await userEvent.type(
+    await screen.findByLabelText('Manifest to restore'),
+    '7',
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Request restore' }),
+  );
+  setActions(['telemetry.read']);
+  await waitFor(() =>
+    expect(request.mock.calls[0]?.[1].signal.aborted).toBe(true),
+  );
+  complete({ manifestId: '7', generation: '1', state: 'ready' });
+  await Promise.resolve();
+  expect(
+    screen.queryByRole('button', { name: 'Review restored history' }),
+  ).toBeNull();
+  expect(view.history.get()).not.toContain('history_manifest=');
+});
+
+test('an old export cannot displace the exact replay of a new uncertain request', async () => {
+  const create = vi
+    .fn()
+    .mockResolvedValueOnce(readyExport)
+    .mockRejectedValueOnce(new RequestFailure('unavailable'))
+    .mockResolvedValueOnce({ ...readyExport, id: '8' });
+  const cancel = vi
+    .fn()
+    .mockResolvedValue({ ...readyExport, state: 'cancelled' });
+  const status = vi.fn();
+  mount(
+    ports({ exports: { create, cancel, status, download: vi.fn() } }),
+    exportSearch,
+    () => exportGrants,
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Request export' }),
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Cancel export' }),
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Request export' }),
+  );
+  const retry = await screen.findByRole('button', {
+    name: 'Retry exact export request',
+  });
+  expect(
+    screen.queryByRole('button', { name: 'Refresh export status' }),
+  ).toBeNull();
+  await userEvent.click(retry);
+  expect(create.mock.calls[2]?.[0]).toEqual(create.mock.calls[1]?.[0]);
+});
+
+test('a superseded restore allows explicit recovery with a new expectation', async () => {
+  const request = vi
+    .fn()
+    .mockResolvedValue({ manifestId: '7', generation: '1', state: 'ready' });
+  const status = vi.fn().mockRejectedValue(new RequestFailure('not-found'));
+  mount(
+    ports({ restores: { request, status } }),
+    exportSearch,
+    () => exportGrants,
+  );
+  await userEvent.type(
+    await screen.findByLabelText('Manifest to restore'),
+    '7',
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Request restore' }),
+  );
+  await userEvent.click(
+    await screen.findByRole('button', { name: 'Refresh restore status' }),
+  );
+  await screen.findByRole('button', { name: 'Request restore' });
+  expect(
+    screen.queryByRole('button', { name: 'Review restored history' }),
+  ).toBeNull();
+  expect(request).toHaveBeenCalledOnce();
 });

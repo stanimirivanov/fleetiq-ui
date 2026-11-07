@@ -85,7 +85,11 @@ export function PropertyTelemetry(props: {
           </div>
         </Show>
       </MetadataPanel>
-      <HistoryReview model={model} workspace={props.workspace} />
+      <HistoryReview
+        model={model}
+        workspace={props.workspace}
+        asset={props.asset}
+      />
       <Show when={model.ready()?.interpretation}>
         <MetadataPanel title="Interpretation provenance">
           <EvidenceReadContent

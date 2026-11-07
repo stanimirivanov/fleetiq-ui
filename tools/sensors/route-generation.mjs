@@ -109,7 +109,7 @@ export function recoveryCommandSchema(spec) {
 
 /** Generate only consumed operations and their transitive component closure.
  * The upstream artifact stays byte-identical. Browser-only header parameters
- * make the published recovery prose executable in the private client.
+ * make published mutation requirements executable in the private client.
  */
 export function browserGenerationPatch(spec) {
   if (!spec.paths) return [];
@@ -125,7 +125,14 @@ export function browserGenerationPatch(spec) {
     paths[path][method] = source.paths[path][method];
     // The published operation describes the browser guard in prose. The
     // private browser client sends the same marker as other protected writes.
-    if (id === 'applyWorkRecovery') {
+    if (
+      [
+        'applyWorkRecovery',
+        'createHistoricalExport',
+        'cancelHistoricalExport',
+        'requestArchiveRestore',
+      ].includes(id)
+    ) {
       const parameters = paths[path][method].parameters;
       for (const header of ['admin-mutation-origin', 'admin-mutation-csrf']) {
         const $ref = `#/components/parameters/${header}`;

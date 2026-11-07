@@ -14,7 +14,9 @@ export class PropertyEvidencePage {
     private readonly narrator?: GuideNarrator,
   ) {
     this.readings = page.getByRole('region', { name: 'Property readings' });
-    this.history = page.getByRole('region', { name: 'Hot property history' });
+    this.history = page.getByRole('region', {
+      name: /^(Hot property history|Property history review)$/u,
+    });
     this.provenance = page.getByRole('region', {
       name: 'Interpretation provenance',
     });
@@ -94,6 +96,18 @@ export class PropertyEvidencePage {
       },
       () => target.click(),
     );
+  }
+  async review(representation: string, manifest = '', generation = '') {
+    await this.history
+      .getByLabel('History representation')
+      .selectOption(representation);
+    await this.history
+      .getByLabel('Archive manifest ID (optional)')
+      .fill(manifest);
+    await this.history
+      .getByLabel('Restore generation (paired)')
+      .fill(generation);
+    await this.applyWindow('0', '3000');
   }
   async refreshReading() {
     await this.readings

@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { Schema } from 'effect';
 import {
   CurrentPropertySnapshot,
+  NumericSummaryPage,
   PropertyHistoryChange,
   PropertyHistoryPage,
 } from '../../web/src/generated/fleetiq-api';
@@ -12,6 +13,8 @@ export async function installTelemetryApi(page: Page) {
   let status = 200;
   let pending = true;
   let empty = false;
+  let archive: 'archived' | 'restoring' | 'restored' | 'unavailable' =
+    'restored';
   const requests: string[] = [];
   await page.route(
     '**/api/v1/tenants/*/assets/*/properties/*/versions/*/**',
@@ -19,7 +22,11 @@ export async function installTelemetryApi(page: Page) {
       const url = new URL(route.request().url()),
         parts = url.pathname.split('/').filter(Boolean);
       const action = parts[10];
-      if (!['current', 'history', 'interpretations'].includes(action ?? ''))
+      if (
+        !['current', 'history', 'interpretations', 'summaries'].includes(
+          action ?? '',
+        )
+      )
         return route.fallback();
       requests.push(`${url.pathname}${url.search}`);
       const reply = (body: unknown) =>
@@ -98,6 +105,65 @@ export async function installTelemetryApi(page: Page) {
           ),
         );
       }
+      const manifest = url.searchParams.get('manifest_id'),
+        generation = url.searchParams.get('restore_generation');
+      if (action === 'summaries') {
+        const value = change(0).value.value;
+        return reply(
+          Schema.decodeUnknownSync(NumericSummaryPage)({
+            representation: 'numeric_summary',
+            algorithm: 'numeric-fixed-v1',
+            series_id: '7',
+            revision: '2',
+            observed_at_ms: '4000',
+            start_at_ms: '0',
+            end_at_ms: '3000',
+            resolution_ms: '1000',
+            kind: 'decimal',
+            unit: thermal ? 'Cel' : 'V',
+            coverage: {
+              scope: manifest
+                ? 'hot_and_selected_manifest_snapshot'
+                : 'hot_snapshot',
+              manifest_id: manifest,
+              restore_generation: generation,
+            },
+            buckets: [
+              {
+                start_ms: '0',
+                end_ms: '1000',
+                total: 0,
+                count: 0,
+                excluded: 0,
+                min: null,
+                max: null,
+                sum: '0',
+              },
+              {
+                start_ms: '1000',
+                end_ms: '2000',
+                total: 1,
+                count: 1,
+                excluded: 0,
+                min: value,
+                max: value,
+                sum: value,
+              },
+              {
+                start_ms: '2000',
+                end_ms: '3000',
+                total: 1,
+                count: 0,
+                excluded: 1,
+                min: null,
+                max: null,
+                sum: '0',
+              },
+            ],
+            next_after: null,
+          }),
+        );
+      }
       const first = !url.searchParams.has('after'),
         start = BigInt(url.searchParams.get('start_at_ms') ?? '0'),
         end = BigInt(url.searchParams.get('end_at_ms') ?? '0');
@@ -108,6 +174,17 @@ export async function installTelemetryApi(page: Page) {
           BigInt(c.event_at_ms) < end;
       return reply(
         Schema.decodeUnknownSync(PropertyHistoryPage)({
+          ...(manifest
+            ? {
+                coverage: {
+                  hot: 'queried',
+                  archive,
+                  scope: 'selected_manifest_only',
+                  manifest_id: manifest,
+                  restore_generation: generation,
+                },
+              }
+            : {}),
           changes: inside ? [c] : [],
           next_after: inside && first ? 'v1.cc' : null,
         }),
@@ -116,6 +193,9 @@ export async function installTelemetryApi(page: Page) {
   );
   return {
     requests,
+    setArchive(value: typeof archive) {
+      archive = value;
+    },
     setStatus(value: 200 | 401 | 403 | 500) {
       status = value;
     },

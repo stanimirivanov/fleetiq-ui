@@ -3,12 +3,14 @@ import { type BrowserApi, normalizeRequestFailure } from '#shared/api';
 import { RequestFailure } from '#shared/model';
 import type { FleetIqApi } from '../../../generated/fleetiq-api';
 import type { AssetReadOptions } from '../model/asset-catalogue';
+import { validSummary } from '../model/history-review';
 import {
   isToken,
   type TelemetryReader,
   validHistory,
   validProperty,
 } from '../model/property-evidence';
+import { parseNumericSummary } from './parse-numeric-summary';
 import {
   parseCurrentProperty,
   parsePropertyEvidence,
@@ -64,10 +66,46 @@ export function createTelemetryReader(api: BrowserApi): TelemetryReader {
                 end_at_ms: request.end,
                 limit: request.limit,
                 after: request.after,
+                ...(request.restore
+                  ? {
+                      mode: 'hot_and_restored' as const,
+                      manifest_id: request.restore.manifestId,
+                      restore_generation: request.restore.generation,
+                    }
+                  : {}),
               },
             },
           ),
         (wire) => parsePropertyHistory(wire, request),
+        options,
+      );
+    },
+    async summary(request, options) {
+      validSummary(request);
+      return read(
+        (client) =>
+          client.listNumericSummaries(
+            request.tenantId,
+            request.assetId,
+            request.property.id,
+            String(request.property.version),
+            {
+              params: {
+                start_at_ms: request.start,
+                end_at_ms: request.end,
+                resolution_ms: request.resolution,
+                limit: request.limit,
+                after: request.after,
+                ...(request.restore
+                  ? {
+                      manifest_id: request.restore.manifestId,
+                      restore_generation: request.restore.generation,
+                    }
+                  : {}),
+              },
+            },
+          ),
+        (wire) => parseNumericSummary(wire, request),
         options,
       );
     },

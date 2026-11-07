@@ -8,14 +8,15 @@ const copy: Record<RequestFailureKind, string> = {
   forbidden:
     'Telemetry access denied. telemetry.read is independent of metadata.read.',
   'not-found':
-    'The requested installed property or interpretation was not found.',
+    'The requested installed property, interpretation or published summary was not found.',
   'invalid-request':
     'The telemetry request is invalid. Check its exact property and window.',
   'invalid-response':
     'The telemetry response is invalid. No evidence from that response is shown.',
   unavailable:
     'The telemetry service is unavailable. No sample values are substituted.',
-  conflict: 'The telemetry request conflicts with current state.',
+  conflict:
+    'The evidence scope changed or selected archived coverage is unavailable. Check the selection and retry.',
 };
 export function EvidenceReadContent<T>(props: {
   readonly state: MetadataReadState<T>;

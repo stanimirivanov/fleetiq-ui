@@ -2,7 +2,7 @@
   "openapi": "3.1.1",
   "info": {
     "title": "FleetIQ HTTP UI baseline",
-    "version": "1.0.0-baseline.28",
+    "version": "1.0.0-baseline.34",
     "description": "Backend-owned, versioned subset of the /api/v1 HTTP surface for asset identity, semantic metadata reads, and actor administration. Other implemented routes are intentionally not yet described here. Protected routes use configured workload bearer or provider-neutral OIDC browser sessions. Modes are mutually exclusive; metadata reads check current identity and tenant metadata.read policy. Operator tenant discovery returns advisory current grants without authorizing operations. Actor administration requires exact platform identity.manage and browser mutation protection. Platform-grant administration requires exact platform.access.manage authority. Tenant grant administration requires exact tenant access.manage authority. Semantic definition publication requires exact metadata.manage; bounded catalogues require metadata.read. Asset and communication-device registration require exact metadata.manage and atomically record original actor/time evidence. Relationship and signal-binding revision commands preserve immutable temporal lineage with original actor attribution and exact retry resolution. Protocol artifact registration and isolated policy-versioned admission require separate exact protocol.manage; neither activates a device. Property history and exact interpretation provenance require separately delegated telemetry.read; baseline.16 expands the closed action vocabulary without upgrading grants. Calculator configuration reads require metadata.read and revision/activation writes require separate analytics.manage; baseline.22 expands discovery to six actions without implicit grants."
   },
   "servers": [
@@ -12,6 +12,174 @@
   ],
   "security": [],
   "paths": {
+    "/api/v1/tenants/{tenant_id}/assets/{asset_id}/properties/{property_id}/versions/{version}/summaries": {
+      "get": {
+        "operationId": "listNumericSummaries",
+        "summary": "Read bounded published numeric summary buckets",
+        "description": "Requires current telemetry.read on every page. Selects an existing numeric-fixed-v1 publication for the exact property version, aligned half-open window, resolution and optional manifest/generation. At most seven days, 64 full buckets and 64 buckets per page. First page selects the latest revision; opaque continuations bind full scope and pin the original immutable revision across late publications. Missing publications return 404. Invalid, oversized or cross-scope cursors return 400. Exact numeric strings and representation=numeric_summary distinguish derived evidence from raw history. Mean is the exact sum/count pair, undefined when count is zero. Only good quality contributes; total/excluded counts retain other qualities. Coverage describes the captured snapshot, never interval completeness or present staging availability. Reads never trigger production, restore, interpolation, unit conversion or raw fallback. Existing history budget admission applies; denied work returns 429, disabled policy preserves reads. Responses are no-store and bounded to 1 MiB.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/telemetry-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/history-asset-id"
+          },
+          {
+            "$ref": "#/components/parameters/property-id"
+          },
+          {
+            "$ref": "#/components/parameters/definition-version"
+          },
+          {
+            "$ref": "#/components/parameters/history-start-at-ms"
+          },
+          {
+            "$ref": "#/components/parameters/history-end-at-ms"
+          },
+          {
+            "$ref": "#/components/parameters/summary-resolution-ms"
+          },
+          {
+            "$ref": "#/components/parameters/summary-limit"
+          },
+          {
+            "$ref": "#/components/parameters/summary-after"
+          },
+          {
+            "$ref": "#/components/parameters/summary-manifest-id"
+          },
+          {
+            "$ref": "#/components/parameters/summary-restore-generation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/NumericSummarySucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/HistoryBudgetExceeded"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/retention-preview": {
+      "get": {
+        "operationId": "getRetentionPreview",
+        "summary": "Preview tenant retention eligibility",
+        "description": "Requires independent current operations.read. Returns at most 100 interpretations in stable complete-identity order with a look-ahead, not whole-tenant totals. Uses one repeatable-read database snapshot and two-second statements within a five-second operation. Verified manifest lease end supplies a conservative age floor; event/device time does not. Tenant-wide replay, semantic, calculator and restore holds protect payload candidates. Identity/lineage anchors remain retained. Estimated bytes cover only three BIGINT projection fields, not physical savings. No deletion executor or provider check is invoked. Optional public context is rechecked against current policy, sampled assessment and a 60-second lifetime; it is not an execution permit.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          },
+          {
+            "$ref": "#/components/parameters/retention-preview-context"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RetentionPreviewSucceeded"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "409": {
+            "$ref": "#/components/responses/RetentionPreviewStale"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/v1/tenants/{tenant_id}/storage-usage": {
+      "get": {
+        "operationId": "getStorageUsage",
+        "summary": "Read tenant logical storage usage",
+        "description": "Requires independent current operations.read. Reconciles authoritative tenant rows in one repeatable-read database snapshot with a two-second statement deadline. Counts and bytes are exact decimal strings. Accepted bytes measure wire payloads only; decoded and interpretation bytes measure UTF-8 PostgreSQL row JSON serialization. These are distinct logical methods, not physical allocation, total tenant cost or billing. Archive, export and shared physical usage are not measured. A scan failure or timeout returns an error, never a successful empty report. No payload or row content is returned.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/admin-tenant-id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Live snapshot of supported classes only; other storage is unmeasured.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/cache-control"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageUsage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "405": {
+            "$ref": "#/components/responses/CalculatorEvidenceMethodNotAllowed"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
     "/api/v1/tenants/{tenant_id}/work-recovery/{kind}": {
       "get": {
         "operationId": "getWorkRecoveryTargets",
@@ -118,7 +286,7 @@
       "get": {
         "operationId": "getWorkDiagnostics",
         "summary": "Read bounded tenant work evidence",
-        "description": "Requires independent current operations.read before discovery. Existing metadata, protocol, analytics and alerts grants imply no access. Returns at most 64 identity-prefix observations per work family, with a sentinel for truncation; counts and oldest eligible time concern only that sample. Alert evaluation samples selected rules and their next matching evidence. Leases are database evidence, never worker health. Empty results do not prove notification seeding, absence of backlog or receiver delivery. No mutation or raw payload, request, endpoint or exception text is returned.",
+        "description": "Requires independent current operations.read before discovery. Existing metadata, protocol, analytics and alerts grants imply no access. Returns at most 64 observations per work family, with a sentinel for truncation. Notification samples exclude completed reconciliation positions and prioritize failed, then eligible work before leased, blocked and deferred positions, with deterministic identity tie breakers. Other families use identity prefixes. Counts and oldest eligible time concern only that sample. Alert evaluation samples selected rules and their next matching evidence. Leases are database evidence, never worker health. Empty results do not prove notification seeding, absence of backlog or receiver delivery. No mutation or raw payload, request, endpoint or exception text is returned.",
         "security": [
           {
             "bearerAuth": []
@@ -1012,7 +1180,7 @@
       "get": {
         "operationId": "listPropertyHistory",
         "summary": "List bounded property history",
-        "description": "Requires exact telemetry.read. Returns all interpretations for one pinned property in a half-open event-time window of at most seven days. Ascending event time then full interpretation key provides stable ties, not latest-state precedence. Pages are not a snapshot: restart the window to observe late appends behind the cursor. No raw payload, archival history, correction collapse or implicit unit conversion.",
+        "description": "Requires exact telemetry.read. Returns all interpretations for one pinned property in a half-open event-time window of at most seven days. Ascending event time then full interpretation key provides stable ties, not latest-state precedence. Pages are not a snapshot: restart the window to observe late appends behind the cursor. No raw payload, transparent object-store scan, correction collapse or implicit unit conversion. Configured lifecycle budgets reserve one slot and 1048576 response bytes; denied admission or oversized output returns 429. Disabled policies preserve prior hot-only behavior. The opt-in hot_and_restored mode always has a five-second/1 MiB bound and merges one selected restore generation, deduplicated by immutable identity. Its coverage is selected_manifest_only, never interval completeness. Cursors additionally bind mode, manifest, restore generation and coverage state; expiry or state changes require restarting and return 400 for old cursors. Unavailable selections issue no continuation; select a valid restore generation or use hot mode to continue hot-only paging.",
         "security": [
           {
             "bearerAuth": []
@@ -1045,6 +1213,15 @@
           },
           {
             "$ref": "#/components/parameters/history-after"
+          },
+          {
+            "$ref": "#/components/parameters/history-mode"
+          },
+          {
+            "$ref": "#/components/parameters/history-manifest-id"
+          },
+          {
+            "$ref": "#/components/parameters/history-restore-generation"
           }
         ],
         "responses": {
@@ -1060,6 +1237,12 @@
           "403": {
             "$ref": "#/components/responses/Forbidden"
           },
+          "409": {
+            "$ref": "#/components/responses/ArchivedHistory"
+          },
+          "429": {
+            "$ref": "#/components/responses/HistoryBudgetExceeded"
+          },
           "500": {
             "$ref": "#/components/responses/InternalError"
           }
@@ -1070,7 +1253,7 @@
       "get": {
         "operationId": "getPropertyInterpretation",
         "summary": "Read exact property interpretation provenance",
-        "description": "Requires exact telemetry.read. Reads original source, binding revision, exact property version and first-append resolution cutoffs. Corrections do not rewrite this fact. Another tenant/target or absent interpretation yields no provenance; no fallback to current metadata.",
+        "description": "Requires exact telemetry.read. Reads original source, binding revision, exact property version and first-append resolution cutoffs. Corrections do not rewrite this fact. Another tenant/target or absent interpretation yields no provenance; no fallback to current metadata. Configured lifecycle budgets reserve one slot and 1048576 response bytes before lookup. Budget rejection is distinct from missing evidence. Disabled policies preserve prior behavior.",
         "security": [
           {
             "bearerAuth": []
@@ -1111,6 +1294,12 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/ArchivedHistory"
+          },
+          "429": {
+            "$ref": "#/components/responses/HistoryBudgetExceeded"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -4089,6 +4278,444 @@
   },
   "components": {
     "schemas": {
+      "NumericSummaryPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "representation",
+          "algorithm",
+          "series_id",
+          "revision",
+          "observed_at_ms",
+          "start_at_ms",
+          "end_at_ms",
+          "resolution_ms",
+          "kind",
+          "unit",
+          "coverage",
+          "buckets",
+          "next_after"
+        ],
+        "properties": {
+          "representation": {
+            "type": "string",
+            "const": "numeric_summary"
+          },
+          "algorithm": {
+            "type": "string",
+            "const": "numeric-fixed-v1"
+          },
+          "series_id": {
+            "$ref": "#/components/schemas/HistoryRestoreId"
+          },
+          "revision": {
+            "$ref": "#/components/schemas/HistoryRestoreId"
+          },
+          "observed_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "start_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "end_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "resolution_ms": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,8}$",
+            "maxLength": 9
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "integer",
+              "decimal"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/NumericSummaryCoverage"
+          },
+          "buckets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "$ref": "#/components/schemas/NumericSummaryBucket"
+            }
+          },
+          "next_after": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HistoryToken"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "NumericSummaryBucket": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "start_ms",
+          "end_ms",
+          "total",
+          "count",
+          "excluded",
+          "min",
+          "max",
+          "sum"
+        ],
+        "properties": {
+          "start_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "end_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "excluded": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "min": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048,
+            "pattern": "^-?(0|[1-9][0-9]*)([.][0-9]*[1-9])?$"
+          },
+          "max": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048,
+            "pattern": "^-?(0|[1-9][0-9]*)([.][0-9]*[1-9])?$"
+          },
+          "sum": {
+            "type": "string",
+            "maxLength": 2048,
+            "pattern": "^-?(0|[1-9][0-9]*)([.][0-9]*[1-9])?$"
+          }
+        }
+      },
+      "NumericSummaryCoverage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scope",
+          "manifest_id",
+          "restore_generation"
+        ],
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": [
+              "hot_snapshot",
+              "hot_and_selected_manifest_snapshot"
+            ]
+          },
+          "manifest_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9][0-9]*$",
+            "maxLength": 19
+          },
+          "restore_generation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[1-9][0-9]*$",
+            "maxLength": 19
+          }
+        }
+      },
+      "RetentionPreview": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "observed_at_ms",
+          "expires_at_ms",
+          "policy_revision",
+          "preview_token",
+          "sample_scope",
+          "has_more",
+          "consumer_scope",
+          "age_method",
+          "estimate_method",
+          "estimated_reclaimable_bytes",
+          "physical_reclaimable_bytes",
+          "retained_anchors",
+          "reclamation_supported",
+          "candidates"
+        ],
+        "properties": {
+          "observed_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "expires_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "policy_revision": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "maxLength": 19
+          },
+          "preview_token": {
+            "$ref": "#/components/schemas/RetentionPreviewToken"
+          },
+          "sample_scope": {
+            "const": "first_100_interpretations_by_identity"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "consumer_scope": {
+            "const": "tenant_wide_conservative"
+          },
+          "age_method": {
+            "const": "verified_manifest_lease_end_v1"
+          },
+          "estimate_method": {
+            "const": "three_bigint_projection_fields_v1"
+          },
+          "estimated_reclaimable_bytes": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "maxLength": 4,
+            "description": "Sum only for the bounded sample; at most 2400 potential logical bytes, not whole-tenant or disk savings."
+          },
+          "physical_reclaimable_bytes": {
+            "const": "not_measured"
+          },
+          "retained_anchors": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "lineage",
+                "idempotency"
+              ]
+            }
+          },
+          "reclamation_supported": {
+            "const": true
+          },
+          "candidates": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/RetentionCandidate"
+            }
+          }
+        },
+        "example": {
+          "observed_at_ms": "100000",
+          "expires_at_ms": "160000",
+          "policy_revision": "0",
+          "preview_token": "v1.7b7d",
+          "sample_scope": "first_100_interpretations_by_identity",
+          "has_more": false,
+          "consumer_scope": "tenant_wide_conservative",
+          "age_method": "verified_manifest_lease_end_v1",
+          "estimate_method": "three_bigint_projection_fields_v1",
+          "estimated_reclaimable_bytes": "0",
+          "physical_reclaimable_bytes": "not_measured",
+          "retained_anchors": [
+            "lineage",
+            "idempotency"
+          ],
+          "reclamation_supported": true,
+          "candidates": []
+        }
+      },
+      "RetentionCandidate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_id",
+          "age_floor_ms",
+          "archive_verified",
+          "active_consumers",
+          "payload_eligible",
+          "estimated_reclaimable_bytes",
+          "protections"
+        ],
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Opaque digest of the complete interpretation identity, not an access capability."
+          },
+          "age_floor_ms": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HistoryMillis"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Conservative verified manifest lease end, not source/event time or a precise append timestamp."
+          },
+          "archive_verified": {
+            "type": "boolean",
+            "description": "Valid committed publication receipt; provider availability/integrity must be freshly checked before any future reclamation."
+          },
+          "active_consumers": {
+            "description": "Conservative dependency holds, including unfinished discovery and recoverable work; not worker liveness.",
+            "type": "array",
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "replay",
+                "semantic",
+                "calculator",
+                "restore",
+                "projection"
+              ]
+            }
+          },
+          "payload_eligible": {
+            "type": "boolean",
+            "description": "Future projection-payload candidate only; anchors and original immutable rows are not deletion targets."
+          },
+          "estimated_reclaimable_bytes": {
+            "type": "string",
+            "enum": [
+              "0",
+              "24"
+            ],
+            "description": "Potential logical bytes of three BIGINT projection fields, excluding anchors and physical allocation."
+          },
+          "protections": {
+            "type": "array",
+            "maxItems": 7,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "policy_disabled",
+                "hot_retention",
+                "unverified_archive",
+                "active_consumer",
+                "archived_payload",
+                "current_projection",
+                "pinned_analytics"
+              ]
+            }
+          }
+        }
+      },
+      "RetentionPreviewToken": {
+        "type": "string",
+        "pattern": "^v1\\.[0-9a-f]+$",
+        "maxLength": 8192,
+        "description": "Public opaque 60-second preview context bound to tenant, policy and sampled assessment. Not a credential, signature or deletion permit; rechecking always recomputes current state."
+      },
+      "StorageUsage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "observed_at_ms",
+          "coverage",
+          "archive",
+          "exports",
+          "physical_allocation",
+          "classes"
+        ],
+        "properties": {
+          "observed_at_ms": {
+            "$ref": "#/components/schemas/HistoryMillis"
+          },
+          "coverage": {
+            "const": "supported_classes_only"
+          },
+          "archive": {
+            "const": "not_measured"
+          },
+          "exports": {
+            "const": "not_measured"
+          },
+          "physical_allocation": {
+            "const": "not_measured"
+          },
+          "classes": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "$ref": "#/components/schemas/StorageUsageClass"
+            }
+          }
+        }
+      },
+      "StorageUsageClass": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "method",
+          "records",
+          "bytes"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "accepted_messages",
+              "decoded_observations",
+              "property_interpretations"
+            ]
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "wire_payload_octets",
+              "postgres_row_json_utf8_v1"
+            ]
+          },
+          "records": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "maxLength": 39
+          },
+          "bytes": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "maxLength": 39
+          }
+        }
+      },
       "WorkKind": {
         "type": "string",
         "enum": [
@@ -6151,6 +6778,58 @@
           }
         }
       },
+      "PropertyHistoryCoverage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "hot",
+          "archive",
+          "scope",
+          "manifest_id",
+          "restore_generation"
+        ],
+        "properties": {
+          "hot": {
+            "type": "string",
+            "const": "queried",
+            "description": "The bounded hot-history query ran; this is not an interval completeness assertion."
+          },
+          "archive": {
+            "type": "string",
+            "enum": [
+              "archived",
+              "restoring",
+              "restored",
+              "unavailable"
+            ],
+            "description": "State of only the selected manifest/request. Unavailable includes missing, replaced, cancelled, expired or invalid staging."
+          },
+          "scope": {
+            "type": "string",
+            "const": "selected_manifest_only",
+            "description": "Other manifests, unarchived evidence and later arrivals are not certified complete."
+          },
+          "manifest_id": {
+            "$ref": "#/components/schemas/HistoryRestoreId"
+          },
+          "restore_generation": {
+            "$ref": "#/components/schemas/HistoryRestoreId"
+          }
+        },
+        "example": {
+          "hot": "queried",
+          "archive": "restored",
+          "scope": "selected_manifest_only",
+          "manifest_id": "1",
+          "restore_generation": "1"
+        }
+      },
+      "HistoryRestoreId": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{0,18}$",
+        "maxLength": 19,
+        "description": "Canonical positive signed-64-bit manifest or restore request generation (at most 9223372036854775807), serialized exactly."
+      },
       "PropertyHistoryPage": {
         "type": "object",
         "additionalProperties": false,
@@ -6175,6 +6854,9 @@
                 "type": "null"
               }
             ]
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/PropertyHistoryCoverage"
           }
         }
       },
@@ -8807,6 +9489,56 @@
       }
     },
     "parameters": {
+      "summary-after": {
+        "name": "after",
+        "in": "query",
+        "required": false,
+        "description": "Opaque continuation binding tenant, exact target/version, window, resolution and manifest/generation to an immutable publication revision. Later head changes and restore expiry do not invalidate this published snapshot; restart without after for the latest revision. A token grants no authority.",
+        "schema": {
+          "$ref": "#/components/schemas/HistoryToken"
+        }
+      },
+      "summary-resolution-ms": {
+        "name": "resolution_ms",
+        "in": "query",
+        "required": true,
+        "description": "Positive exact epoch-aligned full bucket width; range must contain at most 64 buckets.",
+        "schema": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,8}$",
+          "maxLength": 9
+        }
+      },
+      "summary-limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Maximum buckets per page. Continuations remain on their original immutable revision.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64,
+          "default": 64
+        }
+      },
+      "summary-manifest-id": {
+        "name": "manifest_id",
+        "in": "query",
+        "required": false,
+        "description": "Optional published manifest scope; supply together with restore_generation. Reads captured coverage, without requiring staging to remain live.",
+        "schema": {
+          "$ref": "#/components/schemas/HistoryRestoreId"
+        }
+      },
+      "summary-restore-generation": {
+        "name": "restore_generation",
+        "in": "query",
+        "required": false,
+        "description": "Exact generation used during publication; supply together with manifest_id.",
+        "schema": {
+          "$ref": "#/components/schemas/HistoryRestoreId"
+        }
+      },
       "work-kind": {
         "name": "kind",
         "in": "path",
@@ -9137,11 +9869,52 @@
           "default": 50
         }
       },
+      "retention-preview-context": {
+        "name": "preview",
+        "in": "query",
+        "required": false,
+        "description": "Optional prior context to recheck. A fresh consistent snapshot is always computed; expiry or changed policy/sample/protection returns 409. Context never authorizes deletion.",
+        "schema": {
+          "$ref": "#/components/schemas/RetentionPreviewToken"
+        }
+      },
+      "history-mode": {
+        "name": "mode",
+        "in": "query",
+        "required": false,
+        "description": "Hot is the unchanged default. hot_and_restored requires manifest_id and restore_generation and reports selected-manifest coverage; it never scans object storage. Restore parameters are invalid in hot mode.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "hot",
+            "hot_and_restored"
+          ],
+          "default": "hot"
+        }
+      },
+      "history-manifest-id": {
+        "name": "manifest_id",
+        "in": "query",
+        "required": false,
+        "description": "Exact tenant-owned manifest selected in hot_and_restored mode; required only in that mode. Unknown selections report unavailable coverage.",
+        "schema": {
+          "$ref": "#/components/schemas/HistoryRestoreId"
+        }
+      },
+      "history-restore-generation": {
+        "name": "restore_generation",
+        "in": "query",
+        "required": false,
+        "description": "Explicit restore request generation selected with manifest_id in hot_and_restored mode. No restore is created by a read.",
+        "schema": {
+          "$ref": "#/components/schemas/HistoryRestoreId"
+        }
+      },
       "history-after": {
         "name": "after",
         "in": "query",
         "required": false,
-        "description": "Exclusive cursor bound to tenant, asset, exact property version and window. Restart to see late appends behind it.",
+        "description": "Exclusive cursor bound to tenant, asset, exact property version and window. Restart to see late appends behind it. In hot_and_restored mode it also binds manifest, request generation and coverage state; a changed/expired selection invalidates it.",
         "schema": {
           "$ref": "#/components/schemas/HistoryToken"
         }
@@ -9695,6 +10468,145 @@
       }
     },
     "responses": {
+      "NumericSummarySucceeded": {
+        "description": "Published numeric summary page. Snapshot coverage is not interval completeness; sum/count is the exact mean, undefined when count is zero.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NumericSummaryPage"
+            },
+            "example": {
+              "representation": "numeric_summary",
+              "algorithm": "numeric-fixed-v1",
+              "series_id": "1",
+              "revision": "1",
+              "observed_at_ms": "3000",
+              "start_at_ms": "0",
+              "end_at_ms": "1000",
+              "resolution_ms": "1000",
+              "kind": "integer",
+              "unit": "volt",
+              "coverage": {
+                "scope": "hot_snapshot",
+                "manifest_id": null,
+                "restore_generation": null
+              },
+              "buckets": [
+                {
+                  "start_ms": "0",
+                  "end_ms": "1000",
+                  "total": 1,
+                  "count": 1,
+                  "excluded": 0,
+                  "min": "9223372036854775807",
+                  "max": "9223372036854775807",
+                  "sum": "9223372036854775807"
+                }
+              ],
+              "next_after": null
+            }
+          }
+        }
+      },
+      "ArchivedHistory": {
+        "description": "Hot payload has been reclaimed. Use an explicit verified restore selection; no empty complete history is implied.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:archived-history",
+              "title": "Archived history requires explicit restore",
+              "status": 409
+            }
+          }
+        }
+      },
+      "RetentionPreviewSucceeded": {
+        "description": "Bounded read-only eligibility sample with conservative protections and logical estimates; no deletion authority.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RetentionPreview"
+            },
+            "example": {
+              "observed_at_ms": "100000",
+              "expires_at_ms": "160000",
+              "policy_revision": "0",
+              "preview_token": "v1.7b7d",
+              "sample_scope": "first_100_interpretations_by_identity",
+              "has_more": false,
+              "consumer_scope": "tenant_wide_conservative",
+              "age_method": "verified_manifest_lease_end_v1",
+              "estimate_method": "three_bigint_projection_fields_v1",
+              "estimated_reclaimable_bytes": "0",
+              "physical_reclaimable_bytes": "not_measured",
+              "retained_anchors": [
+                "lineage",
+                "idempotency"
+              ],
+              "reclamation_supported": true,
+              "candidates": []
+            }
+          }
+        }
+      },
+      "RetentionPreviewStale": {
+        "description": "Preview expired or its policy/sample/protection changed. Fetch a new preview; no action was authorized or performed.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:stale-retention-preview",
+              "title": "Retention preview changed or expired",
+              "status": 409
+            }
+          }
+        }
+      },
+      "HistoryBudgetExceeded": {
+        "description": "Configured tenant history-work slots or reserved response bytes are exhausted, output exceeded its reserved allowance, or opt-in restored-history output exceeded the unconditional 1 MiB cap. Retry after competing work completes or expires; the requested allowance may require policy review. No evidence or empty page is implied.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/cache-control"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            },
+            "example": {
+              "type": "urn:fleetiq:problem:history-budget-exceeded",
+              "title": "History work budget exceeded",
+              "status": 429
+            }
+          }
+        }
+      },
       "WorkRecoverySucceeded": {
         "description": "Safe operational original receipt; not a current-state or completion assertion.",
         "headers": {
@@ -10781,7 +11693,7 @@
         }
       },
       "PropertyHistorySucceeded": {
-        "description": "Bounded hot-history interpretations. Empty is no matching durable interpretation, not proof of a known asset/property or healthy ingestion.",
+        "description": "Bounded history interpretations. Legacy hot-only responses retain their shape. Opt-in hot_and_restored responses include selected-manifest coverage; empty or unavailable coverage never certifies a complete interval or healthy ingestion.",
         "headers": {
           "Cache-Control": {
             "$ref": "#/components/headers/cache-control"

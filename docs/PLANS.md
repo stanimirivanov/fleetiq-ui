@@ -117,3 +117,5 @@ recovery, without changing lifecycle or delivery state.
 
 M05-PR19 connects the [operations workspace](exec-plans/completed/2026-11-work-operations.md)
 to bounded diagnostics and audited work recovery.
+
+M06-PR15 adds the [archive-aware history review](exec-plans/completed/2026-11-archive-history-review.md) slice.

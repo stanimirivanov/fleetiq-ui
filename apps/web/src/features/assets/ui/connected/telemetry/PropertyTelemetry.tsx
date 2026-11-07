@@ -9,8 +9,7 @@ import { MetadataReadContent } from '../MetadataReadContent';
 import type { useMetadataWorkspace } from '../useMetadataWorkspace';
 import { CurrentReading } from './CurrentReading';
 import { EvidenceReadContent } from './EvidenceReadContent';
-import { HistoryEvidence } from './HistoryEvidence';
-import { HistoryWindow } from './HistoryWindow';
+import { HistoryReview } from './HistoryReview';
 import { LiveReading } from './LiveReading';
 import { PropertyChooser } from './PropertyChooser';
 import { ProvenanceEvidence } from './ProvenanceEvidence';
@@ -35,6 +34,9 @@ export function PropertyTelemetry(props: {
               property: p.id,
               property_version: String(p.version),
               history_after: null,
+              history_manifest: null,
+              history_generation: null,
+              history_resolution: null,
               interpretation: null,
             })
           }
@@ -83,51 +85,7 @@ export function PropertyTelemetry(props: {
           </div>
         </Show>
       </MetadataPanel>
-      <Show when={model.ready()}>
-        {(s) => (
-          <MetadataPanel
-            title="Hot property history"
-            description="Bounded event-time interpretations with exact values and accessible table parity."
-          >
-            <HistoryWindow
-              start={s().start}
-              end={s().end}
-              apply={(start, end) =>
-                props.workspace.update({
-                  history_start: start,
-                  history_end: end,
-                  history_after: null,
-                  interpretation: null,
-                })
-              }
-            />
-            <div class="mt-4">
-              <EvidenceReadContent
-                state={model.history.state()}
-                label="property history"
-                retry={model.history.retry}
-              >
-                {(page) => (
-                  <HistoryEvidence
-                    page={page}
-                    after={s().after}
-                    inspect={model.inspect}
-                    pageTo={(token) =>
-                      props.workspace.update({
-                        history_start: s().start,
-                        history_end: s().end,
-                        history_after: token,
-                        interpretation: null,
-                      })
-                    }
-                    refresh={model.history.retry}
-                  />
-                )}
-              </EvidenceReadContent>
-            </div>
-          </MetadataPanel>
-        )}
-      </Show>
+      <HistoryReview model={model} workspace={props.workspace} />
       <Show when={model.ready()?.interpretation}>
         <MetadataPanel title="Interpretation provenance">
           <EvidenceReadContent

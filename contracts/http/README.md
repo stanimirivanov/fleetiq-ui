@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.28` from merged
-`fleetiq-platform` commit `47b8016b4df08b7b7920ddbc2932f8ae12d11282`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.34` from merged
+`fleetiq-platform` commit `bfe91c3471e871f8e1f02c49268c2c6e3c2c6fcb`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -200,3 +200,10 @@ retry/control branches and supplies the existing browser mutation header
 parameters described in the upstream operation's prose. The published snapshot
 remains untouched. Repeated generated Problem dispatch shares a decoder builder
 while preserving each operation's status set, typed error tags and schema.
+
+## Archive-aware history and numeric summaries
+
+The 45 consumed operations include listNumericSummaries from merged baseline.34.
+History can explicitly select one manifest/restore generation; numeric summaries
+retain exact strings, original revision, resolution and snapshot coverage. These
+reads never restore data, produce summaries or replace raw history implicitly.

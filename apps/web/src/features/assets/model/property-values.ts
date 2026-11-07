@@ -6,6 +6,10 @@ export interface PropertyRequest extends AssetRequest {
   readonly property: PropertyDefinition;
 }
 export interface HistoryRequest extends PropertyRequest {
+  readonly restore?: {
+    readonly manifestId: string;
+    readonly generation: string;
+  };
   readonly start: string;
   readonly end: string;
   readonly limit: number;
@@ -51,6 +55,11 @@ export interface CurrentProperty {
   } | null;
 }
 export interface PropertyHistory {
+  readonly coverage?: {
+    readonly archive: 'archived' | 'restoring' | 'restored' | 'unavailable';
+    readonly manifestId: string;
+    readonly generation: string;
+  };
   readonly changes: readonly PropertyEvidence[];
   readonly nextAfter: string | null;
 }

@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.34` from merged
-`fleetiq-platform` commit `bfe91c3471e871f8e1f02c49268c2c6e3c2c6fcb`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.36` from merged
+`fleetiq-platform` commit `5e0ddfedb36611ffedbe694b86cf645b1c58ad79`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -203,7 +203,27 @@ while preserving each operation's status set, typed error tags and schema.
 
 ## Archive-aware history and numeric summaries
 
-The 45 consumed operations include listNumericSummaries from merged baseline.34.
+Baseline.34 introduced listNumericSummaries among its 45 consumed operations.
 History can explicitly select one manifest/restore generation; numeric summaries
 retain exact strings, original revision, resolution and snapshot coverage. These
 reads never restore data, produce summaries or replace raw history implicitly.
+
+
+## Historical export commands
+
+Baseline.35 introduced export creation, status, and
+cancellation from baseline.35. The generated browser mutation headers preserve
+the exact same-origin guard. The binary attachment route shares the managed
+transport and checks its media type, attachment name, and bounded byte length
+against the authorized job. The browser downloads a transient local Blob and
+releases its URL. Repeated generated response dispatch, tenant path prefixes,
+and mutation marker construction share helpers with the original arguments.
+
+
+## Archive restore commands
+
+The 50 consumed JSON operations include baseline.36 restore request and status.
+The request names one manifest and its expected prior generation. Status is
+bound to the returned generation. Ready staging can be selected explicitly in
+the history window. The browser retains the original expectation for exact
+retry and clears owned commands when the history or grant scope changes.

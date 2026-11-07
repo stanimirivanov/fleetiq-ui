@@ -1,5 +1,8 @@
+import { readFile } from 'node:fs/promises';
+import { installExportApi } from '../fixtures/export-api';
 import { installMetadataApi } from '../fixtures/metadata-api';
 import { expect, test } from '../fixtures/production-test';
+import { installRestoreApi } from '../fixtures/restore-api';
 import { installTelemetryApi } from '../fixtures/telemetry-api';
 import { PropertyEvidencePage } from '../pages/property-evidence.page';
 import { connectedGuide } from '../user-guide/connected-guide';
@@ -163,4 +166,96 @@ test('review selected archive coverage and exact numeric summaries without claim
     /history_resolution=|history_manifest=|history_after=/u,
   );
   await expect(inspector.history).toContainText('Hot-only evidence');
+});
+
+test('retry, download and cancel a bounded export through the authorized history scope', async ({
+  page,
+}) => {
+  await installMetadataApi(page, {
+    tenants: [
+      {
+        tenant_id: 'tenant-a',
+        actions: ['metadata.read', 'telemetry.read', 'operations.manage'],
+      },
+    ],
+  });
+  await installTelemetryApi(page);
+  const api = await installExportApi(page);
+  const inspector = new PropertyEvidencePage(page);
+  await inspector.open();
+  await inspector.choose('electrical.voltage', 3);
+  await inspector.exportAction('Request export');
+  await expect(inspector.exports).toContainText('Export outcome is uncertain');
+  await inspector.exportAction('Retry exact export request');
+  await expect(inspector.exports).toContainText('Export ready');
+  const download = await inspector.downloadExport();
+  expect(download.suggestedFilename()).toBe('fleetiq-export-7.parquet');
+  expect(await readFile(await download.path())).toEqual(api.bytes);
+  const submissions = api.requests.filter(
+    (request) => request.method === 'PUT',
+  );
+  expect(submissions).toHaveLength(2);
+  expect(submissions[1]).toEqual(submissions[0]);
+  expect(submissions[0]).toMatchObject({
+    csrf: '1',
+    body: {
+      asset_id: 'asset-1',
+      property_id: 'electrical.voltage',
+      property_version: 3,
+      start_at_ms: '0',
+      end_at_ms: '3000',
+    },
+  });
+  await inspector.exportAction('Cancel export');
+  await expect(inspector.exports).toContainText('Export cancelled');
+  api.deny();
+  await inspector.exportAction('Refresh export status');
+  await expect(inspector.exports).toContainText('Export access denied');
+  await expect(inspector.exports).not.toContainText('Export cancelled');
+});
+
+test('request a restore, retry the same expectation and review the exact ready generation', async ({
+  page,
+}) => {
+  await installMetadataApi(page, {
+    tenants: [
+      {
+        tenant_id: 'tenant-a',
+        actions: ['metadata.read', 'telemetry.read', 'operations.manage'],
+      },
+    ],
+  });
+  const api = await installTelemetryApi(page);
+  api.setArchive('restored');
+  const requests = await installRestoreApi(page);
+  const inspector = new PropertyEvidencePage(page);
+  await inspector.open();
+  await inspector.choose('electrical.voltage', 3);
+  await inspector.requestRestore('7');
+  await expect(inspector.restore).toContainText('Restore outcome is uncertain');
+  await inspector.restoreAction('Retry exact restore request');
+  await expect(inspector.restore).toContainText('Restore pending');
+  await inspector.restoreAction('Refresh restore status');
+  await expect(inspector.restore).toContainText('Restore ready');
+  await inspector.restoreAction('Review restored history');
+  await expect(page).toHaveURL(/history_manifest=7/u);
+  await expect(page).toHaveURL(/history_generation=1/u);
+  await expect(inspector.history).toContainText('Archive coverage: restored');
+  const root = '/api/v1/tenants/tenant-a/restores/manifests/7';
+  const command = {
+    method: 'PUT',
+    path: `${root}/requests/0`,
+    csrf: '1',
+    body: null,
+  };
+  expect(requests).toEqual([
+    command,
+    command,
+    {
+      method: 'GET',
+      path: `${root}/generations/1`,
+      csrf: undefined,
+      body: null,
+    },
+  ]);
 });

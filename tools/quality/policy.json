@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "bundle": {
-    "javascriptBytes": 480000,
-    "javascriptGzipBytes": 137000,
+    "javascriptBytes": 487000,
+    "javascriptGzipBytes": 139000,
     "cssBytes": 60000,
     "cssGzipBytes": 16000,
     "forbiddenModules": [

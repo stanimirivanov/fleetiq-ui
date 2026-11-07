@@ -10,6 +10,8 @@ import {
   validHistory,
   validProperty,
 } from '../model/property-evidence';
+import { createHistoryExports } from './history-exports';
+import { createHistoryRestores } from './history-restores';
 import { parseNumericSummary } from './parse-numeric-summary';
 import {
   parseCurrentProperty,
@@ -35,6 +37,8 @@ export function createTelemetryReader(api: BrowserApi): TelemetryReader {
       options,
     );
   return {
+    exports: createHistoryExports(api),
+    restores: createHistoryRestores(api),
     subscribe: propertySubscription(api),
     async current(request, options) {
       validProperty(request);

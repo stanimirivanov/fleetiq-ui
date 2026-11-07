@@ -33,7 +33,19 @@ export function compactGeneratedProblems(source) {
   if (compacted.split(anchor).length !== 2 || source.includes('decodeProblems'))
     throw new Error('Generated problem dispatch changed; review compaction.');
   const tag = '`${Prefix}${Status}`';
-  return compacted.replace(
+  const responses = compacted.replace(
+    /withResponse\((options(?:\?\.|\.)config)\)\(HttpClientResponse\.matchStatus\(\{\n {6}"2xx": decodeSuccess\((\w+)\),\n {6}\.\.\.decodeProblems\(("(?:\w+)"), (\[[\d, ]+\])\),\n {6}orElse: unexpectedStatus\n {4}\}\)\)/gu,
+    'respond($1, $2, $3, $4)',
+  );
+  const paths = responses.replaceAll(
+    '"/api/v1/tenants/" +',
+    'tenantPathPrefix +',
+  );
+  const markers = paths.replace(
+    /HttpClientRequest\.setHeaders\(\{ "Origin": (options(?:\?\.|\.)params)\?\.\["Origin"\] \?\? undefined, "X-FleetIQ-CSRF": \1\?\.\["X-FleetIQ-CSRF"\] \?\? undefined \}\)/gu,
+    'mutationHeaders($1)',
+  );
+  return markers.replace(
     anchor,
     [
       '  function decodeProblems<Prefix extends string, Status extends number>(prefix: Prefix, statuses: readonly Status[]) {',
@@ -44,6 +56,27 @@ export function compactGeneratedProblems(source) {
       '    );',
       '    return Object.fromEntries(entries) as Record<Status, (typeof entries)[number][1]>;',
       '  }',
+      ...(paths !== responses
+        ? ['  const tenantPathPrefix = "/api/v1/tenants/"']
+        : []),
+      ...(responses !== compacted
+        ? [
+            '  function respond(config: OperationConfig | undefined, schema: Schema.ConstraintDecoder<unknown, never>, prefix: string, statuses: readonly number[]) {',
+            '    return withResponse(config)(HttpClientResponse.matchStatus({',
+            '      "2xx": decodeSuccess(schema),',
+            '      ...decodeProblems(prefix, statuses),',
+            '      orElse: unexpectedStatus',
+            '    }))',
+            '  }',
+          ]
+        : []),
+      ...(markers !== paths
+        ? [
+            '  function mutationHeaders(params: { readonly Origin?: string | undefined; readonly "X-FleetIQ-CSRF"?: string | undefined } | undefined) {',
+            '    return HttpClientRequest.setHeaders({ Origin: params?.Origin, "X-FleetIQ-CSRF": params?.["X-FleetIQ-CSRF"] })',
+            '  }',
+          ]
+        : []),
       anchor,
     ].join('\n'),
   );

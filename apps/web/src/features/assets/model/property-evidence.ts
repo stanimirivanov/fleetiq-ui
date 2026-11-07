@@ -26,6 +26,10 @@ import type {
 /** Telemetry is independently authorized; metadata success cannot imply value access. */
 export interface TelemetryReader {
   readonly subscribe?: SubscribeProperty;
+  readonly summary?: (
+    request: import('./history-review-types').SummaryRequest,
+    options?: AssetReadOptions,
+  ) => Promise<import('./history-review-types').NumericSummary>;
   current(
     request: PropertyRequest,
     options?: AssetReadOptions,
@@ -62,6 +66,10 @@ export function validProperty(request: PropertyRequest): void {
 export function validHistory(request: HistoryRequest): void {
   validProperty(request);
   if (
+    (request.restore !== undefined &&
+      ![request.restore.manifestId, request.restore.generation].every(
+        (s) => /^[1-9][0-9]*$/.test(s) && isMillis(s),
+      )) ||
     !isMillis(request.start) ||
     !isMillis(request.end) ||
     BigInt(request.end) <= BigInt(request.start) ||

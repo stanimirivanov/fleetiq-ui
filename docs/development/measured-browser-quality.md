@@ -50,7 +50,7 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 460,000 / 132,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 480,000 / 137,000 JS bytes and 60,000 / 16,000 CSS bytes.
 The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
 to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
 and adding a 200-replacement burst/disposal workload under unchanged latency,
@@ -308,3 +308,13 @@ The already approved JavaScript caps and every other policy threshold are unchan
 The combined acknowledgement slice passes 81 production, 24 development and
 50 quality scenarios. Final non-map JS measures 448,822 raw / 129,023 gzip bytes;
 no further budget or other threshold changes are introduced by this slice.
+
+
+## M06 archive-aware history budget review
+
+On 2026-11-07 the owner explicitly approved non-map JavaScript caps of 480,000
+raw / 137,000 gzip bytes for M06-PR15. The archive-aware history and exact numeric
+summary slice measured 473,920 raw / 134,722 gzip bytes. All CSS, map, latency,
+heap, DOM, coverage and security limits remain unchanged. The pinned contract,
+strict numeric/coverage decoders, cancellation and accessible summary tables ship
+inside this reviewed envelope.

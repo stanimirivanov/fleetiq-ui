@@ -18,6 +18,11 @@ export function HistoryEvidence(props: {
     title = createUniqueId();
   return (
     <div class="grid min-w-0 gap-3">
+      <p role="status" class="rounded-lg border border-outline p-2 text-xs">
+        {props.page.coverage
+          ? `Archive coverage: ${props.page.coverage.archive}. Manifest ${props.page.coverage.manifestId}, generation ${props.page.coverage.generation}. Selected manifest only; not complete interval coverage.`
+          : 'Hot-only evidence; archive availability and complete interval coverage are not assessed.'}
+      </p>
       <p class="text-xs text-muted">
         Stored interpretations, ascending event time. Late appends behind a
         cursor require restarting the window. Current state and separate pages
@@ -58,9 +63,11 @@ export function HistoryEvidence(props: {
         when={props.page.changes.length}
         fallback={
           <p role="status" class="text-sm text-muted">
-            {props.after
-              ? 'This continuation page contains no stored interpretations. Restart from the first page to review the window; this is not an empty-window claim.'
-              : 'No stored interpretations in this window. This does not establish complete upstream or unresolved coverage.'}
+            {props.page.coverage
+              ? 'This read returned no interpretations. Review selected archive coverage above; this does not establish an empty window.'
+              : props.after
+                ? 'This continuation page contains no stored interpretations. Restart from the first page to review the window; this is not an empty-window claim.'
+                : 'No stored interpretations in this window. This does not establish complete upstream or unresolved coverage.'}
           </p>
         }
       >

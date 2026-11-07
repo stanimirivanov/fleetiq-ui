@@ -1,6 +1,8 @@
 import { useLocation } from '@solidjs/router';
 import { createMemo } from 'solid-js';
+import { RequestFailure } from '#shared/model';
 import { readEvidenceQuery } from '../../../model/evidence-query';
+import type { SummaryRequest } from '../../../model/history-review-types';
 import type { AssetDetail, DefinitionRef } from '../../../model/metadata';
 import type {
   HistoryRequest,
@@ -54,12 +56,13 @@ export function usePropertyTelemetry(props: {
   const historyRequest = createMemo<HistoryRequest | null>(() => {
     const s = selection(),
       p = request();
-    return p && s.kind === 'ready'
+    return p && s.kind === 'ready' && !s.resolution
       ? {
           ...p,
           start: s.start,
           end: s.end,
           limit: 50,
+          ...(s.restore ? { restore: s.restore } : {}),
           ...(s.after === undefined ? {} : { after: s.after }),
         }
       : null;
@@ -67,6 +70,25 @@ export function usePropertyTelemetry(props: {
   const history = useTelemetryRead(historyRequest, (reader, query, options) =>
     reader.history(query, options),
   );
+  const summaryRequest = createMemo<SummaryRequest | null>(() => {
+    const s = selection(),
+      p = request();
+    return p && s.kind === 'ready' && s.resolution
+      ? {
+          ...p,
+          start: s.start,
+          end: s.end,
+          limit: 50,
+          resolution: s.resolution,
+          ...(s.restore ? { restore: s.restore } : {}),
+          ...(s.after ? { after: s.after } : {}),
+        }
+      : null;
+  });
+  const summary = useTelemetryRead(summaryRequest, (reader, query, options) => {
+    if (!reader.summary) throw new RequestFailure('unavailable');
+    return reader.summary(query, options);
+  });
   const provenance = useTelemetryRead(
     () => {
       const s = selection(),
@@ -105,6 +127,7 @@ export function usePropertyTelemetry(props: {
     current,
     live,
     history,
+    summary,
     provenance,
     inspect,
     ready,

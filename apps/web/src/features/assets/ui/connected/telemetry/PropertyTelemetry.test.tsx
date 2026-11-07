@@ -326,3 +326,106 @@ test('live authority denial clears current and history evidence', async () => {
     screen.queryByRole('button', { name: 'Inspect reading provenance' }),
   ).toBeNull();
 });
+
+test('labels exact summaries and hides late results when switching back to raw history', async () => {
+  let finish!: (
+    v: import('../../../model/history-review-types').NumericSummary,
+  ) => void;
+  const summary = vi.fn<NonNullable<TelemetryReader['summary']>>(
+    () =>
+      new Promise<import('../../../model/history-review-types').NumericSummary>(
+        (r) => {
+          finish = r;
+        },
+      ),
+  );
+  const p = ports({ summary });
+  const view = mount(
+    p,
+    '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_start=0&history_end=3000&history_resolution=1000',
+  );
+  await waitFor(() => expect(summary).toHaveBeenCalledOnce());
+  expect(p.telemetry.history).not.toHaveBeenCalled();
+  view.history.set({
+    value:
+      '/assets/asset-a?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_start=0&history_end=3000',
+  });
+  await waitFor(() => expect(p.telemetry.history).toHaveBeenCalledOnce());
+  expect(summary.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
+  finish({
+    series: '1',
+    revision: '2',
+    observedAt: '3000',
+    unit: 'volt',
+    buckets: [
+      {
+        start: '0',
+        end: '1000',
+        total: 1,
+        count: 1,
+        excluded: 0,
+        min: '9223372036854775807',
+        max: '9223372036854775807',
+        sum: '9223372036854775807',
+      },
+    ],
+    nextAfter: null,
+    restore: undefined,
+  });
+  await Promise.resolve();
+  expect(screen.queryByText(/Summary publication/)).toBeNull();
+});
+test('renders selected archive coverage even when no interpretations are available', async () => {
+  const p = ports({
+    history: vi.fn(async () => ({
+      changes: [],
+      nextAfter: null,
+      coverage: {
+        archive: 'unavailable' as const,
+        manifestId: '7',
+        generation: '2',
+      },
+    })),
+  });
+  mount(
+    p,
+    '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_start=0&history_end=3000&history_manifest=7&history_generation=2',
+  );
+  await screen.findByText(/Archive coverage: unavailable/);
+  expect(
+    screen.queryByText('No stored interpretations in this window.'),
+  ).toBeNull();
+  expect(
+    screen.getByText(/This read returned no interpretations/),
+  ).toBeTruthy();
+  expect(p.telemetry.history).toHaveBeenCalledWith(
+    expect.objectContaining({ restore: { manifestId: '7', generation: '2' } }),
+    expect.anything(),
+  );
+  expect(screen.getByText(/not complete interval coverage/)).toBeTruthy();
+});
+
+test('refreshing a summary continuation starts a new publication review', async () => {
+  const summary = vi.fn<NonNullable<TelemetryReader['summary']>>(async () => ({
+    series: '1',
+    revision: '2',
+    observedAt: '3000',
+    unit: 'volt',
+    buckets: [],
+    nextAfter: null,
+    restore: undefined,
+  }));
+  const p = ports({ summary });
+  const view = mount(
+    p,
+    '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_start=0&history_end=3000&history_resolution=1000&history_after=v1.cc',
+  );
+  await screen.findByText(/Summary publication 1, revision 2/);
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Refresh summary' }),
+  );
+  await waitFor(() =>
+    expect(summary.mock.calls.at(-1)?.[0].after).toBeUndefined(),
+  );
+  expect(view.history.get()).not.toContain('history_after=');
+});

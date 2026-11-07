@@ -117,3 +117,50 @@ test('property evidence retains URL history and narrow dark layout without inven
   );
   await expect(inspector.readings).not.toContainText('No materialized value');
 });
+
+test('review selected archive coverage and exact numeric summaries without claiming completeness', async ({
+  page,
+}) => {
+  await installMetadataApi(page);
+  const api = await installTelemetryApi(page),
+    inspector = new PropertyEvidencePage(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await inspector.open();
+  await inspector.choose('electrical.voltage', 3);
+  api.setEmpty(true);
+  api.setArchive('unavailable');
+  await inspector.review('', '7', '2');
+  await expect(inspector.history).toContainText(
+    'Archive coverage: unavailable',
+  );
+  await expect(inspector.history).toContainText(
+    'not complete interval coverage',
+  );
+  await page.reload();
+  await expect(inspector.history).toContainText('Manifest 7, generation 2');
+  api.setEmpty(false);
+  await inspector.review('1000');
+  await expect(inspector.history).toContainText(
+    'Summary publication 7, revision 2',
+  );
+  await expect(inspector.history).toContainText(
+    'derived buckets, not raw interpretations',
+  );
+  await expect(inspector.history).toContainText(
+    '9007199254740993.000000001 / 1',
+  );
+  await expect(inspector.history).toContainText('Undefined (no good samples)');
+  await expect(page).toHaveURL(/history_resolution=1000/u);
+  await expect(page).not.toHaveURL(/history_manifest=/u);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  expect(api.requests.some((url) => url.includes('/summaries?'))).toBe(true);
+  await inspector.choose('thermal.temperature', 1);
+  await expect(page).not.toHaveURL(
+    /history_resolution=|history_manifest=|history_after=/u,
+  );
+  await expect(inspector.history).toContainText('Hot-only evidence');
+});

@@ -134,3 +134,37 @@ describe('exact property evidence boundary', () => {
     expect(c.quality).toBe('invalid');
   });
 });
+
+test('requires exact selected-manifest coverage and rejects misleading hot-only or unavailable continuations', () => {
+  const restore = { manifestId: '7', generation: '2' };
+  const coverage = {
+    hot: 'queried',
+    archive: 'unavailable',
+    scope: 'selected_manifest_only',
+    manifest_id: '7',
+    restore_generation: '2',
+  };
+  const page = { changes: [], next_after: null, coverage };
+  expect(
+    parsePropertyHistory(page, { ...query, restore }).coverage?.archive,
+  ).toBe('unavailable');
+  for (const bad of [
+    undefined,
+    { ...coverage, manifest_id: '8' },
+    { ...coverage, restore_generation: '3' },
+  ]) {
+    expect(() =>
+      parsePropertyHistory({ ...page, coverage: bad }, { ...query, restore }),
+    ).toThrow();
+  }
+  expect(() => parsePropertyHistory(page, query)).toThrow();
+  expect(() =>
+    parsePropertyHistory(page, { ...query, restore, after: 'v1.aa' }),
+  ).toThrow();
+  expect(() =>
+    parsePropertyHistory(
+      { ...page, changes: [wireChange()], next_after: 'v1.cc' },
+      { ...query, restore },
+    ),
+  ).toThrow();
+});

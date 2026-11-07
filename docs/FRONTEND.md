@@ -67,7 +67,13 @@ snapshot or a whole graph.
 
 Identity, type, and property definitions appear in focused evidence panels. The
 inspector connects exact current readings, bounded history and original provenance
-with independent telemetry.read. Exact-property live delivery uses explicit
+with independent telemetry.read. History can select an existing archive manifest
+and restore generation; the displayed coverage applies only to that selection and
+never establishes complete interval coverage. Numeric summaries use aligned,
+bounded buckets, retain exact decimal strings and display an exact sum/count mean
+with explicit empty and excluded counts. The URL retains representation and archive
+scope; changing the property clears them and cancels outstanding reads. No restore
+or export command is offered. Exact-property live delivery uses explicit
 start/stop/retry controls, validated same-origin SSE, an opaque replay cursor and
 finite reconnect attempts. Discontinuity clears the baseline before resnapshot;
 scope changes cancel delivery. Transport state never establishes asset health.

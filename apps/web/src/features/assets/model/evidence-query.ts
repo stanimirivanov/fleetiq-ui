@@ -1,3 +1,4 @@
+import { positiveId, validResolution } from './history-review';
 import type { DefinitionRef } from './metadata';
 import { isMillis, isToken } from './property-evidence';
 export const evidenceKeys = [
@@ -7,6 +8,9 @@ export const evidenceKeys = [
   'history_end',
   'history_after',
   'interpretation',
+  'history_manifest',
+  'history_generation',
+  'history_resolution',
 ] as const;
 export type EvidenceSelection =
   | { readonly kind: 'invalid' }
@@ -15,6 +19,11 @@ export type EvidenceSelection =
       readonly property: DefinitionRef | null;
       readonly start: string;
       readonly end: string;
+      readonly restore?: {
+        readonly manifestId: string;
+        readonly generation: string;
+      };
+      readonly resolution?: string;
       readonly after?: string;
       readonly interpretation?: string;
     };
@@ -47,6 +56,16 @@ export function readEvidenceQuery(
     BigInt(end) - BigInt(start) > 604800000n
   )
     return { kind: 'invalid' };
+  const manifest = p.get('history_manifest'),
+    generation = p.get('history_generation'),
+    resolution = p.get('history_resolution');
+  if (
+    (manifest === null) !== (generation === null) ||
+    (manifest !== null &&
+      (!positiveId(manifest) || !positiveId(generation ?? ''))) ||
+    (resolution !== null && !validResolution(start, end, resolution))
+  )
+    return { kind: 'invalid' };
   const after = p.get('history_after'),
     interpretation = p.get('interpretation');
   if (
@@ -59,6 +78,10 @@ export function readEvidenceQuery(
     property: selected ?? null,
     start,
     end,
+    ...(manifest === null
+      ? {}
+      : { restore: { manifestId: manifest, generation: generation ?? '' } }),
+    ...(resolution === null ? {} : { resolution }),
     ...(after === null ? {} : { after }),
     ...(interpretation === null ? {} : { interpretation }),
   };

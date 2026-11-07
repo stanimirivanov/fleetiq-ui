@@ -72,3 +72,28 @@ test('aborted requests never start a transport operation', async () => {
   ).rejects.toMatchObject({ name: 'AbortError' });
   expect(s.fetch).not.toHaveBeenCalled();
 });
+
+test('summary requests retain explicit archive scope through the managed session and validate before transport', async () => {
+  const s = setup({}, 403),
+    summary = s.reader.summary;
+  if (!summary) throw new Error('Production summary port is required');
+  const query = {
+    ...request,
+    start: '0',
+    end: '3000',
+    limit: 50,
+    resolution: '1000',
+    restore: { manifestId: '7', generation: '2' },
+  };
+  await expect(summary(query)).rejects.toMatchObject({ kind: 'forbidden' });
+  const url = new URL(String(s.fetch.mock.calls[0]?.[0]));
+  expect(url.origin).toBe('https://fleet.example');
+  expect(url.pathname).toContain('/summaries');
+  expect(url.searchParams.get('manifest_id')).toBe('7');
+  expect(url.searchParams.get('restore_generation')).toBe('2');
+  expect(url.searchParams.get('resolution_ms')).toBe('1000');
+  await expect(summary({ ...query, resolution: '0' })).rejects.toMatchObject({
+    kind: 'invalid-request',
+  });
+  expect(s.fetch).toHaveBeenCalledTimes(1);
+});

@@ -175,5 +175,29 @@ export function parsePropertyHistory(
     seen.add(c.interpretation);
     previous = c;
   });
-  return { changes, nextAfter: w.next_after };
+  if (request.restore) {
+    if (
+      !w.coverage ||
+      w.coverage.manifest_id !== request.restore.manifestId ||
+      w.coverage.restore_generation !== request.restore.generation ||
+      w.coverage.hot !== 'queried' ||
+      w.coverage.scope !== 'selected_manifest_only' ||
+      (w.coverage.archive === 'unavailable' &&
+        (request.after !== undefined || w.next_after !== null))
+    )
+      invalid();
+  } else if (w.coverage !== undefined) invalid();
+  return {
+    changes,
+    nextAfter: w.next_after,
+    ...(w.coverage
+      ? {
+          coverage: {
+            archive: w.coverage.archive,
+            manifestId: w.coverage.manifest_id,
+            generation: w.coverage.restore_generation,
+          },
+        }
+      : {}),
+  };
 }

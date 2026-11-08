@@ -118,3 +118,24 @@ test('restore requests reject a different manifest or unexpected generation', as
     expect(fetch).toHaveBeenCalledOnce();
   }
 });
+
+test('reads selected interpretation provenance only from the exact restore', async () => {
+  const s = setup(wireChange());
+  const selected = {
+    ...request,
+    interpretation: wireChange().interpretation,
+    restore: { manifestId: '9223372036854775807', generation: '2' },
+  };
+  expect((await s.reader.interpretation(selected)).bindingId).toBe('binding-1');
+  const url = new URL(String(s.fetch.mock.calls[0]?.[0]));
+  expect(url.searchParams.get('manifest_id')).toBe(selected.restore.manifestId);
+  expect(url.searchParams.get('restore_generation')).toBe('2');
+
+  await expect(
+    s.reader.interpretation({
+      ...selected,
+      restore: { manifestId: '7', generation: '0' },
+    }),
+  ).rejects.toMatchObject({ kind: 'invalid-request' });
+  expect(s.fetch).toHaveBeenCalledTimes(1);
+});

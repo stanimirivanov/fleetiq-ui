@@ -5,6 +5,7 @@ import {
 } from './asset-catalogue';
 import type { HistoryExports } from './history-export';
 import type { HistoryRestores } from './history-restore';
+import type { RestoreSelection } from './history-review-types';
 import { isDefinitionVersion } from './metadata';
 import type { SubscribeProperty } from './property-live';
 
@@ -43,7 +44,10 @@ export interface TelemetryReader {
     options?: AssetReadOptions,
   ): Promise<PropertyHistory>;
   interpretation(
-    request: PropertyRequest & { readonly interpretation: string },
+    request: PropertyRequest & {
+      readonly interpretation: string;
+      readonly restore?: RestoreSelection;
+    },
     options?: AssetReadOptions,
   ): Promise<PropertyEvidence>;
 }

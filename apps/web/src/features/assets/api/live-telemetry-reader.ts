@@ -3,7 +3,7 @@ import { type BrowserApi, normalizeRequestFailure } from '#shared/api';
 import { RequestFailure } from '#shared/model';
 import type { FleetIqApi } from '../../../generated/fleetiq-api';
 import type { AssetReadOptions } from '../model/asset-catalogue';
-import { validSummary } from '../model/history-review';
+import { positiveId, validSummary } from '../model/history-review';
 import {
   isToken,
   type TelemetryReader,
@@ -115,7 +115,12 @@ export function createTelemetryReader(api: BrowserApi): TelemetryReader {
     },
     async interpretation(request, options) {
       validProperty(request);
-      if (!isToken(request.interpretation))
+      if (
+        !isToken(request.interpretation) ||
+        (request.restore &&
+          (!positiveId(request.restore.manifestId) ||
+            !positiveId(request.restore.generation)))
+      )
         throw new RequestFailure('invalid-request');
       return read(
         (client) =>
@@ -125,7 +130,14 @@ export function createTelemetryReader(api: BrowserApi): TelemetryReader {
             request.property.id,
             String(request.property.version),
             request.interpretation,
-            undefined,
+            request.restore
+              ? {
+                  params: {
+                    manifest_id: request.restore.manifestId,
+                    restore_generation: request.restore.generation,
+                  },
+                }
+              : undefined,
           ),
         (wire) => {
           const parsed = parsePropertyEvidence(wire, request);

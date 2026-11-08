@@ -660,3 +660,82 @@ test('a superseded restore allows explicit recovery with a new expectation', asy
   ).toBeNull();
   expect(request).toHaveBeenCalledOnce();
 });
+
+test('restored Inspect owns the exact generation and ignores a late response after navigation', async () => {
+  const evidence = parsePropertyEvidence(wireChange(), request);
+  let resolveOld!: (value: typeof evidence) => void;
+  let oldSignal: AbortSignal | undefined;
+  const p = ports({
+    interpretation: vi.fn<TelemetryReader['interpretation']>(
+      (query, options) => {
+        if (query.restore?.generation === '2') {
+          oldSignal = options?.signal;
+          return new Promise((resolve) => {
+            resolveOld = resolve;
+          });
+        }
+        return Promise.reject(new RequestFailure('not-found'));
+      },
+    ),
+  });
+  const search =
+    '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_manifest=7';
+  const view = mount(p, `${search}&history_generation=2`);
+  await userEvent.setup().click(
+    await screen.findByRole('button', {
+      name: 'Inspect history interpretation 1',
+    }),
+  );
+  await waitFor(() =>
+    expect(p.telemetry.interpretation).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        restore: { manifestId: '7', generation: '2' },
+      }),
+      expect.anything(),
+    ),
+  );
+  view.history.set({
+    value: `/assets/asset-a${search}&history_generation=3&interpretation=${evidence.interpretation}`,
+  });
+  await waitFor(() => expect(oldSignal?.aborted).toBe(true));
+  resolveOld(evidence);
+  expect(
+    await screen.findByText(
+      /interpretation or published summary was not found/,
+    ),
+  ).toBeTruthy();
+  expect(screen.queryByText('Original binding')).toBeNull();
+});
+
+test('current Inspect stays hot and a grant change clears selected provenance', async () => {
+  const p = ports();
+  const [actions, setActions] = createSignal([
+    'metadata.read',
+    'telemetry.read',
+  ]);
+  mount(
+    p,
+    '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_manifest=7&history_generation=2',
+    actions,
+  );
+  const user = userEvent.setup();
+  await user.click(
+    await screen.findByRole('button', { name: 'Inspect reading provenance' }),
+  );
+  await screen.findByText('Original binding');
+  expect(
+    vi.mocked(p.telemetry.interpretation).mock.lastCall?.[0].restore,
+  ).toBeUndefined();
+
+  await user.click(
+    screen.getByRole('button', { name: 'Inspect history interpretation 1' }),
+  );
+  await waitFor(() =>
+    expect(
+      vi.mocked(p.telemetry.interpretation).mock.lastCall?.[0].restore,
+    ).toEqual({ manifestId: '7', generation: '2' }),
+  );
+  await screen.findByText('Original binding');
+  setActions(['metadata.read']);
+  expect(screen.queryByText('Original binding')).toBeNull();
+});

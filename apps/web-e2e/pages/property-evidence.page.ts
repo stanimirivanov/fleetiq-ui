@@ -94,6 +94,11 @@ export class PropertyEvidencePage {
       .getByRole('button', { name: 'First history page' })
       .click();
   }
+  async refreshHistory() {
+    await this.history
+      .getByRole('button', { name: 'Refresh history page' })
+      .click();
+  }
   async inspectHistory() {
     await this.history
       .getByRole('button', { name: 'Inspect history interpretation 1' })

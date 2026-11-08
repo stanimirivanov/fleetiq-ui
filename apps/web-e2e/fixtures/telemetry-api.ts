@@ -97,7 +97,22 @@ export async function installTelemetryApi(page: Page) {
             items: empty ? [] : [{ freshness: 'stale', change: change(0) }],
           }),
         );
+      const manifest = url.searchParams.get('manifest_id'),
+        generation = url.searchParams.get('restore_generation');
       if (action === 'interpretations') {
+        if (
+          manifest &&
+          (archive !== 'restored' || manifest !== '7' || generation !== '1')
+        )
+          return route.fulfill({
+            status: 404,
+            contentType: 'application/problem+json',
+            body: JSON.stringify({
+              type: 'about:blank',
+              title: 'Not found',
+              status: 404,
+            }),
+          });
         const token = parts[11];
         return reply(
           Schema.decodeUnknownSync(PropertyHistoryChange)(
@@ -105,8 +120,6 @@ export async function installTelemetryApi(page: Page) {
           ),
         );
       }
-      const manifest = url.searchParams.get('manifest_id'),
-        generation = url.searchParams.get('restore_generation');
       if (action === 'summaries') {
         const value = change(0).value.value;
         return reply(

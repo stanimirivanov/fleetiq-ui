@@ -273,7 +273,7 @@ export async function checkAssetContract({ contractPath, provenancePath }) {
     !contract ||
     typeof contract !== 'object' ||
     contract.openapi !== '3.1.1' ||
-    contract.info?.version !== '1.0.0-baseline.36' ||
+    contract.info?.version !== '1.0.0-baseline.37' ||
     contract.paths?.['/api/v1/tenants/{tenant_id}/assets']?.get?.operationId !==
       'listAssets' ||
     contract.components?.schemas?.AssetPage === undefined ||

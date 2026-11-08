@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.36` from merged
-`fleetiq-platform` commit `5e0ddfedb36611ffedbe694b86cf645b1c58ad79`.
+Pin the backend-owned OpenAPI 3.1.1 baseline `1.0.0-baseline.37` from merged
+`fleetiq-platform` commit `df76c5db3b026c022d02504140c8a99a40cba3c7`.
 Its artifact path and exact SHA-256 are in [source.json](source.json).
 `pnpm contract:check` validates provenance and deterministic client output.
 The bundled snapshot is a partial `/api/v1` contract, not the whole platform API.
@@ -222,7 +222,7 @@ and mutation marker construction share helpers with the original arguments.
 
 ## Archive restore commands
 
-The 50 consumed JSON operations include baseline.36 restore request and status.
+The 50 consumed JSON operations include baseline.37 restore request and status.
 The request names one manifest and its expected prior generation. Status is
 bound to the returned generation. Ready staging can be selected explicitly in
 the history window. The browser retains the original expectation for exact

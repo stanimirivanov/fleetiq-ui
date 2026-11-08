@@ -8,6 +8,7 @@ export const evidenceKeys = [
   'history_end',
   'history_after',
   'interpretation',
+  'interpretation_source',
   'history_manifest',
   'history_generation',
   'history_resolution',
@@ -26,6 +27,7 @@ export type EvidenceSelection =
       readonly resolution?: string;
       readonly after?: string;
       readonly interpretation?: string;
+      readonly interpretationSource?: 'current';
     };
 /** Explicit URL scope; invalid/duplicate/partial selections never silently fall back. */
 export function readEvidenceQuery(
@@ -67,10 +69,12 @@ export function readEvidenceQuery(
   )
     return { kind: 'invalid' };
   const after = p.get('history_after'),
-    interpretation = p.get('interpretation');
+    interpretation = p.get('interpretation'),
+    interpretationSource = p.get('interpretation_source');
   if (
     (after !== null && !isToken(after)) ||
-    (interpretation !== null && !isToken(interpretation))
+    (interpretation !== null && !isToken(interpretation)) ||
+    (interpretationSource !== null && interpretationSource !== 'current')
   )
     return { kind: 'invalid' };
   return {
@@ -84,5 +88,6 @@ export function readEvidenceQuery(
     ...(resolution === null ? {} : { resolution }),
     ...(after === null ? {} : { after }),
     ...(interpretation === null ? {} : { interpretation }),
+    ...(interpretationSource === 'current' ? { interpretationSource } : {}),
   };
 }

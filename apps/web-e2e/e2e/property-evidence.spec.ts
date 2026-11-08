@@ -241,6 +241,17 @@ test('request a restore, retry the same expectation and review the exact ready g
   await expect(page).toHaveURL(/history_manifest=7/u);
   await expect(page).toHaveURL(/history_generation=1/u);
   await expect(inspector.history).toContainText('Archive coverage: restored');
+  await inspector.inspectHistory();
+  await expect(inspector.provenance).toContainText('Original binding');
+  expect(api.requests).toContainEqual(
+    expect.stringContaining(
+      '/interpretations/v1.aa?manifest_id=7&restore_generation=1',
+    ),
+  );
+  api.setArchive('unavailable');
+  await inspector.refreshHistory();
+  await expect(inspector.provenance).toContainText('was not found');
+  await expect(inspector.provenance).not.toContainText('Original binding');
   const root = '/api/v1/tenants/tenant-a/restores/manifests/7';
   const command = {
     method: 'PUT',

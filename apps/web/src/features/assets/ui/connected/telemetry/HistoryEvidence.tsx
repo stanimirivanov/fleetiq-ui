@@ -10,7 +10,7 @@ import { metadataButtonClass } from '../MetadataPanel';
 export function HistoryEvidence(props: {
   readonly page: PropertyHistory;
   readonly after?: string;
-  readonly inspect: (token: string) => void;
+  readonly inspect: (token: string, source?: 'hot') => void;
   readonly pageTo: (token: string | null) => void;
   readonly refresh: () => void;
 }) {
@@ -108,7 +108,15 @@ export function HistoryEvidence(props: {
                         type="button"
                         class={metadataButtonClass}
                         aria-label={`Inspect history interpretation ${index() + 1}`}
-                        onClick={() => props.inspect(change.interpretation)}
+                        onClick={() =>
+                          props.inspect(
+                            change.interpretation,
+                            props.page.restoredRowIndices &&
+                              !props.page.restoredRowIndices.includes(index())
+                              ? 'hot'
+                              : undefined,
+                          )
+                        }
                       >
                         Inspect
                       </button>

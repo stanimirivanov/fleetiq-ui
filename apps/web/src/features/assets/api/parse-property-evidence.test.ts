@@ -144,7 +144,12 @@ test('requires exact selected-manifest coverage and rejects misleading hot-only 
     manifest_id: '7',
     restore_generation: '2',
   };
-  const page = { changes: [], next_after: null, coverage };
+  const page = {
+    changes: [],
+    next_after: null,
+    coverage,
+    restored_row_indices: [],
+  };
   expect(
     parsePropertyHistory(page, { ...query, restore }).coverage?.archive,
   ).toBe('unavailable');
@@ -165,6 +170,44 @@ test('requires exact selected-manifest coverage and rejects misleading hot-only 
     parsePropertyHistory(
       { ...page, changes: [wireChange()], next_after: 'v1.cc' },
       { ...query, restore },
+    ),
+  ).toThrow();
+});
+
+test('accepts only sorted page-local indices for verified restore membership', () => {
+  const selected = { ...query, restore: { manifestId: '7', generation: '2' } };
+  const page = {
+    changes: [wireChange()],
+    next_after: null,
+    coverage: {
+      hot: 'queried',
+      archive: 'restored',
+      scope: 'selected_manifest_only',
+      manifest_id: '7',
+      restore_generation: '2',
+    },
+  };
+  expect(
+    parsePropertyHistory({ ...page, restored_row_indices: [0] }, selected)
+      .restoredRowIndices,
+  ).toEqual([0]);
+  expect(() => parsePropertyHistory(page, selected)).toThrow();
+  for (const indices of [[1], [-1], [0.5], [0, 0]]) {
+    expect(() =>
+      parsePropertyHistory(
+        { ...page, restored_row_indices: indices },
+        selected,
+      ),
+    ).toThrow();
+  }
+  expect(() =>
+    parsePropertyHistory(
+      {
+        ...page,
+        coverage: { ...page.coverage, archive: 'unavailable' },
+        restored_row_indices: [0],
+      },
+      selected,
     ),
   ).toThrow();
 });

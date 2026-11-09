@@ -26,7 +26,8 @@ afterEach(cleanup);
 function ports(overrides: Partial<TelemetryReader> = {}) {
   const telemetry: TelemetryReader = {
     current: vi.fn(async () => parseCurrentProperty(wireCurrent(), request)),
-    history: vi.fn(async () => ({
+    history: vi.fn<TelemetryReader['history']>(async (q) => ({
+      ...(q.restore ? { restoredRowIndices: [0] } : {}),
       changes: [
         parsePropertyEvidence(wireChange(), request),
         {
@@ -707,7 +708,7 @@ test('restored Inspect owns the exact generation and ignores a late response aft
   expect(screen.queryByText('Original binding')).toBeNull();
 });
 
-test('current Inspect stays hot and a grant change clears selected provenance', async () => {
+test('mixed history and current Inspect use their exact scopes and revocation clears provenance', async () => {
   const p = ports();
   const [actions, setActions] = createSignal([
     'metadata.read',
@@ -736,6 +737,61 @@ test('current Inspect stays hot and a grant change clears selected provenance', 
     ).toEqual({ manifestId: '7', generation: '2' }),
   );
   await screen.findByText('Original binding');
+  await user.click(
+    screen.getByRole('button', { name: 'Inspect history interpretation 2' }),
+  );
+  await waitFor(() => {
+    const query = vi.mocked(p.telemetry.interpretation).mock.lastCall?.[0];
+    expect(query?.interpretation).toBe('v1.bb');
+    expect(query?.restore).toBeUndefined();
+  });
+  await user.click(
+    screen.getByRole('button', { name: 'Inspect history interpretation 1' }),
+  );
+  await screen.findByText('Original binding');
   setActions(['metadata.read']);
   expect(screen.queryByText('Original binding')).toBeNull();
+});
+
+test('switching from a restored row to a hot row discards late restored provenance', async () => {
+  const restored = parsePropertyEvidence(wireChange(), request);
+  let finishRestore!: (value: typeof restored) => void;
+  let restoreSignal: AbortSignal | undefined;
+  const p = ports({
+    interpretation: vi.fn<TelemetryReader['interpretation']>(
+      (query, options) => {
+        if (query.restore) {
+          restoreSignal = options?.signal;
+          return new Promise((resolve) => {
+            finishRestore = resolve;
+          });
+        }
+        return Promise.resolve({
+          ...restored,
+          interpretation: 'v1.bb',
+          bindingId: 'hot-binding',
+        });
+      },
+    ),
+  });
+  const view = mount(
+    p,
+    '?tenant=tenant-a&effective_at_ms=3000&known_at_ms=3000&history_manifest=7&history_generation=2',
+  );
+  const user = userEvent.setup();
+  await user.click(
+    await screen.findByRole('button', {
+      name: 'Inspect history interpretation 1',
+    }),
+  );
+  await waitFor(() => expect(restoreSignal).toBeDefined());
+  await user.click(
+    screen.getByRole('button', { name: 'Inspect history interpretation 2' }),
+  );
+  expect(await screen.findByText('hot-binding · revision 1')).toBeTruthy();
+  expect(restoreSignal?.aborted).toBe(true);
+  finishRestore(restored);
+  await Promise.resolve();
+  expect(screen.getByText('hot-binding · revision 1')).toBeTruthy();
+  expect(view.history.get()).toContain('history_generation=2');
 });

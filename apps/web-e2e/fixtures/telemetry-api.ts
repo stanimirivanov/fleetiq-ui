@@ -102,7 +102,10 @@ export async function installTelemetryApi(page: Page) {
       if (action === 'interpretations') {
         if (
           manifest &&
-          (archive !== 'restored' || manifest !== '7' || generation !== '1')
+          (archive !== 'restored' ||
+            manifest !== '7' ||
+            generation !== '1' ||
+            parts[11] !== 'v1.aa')
         )
           return route.fulfill({
             status: 404,
@@ -185,6 +188,16 @@ export async function installTelemetryApi(page: Page) {
           !empty &&
           BigInt(c.event_at_ms) >= start &&
           BigInt(c.event_at_ms) < end;
+      const changes = inside ? [c] : [];
+      const later = change(1);
+      if (
+        manifest &&
+        archive === 'restored' &&
+        first &&
+        inside &&
+        BigInt(later.event_at_ms) < end
+      )
+        changes.push(later);
       return reply(
         Schema.decodeUnknownSync(PropertyHistoryPage)({
           ...(manifest
@@ -198,8 +211,20 @@ export async function installTelemetryApi(page: Page) {
                 },
               }
             : {}),
-          changes: inside ? [c] : [],
-          next_after: inside && first ? 'v1.cc' : null,
+          changes,
+          ...(url.searchParams.get('include_restore_membership') === 'true'
+            ? {
+                restored_row_indices:
+                  archive === 'restored' && first && inside ? [0] : [],
+              }
+            : {}),
+          next_after:
+            inside &&
+            first &&
+            changes.length === 1 &&
+            (!manifest || archive !== 'unavailable')
+              ? 'v1.cc'
+              : null,
         }),
       );
     },

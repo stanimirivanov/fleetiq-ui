@@ -73,6 +73,7 @@ export function createTelemetryReader(api: BrowserApi): TelemetryReader {
                 ...(request.restore
                   ? {
                       mode: 'hot_and_restored' as const,
+                      include_restore_membership: true,
                       manifest_id: request.restore.manifestId,
                       restore_generation: request.restore.generation,
                     }

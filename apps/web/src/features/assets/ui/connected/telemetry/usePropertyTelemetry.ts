@@ -104,30 +104,34 @@ export function usePropertyTelemetry(props: {
     )
       return null;
     return {
-      ...p,
-      interpretation: s.interpretation,
-      ...(s.restore && s.interpretationSource !== 'current'
-        ? { restore: s.restore }
-        : {}),
+      selection: s.restore,
+      lookup: {
+        ...p,
+        interpretation: s.interpretation,
+        ...(s.restore && !s.interpretationSource ? { restore: s.restore } : {}),
+      },
     };
   };
   const provenance = useTelemetryRead(
     provenanceRequest,
-    (reader, query, options) => reader.interpretation(query, options),
+    (reader, query, options) => reader.interpretation(query.lookup, options),
   );
   // The wire receipt has no expiry timestamp. Revalidate while selected
   // evidence is visible, stopping on expiry, denial or scope change.
   createEffect(() => {
-    if (!provenanceRequest()?.restore || provenance.state().kind !== 'ready')
+    if (
+      !provenanceRequest()?.lookup.restore ||
+      provenance.state().kind !== 'ready'
+    )
       return;
     const timeout = setTimeout(provenance.retry, 30_000);
     onCleanup(() => clearTimeout(timeout));
   });
   const refreshHistory = () => {
     history.retry();
-    if (provenanceRequest()?.restore) provenance.retry();
+    if (provenanceRequest()?.lookup.restore) provenance.retry();
   };
-  const inspect = (interpretation: string, source?: 'current') => {
+  const inspect = (interpretation: string, source?: 'current' | 'hot') => {
     const p = selected();
     if (p)
       props.workspace.update({

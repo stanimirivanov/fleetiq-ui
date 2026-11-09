@@ -55,6 +55,7 @@ export interface CurrentProperty {
   } | null;
 }
 export interface PropertyHistory {
+  readonly restoredRowIndices?: readonly number[];
   readonly coverage?: {
     readonly archive: 'archived' | 'restoring' | 'restored' | 'unavailable';
     readonly manifestId: string;

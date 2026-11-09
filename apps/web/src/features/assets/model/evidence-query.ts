@@ -27,7 +27,7 @@ export type EvidenceSelection =
       readonly resolution?: string;
       readonly after?: string;
       readonly interpretation?: string;
-      readonly interpretationSource?: 'current';
+      readonly interpretationSource?: 'current' | 'hot';
     };
 /** Explicit URL scope; invalid/duplicate/partial selections never silently fall back. */
 export function readEvidenceQuery(
@@ -74,7 +74,9 @@ export function readEvidenceQuery(
   if (
     (after !== null && !isToken(after)) ||
     (interpretation !== null && !isToken(interpretation)) ||
-    (interpretationSource !== null && interpretationSource !== 'current')
+    (interpretationSource !== null &&
+      interpretationSource !== 'current' &&
+      interpretationSource !== 'hot')
   )
     return { kind: 'invalid' };
   return {
@@ -88,6 +90,6 @@ export function readEvidenceQuery(
     ...(resolution === null ? {} : { resolution }),
     ...(after === null ? {} : { after }),
     ...(interpretation === null ? {} : { interpretation }),
-    ...(interpretationSource === 'current' ? { interpretationSource } : {}),
+    ...(interpretationSource === null ? {} : { interpretationSource }),
   };
 }

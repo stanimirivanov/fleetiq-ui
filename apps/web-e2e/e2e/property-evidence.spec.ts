@@ -248,6 +248,22 @@ test('request a restore, retry the same expectation and review the exact ready g
       '/interpretations/v1.aa?manifest_id=7&restore_generation=1',
     ),
   );
+  expect(api.requests).toContainEqual(
+    expect.stringContaining('include_restore_membership=true'),
+  );
+  await inspector.history
+    .getByRole('button', {
+      name: 'Inspect history interpretation 2',
+      exact: true,
+    })
+    .click();
+  await expect(inspector.provenance).toContainText('message-1 / 1');
+  expect(
+    api.requests.some((path) => path.endsWith('/interpretations/v1.bb')),
+  ).toBe(true);
+  await expect(page).toHaveURL(/history_manifest=7/u);
+  await inspector.inspectHistory();
+  await expect(inspector.provenance).toContainText('message-0 / 0');
   api.setArchive('unavailable');
   await inspector.refreshHistory();
   await expect(inspector.provenance).toContainText('was not found');

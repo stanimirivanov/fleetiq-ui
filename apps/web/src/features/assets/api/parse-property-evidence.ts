@@ -175,9 +175,20 @@ export function parsePropertyHistory(
     seen.add(c.interpretation);
     previous = c;
   });
+  const indices = w.restored_row_indices;
   if (request.restore) {
     if (
+      !indices ||
+      indices.length > 16 ||
+      indices.some(
+        (index, position) =>
+          !Number.isInteger(index) ||
+          index < 0 ||
+          index >= changes.length ||
+          (position > 0 && index <= (indices[position - 1] ?? -1)),
+      ) ||
       !w.coverage ||
+      (indices.length > 0 && w.coverage.archive !== 'restored') ||
       w.coverage.manifest_id !== request.restore.manifestId ||
       w.coverage.restore_generation !== request.restore.generation ||
       w.coverage.hot !== 'queried' ||
@@ -186,9 +197,10 @@ export function parsePropertyHistory(
         (request.after !== undefined || w.next_after !== null))
     )
       invalid();
-  } else if (w.coverage !== undefined) invalid();
+  } else if (w.coverage !== undefined || indices !== undefined) invalid();
   return {
     changes,
+    ...(indices ? { restoredRowIndices: indices } : {}),
     nextAfter: w.next_after,
     ...(w.coverage
       ? {

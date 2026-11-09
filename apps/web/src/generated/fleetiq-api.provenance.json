@@ -4,6 +4,6 @@
     "name": "@effect/openapi-generator",
     "version": "4.0.5"
   },
-  "specSha256": "054474a2396d789d1a7636ed0db32ac18fbf691749490418258d28c69b6d7c87",
-  "outputSha256": "46bb86e770a1e4fa70839f00e0bb4884128eec5d8cefe9c7c1af68f95653b496"
+  "specSha256": "da4bcd28f497adbbfd2ca10f6280cb233480190bc98ef54bd60211e3465d106d",
+  "outputSha256": "ad3e2eb1ce09b20740fcab747f1e1242e7bce2bf90e966f6f15084858ac1dca2"
 }

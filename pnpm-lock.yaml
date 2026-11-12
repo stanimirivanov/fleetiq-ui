@@ -176,10 +176,10 @@ importers:
         version: 2.5.15
       '@effect/openapi-generator':
         specifier: 4.0.5
-        version: 4.0.5(@effect/platform-node@4.0.5(effect@4.0.5)(redis@6.3.0))(effect@4.0.5)
+        version: 4.0.5(@effect/platform-node@4.0.5(effect@4.1.2)(redis@6.3.0))(effect@4.1.2)
       '@effect/platform-node':
         specifier: 4.0.5
-        version: 4.0.5(effect@4.0.5)(redis@6.3.0)
+        version: 4.0.5(effect@4.1.2)(redis@6.3.0)
       '@playwright/test':
         specifier: 1.64.1
         version: 1.64.1
@@ -223,8 +223,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0(solid-js@1.9.17)
       effect:
-        specifier: 4.0.5
-        version: 4.0.5
+        specifier: 4.1.2
+        version: 4.1.2
       maplibre-gl:
         specifier: 6.16.0
         version: 6.16.0
@@ -275,8 +275,8 @@ importers:
         specifier: 24.19.1
         version: 24.19.1
       effect:
-        specifier: 4.0.5
-        version: 4.0.5
+        specifier: 4.1.2
+        version: 4.1.2
       typescript:
         specifier: 7.0.2
         version: 7.0.2
@@ -1209,8 +1209,8 @@ packages:
   earcut@3.2.4:
     resolution: {integrity: sha512-FHc6yNpnTORB0tM5kmZ03iD2mDuNakDE2lvf4Hw1XkfxtEHIGVi01B/GqUSwx+NcC1WGjidAfpTXzeALtPtfpg==}
 
-  effect@4.0.5:
-    resolution: {integrity: sha512-BY4/28NlpOd99yzmV741xbVGmp+1U7tks4oB7F/Png64bTa5tm5eCA6W0RiXsnuLDDoJpjfVSo4Dnq4BZb/89Q==}
+  effect@4.1.2:
+    resolution: {integrity: sha512-d3Oah1WyKxFLFh19yWheS5IXIVaITzxZ71JkE1rkUozq/6EcJSU5nPk5bF2QrSygZ3SQoiNQB8TsxFriyMeMaQ==}
 
   electron-to-chromium@1.5.444:
     resolution: {integrity: sha512-5ss/uJfoDYDHT0lfJzT6FbcskIzROIOPf0BbbFkGcvDzoJU7i//9GDrwwIHQVmIsrAGiF3ihpADBRIsrEFt1rQ==}
@@ -2451,27 +2451,27 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@effect/openapi-generator@4.0.5(@effect/platform-node@4.0.5(effect@4.0.5)(redis@6.3.0))(effect@4.0.5)':
+  '@effect/openapi-generator@4.0.5(@effect/platform-node@4.0.5(effect@4.1.2)(redis@6.3.0))(effect@4.1.2)':
     dependencies:
-      '@effect/platform-node': 4.0.5(effect@4.0.5)(redis@6.3.0)
-      effect: 4.0.5
+      '@effect/platform-node': 4.0.5(effect@4.1.2)(redis@6.3.0)
+      effect: 4.1.2
       swagger2openapi: 7.0.8
     transitivePeerDependencies:
       - encoding
 
-  '@effect/platform-node-shared@4.0.5(effect@4.0.5)':
+  '@effect/platform-node-shared@4.0.5(effect@4.1.2)':
     dependencies:
       '@types/ws': 8.18.2
-      effect: 4.0.5
+      effect: 4.1.2
       ws: 8.22.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform-node@4.0.5(effect@4.0.5)(redis@6.3.0)':
+  '@effect/platform-node@4.0.5(effect@4.1.2)(redis@6.3.0)':
     dependencies:
-      '@effect/platform-node-shared': 4.0.5(effect@4.0.5)
-      effect: 4.0.5
+      '@effect/platform-node-shared': 4.0.5(effect@4.1.2)
+      effect: 4.1.2
       redis: 6.3.0
       undici: 8.12.3
     transitivePeerDependencies:
@@ -3027,7 +3027,7 @@ snapshots:
 
   earcut@3.2.4: {}
 
-  effect@4.0.5: {}
+  effect@4.1.2: {}
 
   electron-to-chromium@1.5.444: {}
 

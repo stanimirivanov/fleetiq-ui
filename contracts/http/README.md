@@ -186,7 +186,6 @@ its returned audit identity. Lifecycle counters and acknowledgement clocks remai
 canonical signed-i64 strings. Optional read annotations are validated against each
 transition's own version. Neither receipts nor annotations resolve/silence an alert.
 
-
 ## Operational work
 
 The browser selects 44 operations, including getWorkDiagnostics,
@@ -208,7 +207,6 @@ History can explicitly select one manifest/restore generation; numeric summaries
 retain exact strings, original revision, resolution and snapshot coverage. These
 reads never restore data, produce summaries or replace raw history implicitly.
 
-
 ## Historical export commands
 
 Baseline.35 introduced export creation, status, and
@@ -218,7 +216,6 @@ transport and checks its media type, attachment name, and bounded byte length
 against the authorized job. The browser downloads a transient local Blob and
 releases its URL. Repeated generated response dispatch, tenant path prefixes,
 and mutation marker construction share helpers with the original arguments.
-
 
 ## Archive restore commands
 

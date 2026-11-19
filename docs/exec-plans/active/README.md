@@ -9,7 +9,6 @@ The active [dependency candidate qualification slice](2026-10-dependency-candida
 in **M02 - Product Foundation** separates proposal test evidence from approval and
 retains the required check merge barrier.
 
-
 - [D03 immutable UX/static-edge image](2026-10-immutable-ux-image.md): M02 source-owned packaging and publication.
 
 - [D06 parser qualification](2026-10-d06-parser-qualification.md): repair installed-tool lookup without weakening verification.
@@ -23,8 +22,6 @@ retains the required check merge barrier.
 - [JOSE v4 patch and deferred v3 blocker](2026-10-jose-v4-remediation.md): M02 edge security, issue #86.
 
 - [Inspector live delivery](2026-10-inspector-live-delivery.md): M04 product PR 27, issue #88.
-
-
 
 - [Signal-binding authoring and attribution review](2026-10-binding-authoring.md).
 

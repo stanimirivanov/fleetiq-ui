@@ -16,17 +16,17 @@ updates:
       component-testing:
         patterns:
           - vitest
-          - '@vitest/coverage-v8'
+          - "@vitest/coverage-v8"
         update-types: [minor, patch]
       browser-testing:
         patterns:
-          - '@playwright/test'
-          - '@axe-core/playwright'
+          - "@playwright/test"
+          - "@axe-core/playwright"
         update-types: [minor, patch]
       effect:
         patterns:
           - effect
-          - '@effect/*'
+          - "@effect/*"
         update-types: [minor, patch]
       development-tools:
         dependency-type: development

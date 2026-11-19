@@ -28,3 +28,5 @@ retains the required check merge barrier.
 - [Complete tenant-grant contract integration](2026-10-complete-tenant-grants.md): M04 issue #98; consume the merged five-grant schema correction.
 
 - [Native NGINX edge](2026-10-native-nginx-edge.md): M04 issue #100; remove the runtime security blocker and qualify the replacement.
+
+- [SIM-PR19 connected development routing](2026-11-sim-connected-development.md) — review of the UI-owned origin, API and HMR contract; installed composition remains SIM-PR20.

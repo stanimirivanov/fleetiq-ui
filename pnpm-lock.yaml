@@ -1242,9 +1242,6 @@ packages:
   effect@4.1.4:
     resolution: {integrity: sha512-Tgrv/9FN+TZYyOn8XSli+fVqAfwDrDAkiX5Uu9vztINb675VTQdhD0gWI5Kzvhlh9QqzjZvw72iugqw5pwoghQ==}
 
-  effect@4.1.4:
-    resolution: {integrity: sha512-Tgrv/9FN+TZYyOn8XSli+fVqAfwDrDAkiX5Uu9vztINb675VTQdhD0gWI5Kzvhlh9QqzjZvw72iugqw5pwoghQ==}
-
   electron-to-chromium@1.5.444:
     resolution: {integrity: sha512-5ss/uJfoDYDHT0lfJzT6FbcskIzROIOPf0BbbFkGcvDzoJU7i//9GDrwwIHQVmIsrAGiF3ihpADBRIsrEFt1rQ==}
 
@@ -3030,8 +3027,6 @@ snapshots:
   dom-accessibility-api@0.6.3: {}
 
   earcut@3.2.4: {}
-
-  effect@4.1.4: {}
 
   effect@4.1.4: {}
 

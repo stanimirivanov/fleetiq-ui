@@ -26,11 +26,11 @@ For private container composition, the deployment overlay may explicitly choose
 
 ## Edge routing contract
 
-| Request | Owner |
-| --- | --- |
-| `/api` and `/api/*`, including auth/session/logout and event streams | Normal backend proxy; preserve Host, Origin, Cookie, Set-Cookie and streaming |
-| `/__fleetiq_hmr` WebSocket upgrade | Vite; preserve upgrade headers and query |
-| UI HTML, `/@vite/*`, source modules, styles and other development assets | Vite; preserve request path and external Host |
+| Request                                                                  | Owner                                                                         |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `/api` and `/api/*`, including auth/session/logout and event streams     | Normal backend proxy; preserve Host, Origin, Cookie, Set-Cookie and streaming |
+| `/__fleetiq_hmr` WebSocket upgrade                                       | Vite; preserve upgrade headers and query                                      |
+| UI HTML, `/@vite/*`, source modules, styles and other development assets | Vite; preserve request path and external Host                                 |
 
 Vite uses the configured external origin, one explicit allowed host/CORS origin,
 and Vite 8 `server.ws` settings. The external client port is explicit, preventing

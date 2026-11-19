@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v7 # v7.1.0
         with:
-          node-version: '24'
+          node-version: "24"
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm security:install

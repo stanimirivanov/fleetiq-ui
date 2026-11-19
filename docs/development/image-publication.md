@@ -83,13 +83,13 @@ promotion remain separate work.
 
 The same image runs in every environment, without a Vite rebuild. Supply:
 
-| Input | Contract |
-| --- | --- |
-| FLEETIQ_PUBLIC_AUTHORITY | Canonical public DNS hostname or IPv4 authority, optionally with its public port; no scheme/path/credentials. |
-| FLEETIQ_API_UPSTREAM | Reviewed private HTTP DNS hostname or IPv4 host:port; no scheme/path/credentials. |
-| HTTP listener | Private port 8080 behind the environment's HTTPS gateway. |
-| Edge probe | Container-loopback HTTP port 8081, path /ready; proves the edge, not backend/database readiness. Kubernetes should use an exec probe to localhost; Pod-IP HTTP probes cannot reach this listener. |
-| Process | UID/GID 10001, read-only root, all capabilities dropped, no-new-privileges, writable bounded /tmp. |
+| Input                    | Contract                                                                                                                                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FLEETIQ_PUBLIC_AUTHORITY | Canonical public DNS hostname or IPv4 authority, optionally with its public port; no scheme/path/credentials.                                                                                     |
+| FLEETIQ_API_UPSTREAM     | Reviewed private HTTP DNS hostname or IPv4 host:port; no scheme/path/credentials.                                                                                                                 |
+| HTTP listener            | Private port 8080 behind the environment's HTTPS gateway.                                                                                                                                         |
+| Edge probe               | Container-loopback HTTP port 8081, path /ready; proves the edge, not backend/database readiness. Kubernetes should use an exec probe to localhost; Pod-IP HTTP probes cannot reach this listener. |
+| Process                  | UID/GID 10001, read-only root, all capabilities dropped, no-new-privileges, writable bounded /tmp.                                                                                                |
 
 IPv6 literal authorities are not supported by this initial bounded configuration
 parser; DNS upstreams can resolve to the deployment's supported address family.

@@ -10,20 +10,20 @@ backend authorization and deployment qualification remain independent concerns.
 
 ## Stack and ownership
 
-| Concern | Choice and owner |
-| --- | --- |
-| Runtime | SolidJS 1.x, Vite, strict TypeScript 7 |
-| Routing | Solid Router; app composition owns route/session gates |
-| Local/derived state | Solid signals, memos, stores; interaction-owning component |
-| Shareable state | URL tenant, filters, selection, cutoffs, scoped cursors |
-| HTTP | Generated Effect v4 client; shared managed browser runtime |
-| Wire validation | Generated Schema plus maintained request-specific invariants |
-| Failures | Safe discriminated categories; explicit retry and authorization states |
-| Styling | Tailwind v4 with semantic light/dark tokens |
-| Theme | One Light → Dark → System icon; versioned browser preference |
-| Testing | Pure rules, Vitest/Solid Testing Library, Playwright POM journeys |
-| Mocking | Explicit DEV readers plus test-only contract-valid HTTP interception |
-| Map | Lazy MapLibre adapter for connected geodetic evidence; separate DEV schematic |
+| Concern             | Choice and owner                                                              |
+| ------------------- | ----------------------------------------------------------------------------- |
+| Runtime             | SolidJS 1.x, Vite, strict TypeScript 7                                        |
+| Routing             | Solid Router; app composition owns route/session gates                        |
+| Local/derived state | Solid signals, memos, stores; interaction-owning component                    |
+| Shareable state     | URL tenant, filters, selection, cutoffs, scoped cursors                       |
+| HTTP                | Generated Effect v4 client; shared managed browser runtime                    |
+| Wire validation     | Generated Schema plus maintained request-specific invariants                  |
+| Failures            | Safe discriminated categories; explicit retry and authorization states        |
+| Styling             | Tailwind v4 with semantic light/dark tokens                                   |
+| Theme               | One Light → Dark → System icon; versioned browser preference                  |
+| Testing             | Pure rules, Vitest/Solid Testing Library, Playwright POM journeys             |
+| Mocking             | Explicit DEV readers plus test-only contract-valid HTTP interception          |
+| Map                 | Lazy MapLibre adapter for connected geodetic evidence; separate DEV schematic |
 
 Effect v4 remains pinned. Services/adapters own Effect execution and scopes; TSX
 components use validated feature ports. Atom and a Solid binding can be introduced

@@ -1,4 +1,5 @@
 # Harness sensors
+
 Read [verification](../docs/development/verification.md),
 [contribution workflow](../CONTRIBUTING.md) and
 [contract ownership](../contracts/http/README.md) for this scope.

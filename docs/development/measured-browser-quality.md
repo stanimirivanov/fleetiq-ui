@@ -328,7 +328,8 @@ On 2026-11-19 the owner explicitly approved non-map JavaScript caps of 506,000
 raw / 145,000 gzip bytes for the Effect 4.1.4 dependency update in PR 110.
 The coordinated runtime, Node adapter and generator update measured 501,366 raw /
 143,394 gzip bytes before the separately qualified Solid and router patches.
-Regenerating the client changes only about 100 source bytes and does not close
+The combined update with Solid 1.9.18 and router 1.0.1 measures 501,693 raw /
+143,461 gzip bytes. Regenerating the client changes only about 100 source bytes and does not close
 the dependency growth gap. All CSS, map, latency, heap, DOM, coverage and security
 limits remain unchanged. Canonical verification and exact-image qualification
 remain required; the budget approval does not waive any failed check.

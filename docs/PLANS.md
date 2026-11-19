@@ -131,3 +131,8 @@ The mixed-history Inspect follow-up uses baseline.39 page membership to choose
 hot or restored provenance for each row while retaining the history selection.
 The backend must be deployed before the UI opts in. UI issue #129 owns the
 browser regression for both rows on the same page.
+
+The [SIM-PR19 connected development slice](exec-plans/active/2026-11-sim-connected-development.md)
+adds opt-in origin/host/HMR routing with a fail-closed API boundary. The
+[runbook](development/connected-demo.md) separates its synthetic transport proof
+from SIM-PR20 installed HTTPS composition and reload qualification.

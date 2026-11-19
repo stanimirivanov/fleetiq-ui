@@ -49,6 +49,8 @@ export default defineConfig({
   webServer: {
     command: `pnpm --filter @fleetiq/web dev --host 127.0.0.1 --port ${port} --strictPort`,
     cwd: repositoryRoot,
+    // Canonical sample journeys never inherit an operator-connected origin.
+    env: { FLEETIQ_CONNECTED_ORIGIN: '' },
     url: baseURL,
     reuseExistingServer: false,
     timeout: 30_000,

@@ -1,4 +1,5 @@
 # Browser scenarios and executable guides
+
 Read [testing](../../docs/development/testing.md) and
 [verification](../../docs/development/verification.md) before changing this scope.
 

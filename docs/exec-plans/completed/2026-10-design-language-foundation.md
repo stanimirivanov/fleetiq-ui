@@ -38,4 +38,3 @@ slice. No screen receives live or mock fleet data in this change.
 
 API contracts, mock transport, tenant navigation, maps, charts, alerts,
 commissioning, mobile applications, and production theme persistence.
-

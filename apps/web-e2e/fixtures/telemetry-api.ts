@@ -97,7 +97,25 @@ export async function installTelemetryApi(page: Page) {
             items: empty ? [] : [{ freshness: 'stale', change: change(0) }],
           }),
         );
+      const manifest = url.searchParams.get('manifest_id'),
+        generation = url.searchParams.get('restore_generation');
       if (action === 'interpretations') {
+        if (
+          manifest &&
+          (archive !== 'restored' ||
+            manifest !== '7' ||
+            generation !== '1' ||
+            parts[11] !== 'v1.aa')
+        )
+          return route.fulfill({
+            status: 404,
+            contentType: 'application/problem+json',
+            body: JSON.stringify({
+              type: 'about:blank',
+              title: 'Not found',
+              status: 404,
+            }),
+          });
         const token = parts[11];
         return reply(
           Schema.decodeUnknownSync(PropertyHistoryChange)(
@@ -105,8 +123,6 @@ export async function installTelemetryApi(page: Page) {
           ),
         );
       }
-      const manifest = url.searchParams.get('manifest_id'),
-        generation = url.searchParams.get('restore_generation');
       if (action === 'summaries') {
         const value = change(0).value.value;
         return reply(
@@ -172,6 +188,16 @@ export async function installTelemetryApi(page: Page) {
           !empty &&
           BigInt(c.event_at_ms) >= start &&
           BigInt(c.event_at_ms) < end;
+      const changes = inside ? [c] : [];
+      const later = change(1);
+      if (
+        manifest &&
+        archive === 'restored' &&
+        first &&
+        inside &&
+        BigInt(later.event_at_ms) < end
+      )
+        changes.push(later);
       return reply(
         Schema.decodeUnknownSync(PropertyHistoryPage)({
           ...(manifest
@@ -185,8 +211,20 @@ export async function installTelemetryApi(page: Page) {
                 },
               }
             : {}),
-          changes: inside ? [c] : [],
-          next_after: inside && first ? 'v1.cc' : null,
+          changes,
+          ...(url.searchParams.get('include_restore_membership') === 'true'
+            ? {
+                restored_row_indices:
+                  archive === 'restored' && first && inside ? [0] : [],
+              }
+            : {}),
+          next_after:
+            inside &&
+            first &&
+            changes.length === 1 &&
+            (!manifest || archive !== 'unavailable')
+              ? 'v1.cc'
+              : null,
         }),
       );
     },

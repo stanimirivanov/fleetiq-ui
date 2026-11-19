@@ -121,3 +121,13 @@ to bounded diagnostics and audited work recovery.
 M06-PR15 adds the [archive-aware history review](exec-plans/completed/2026-11-archive-history-review.md) slice.
 
 M06-PR16 adds [property history lifecycle actions](exec-plans/completed/2026-11-history-actions.md).
+
+The M06 remediation for restored Inspect pins the selected-provenance contract
+and qualifies the exact manifest and generation in UI issue #127. Selected
+provenance revalidates while open and on history refresh. It clears when the
+scope changes or the platform no longer authorizes the selected read.
+
+The mixed-history Inspect follow-up uses baseline.39 page membership to choose
+hot or restored provenance for each row while retaining the history selection.
+The backend must be deployed before the UI opts in. UI issue #129 owns the
+browser regression for both rows on the same page.

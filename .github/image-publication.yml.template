@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0
       - uses: @node@
         with:
-          node-version: '24'
+          node-version: "24"
       - run: node tools/images/preflight.mjs
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -50,7 +50,7 @@ jobs:
           fetch-depth: 0
       - uses: @node@
         with:
-          node-version: '24'
+          node-version: "24"
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm security:install

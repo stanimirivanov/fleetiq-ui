@@ -7,19 +7,19 @@ production readiness. This register gives each control an owner and review
 trigger. Follow [verification](verification.md), [measured quality](measured-browser-quality.md)
 and [secure delivery](security-delivery.md) for commands and recovery.
 
-| Control | Enforcement and scope | Owner | Review trigger |
-| --- | --- | --- | --- |
-| Context and plan integrity | Git-owned Markdown routes, anchors, containment, budgets and lifecycle fixtures | Maintainer / documentation owners | New owner, guide or plan format |
-| Capability boundaries | Runtime/type graph and bounded AST checks over registered product owners | Frontend architects | New capability/package/adapter; parser upgrade |
-| Critical behavior | Ten-module coverage floors, complete denominators, named assertions and three real assertion mutants | Identity/assets/shared-HTTP owners | Changed session/scope/parsing/cursor semantics; legitimate simplification |
-| Browser error ownership | Owned auto fixture, direct-import lint and actual positive/error browser probes | Browser harness owners | New scenario directory or observation hook |
-| Production output | Resolved module ownership, actual output/hash inventory and raw/gzip budgets | Build / frontend owners | Map SDK, substantial feature, Vite upgrade |
-| Rendered accessibility | Selected Axe rules, five representative production surfaces, themes/viewports | Design-system / feature owners | New control, screen, interaction, theme or Axe upgrade |
-| Responsiveness and resource growth | Bounded mock workload, warm-up, five samples, post-GC metrics, no quality retries | Browser harness owners | First hosted result; recording/GC/browser/tool/workload changes; threshold breach |
-| Dependency upgrade qualification | One reviewed registry, read-only candidate diagnostics, owner-scoped installed metadata and early/final group guards | Harness / repository maintainers | Any critical tool, Node/pnpm or action upgrade |
-| Failure recovery | Negative fixtures, owned cleanup, exact-source evidence, no partial release | Harness owners | Any escaped gate or failed cleanup |
-| Source/advisory/artifact safety | Checksummed source/index/history detector, frozen audit, inspected retention | Security / maintainer | Advisory, tool pin or reviewed exception expiry |
-| Publication | Three complete groups and output/source hashes at selected SHA | Maintainer / release owners | Workflow or deployment changes |
+| Control                            | Enforcement and scope                                                                                                | Owner                              | Review trigger                                                                    |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------- |
+| Context and plan integrity         | Git-owned Markdown routes, anchors, containment, budgets and lifecycle fixtures                                      | Maintainer / documentation owners  | New owner, guide or plan format                                                   |
+| Capability boundaries              | Runtime/type graph and bounded AST checks over registered product owners                                             | Frontend architects                | New capability/package/adapter; parser upgrade                                    |
+| Critical behavior                  | Ten-module coverage floors, complete denominators, named assertions and three real assertion mutants                 | Identity/assets/shared-HTTP owners | Changed session/scope/parsing/cursor semantics; legitimate simplification         |
+| Browser error ownership            | Owned auto fixture, direct-import lint and actual positive/error browser probes                                      | Browser harness owners             | New scenario directory or observation hook                                        |
+| Production output                  | Resolved module ownership, actual output/hash inventory and raw/gzip budgets                                         | Build / frontend owners            | Map SDK, substantial feature, Vite upgrade                                        |
+| Rendered accessibility             | Selected Axe rules, five representative production surfaces, themes/viewports                                        | Design-system / feature owners     | New control, screen, interaction, theme or Axe upgrade                            |
+| Responsiveness and resource growth | Bounded mock workload, warm-up, five samples, post-GC metrics, no quality retries                                    | Browser harness owners             | First hosted result; recording/GC/browser/tool/workload changes; threshold breach |
+| Dependency upgrade qualification   | One reviewed registry, read-only candidate diagnostics, owner-scoped installed metadata and early/final group guards | Harness / repository maintainers   | Any critical tool, Node/pnpm or action upgrade                                    |
+| Failure recovery                   | Negative fixtures, owned cleanup, exact-source evidence, no partial release                                          | Harness owners                     | Any escaped gate or failed cleanup                                                |
+| Source/advisory/artifact safety    | Checksummed source/index/history detector, frozen audit, inspected retention                                         | Security / maintainer              | Advisory, tool pin or reviewed exception expiry                                   |
+| Publication                        | Three complete groups and output/source hashes at selected SHA                                                       | Maintainer / release owners        | Workflow or deployment changes                                                    |
 
 ## Review-owned and unqualified areas
 

@@ -62,7 +62,10 @@ export function PropertyTelemetry(props: {
                     {property.name} · {property.valueKind} · v{property.version}
                   </p>
                   <Show when={model.live.available()}>
-                    <LiveReading live={model.live} inspect={model.inspect} />
+                    <LiveReading
+                      live={model.live}
+                      inspect={(token) => model.inspect(token, 'current')}
+                    />
                   </Show>
                   <Show when={!model.live.enabled() && !model.live.blocked()}>
                     <EvidenceReadContent
@@ -73,7 +76,7 @@ export function PropertyTelemetry(props: {
                       {(snapshot) => (
                         <CurrentReading
                           snapshot={snapshot}
-                          inspect={model.inspect}
+                          inspect={(token) => model.inspect(token, 'current')}
                           refresh={model.current.retry}
                         />
                       )}

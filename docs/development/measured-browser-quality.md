@@ -50,7 +50,7 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 487,000 / 139,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 506,000 / 145,000 JS bytes and 60,000 / 16,000 CSS bytes.
 The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
 to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
 and adding a 200-replacement burst/disposal workload under unchanged latency,
@@ -321,3 +321,15 @@ The owner approved non-map JavaScript caps of 487,000 raw and 139,000 gzip bytes
 for M06-PR16. The combined restore and export controls measure 484,386 raw and
 137,840 gzip bytes. The controls share command ownership and the generated
 client shares repeated response dispatch, path prefixes and mutation headers.
+
+## Effect 4.1.4 dependency budget review
+
+On 2026-11-19 the owner explicitly approved non-map JavaScript caps of 506,000
+raw / 145,000 gzip bytes for the Effect 4.1.4 dependency update in PR 110.
+The coordinated runtime, Node adapter and generator update measured 501,366 raw /
+143,394 gzip bytes before the separately qualified Solid and router patches.
+The combined update with Solid 1.9.18 and router 1.0.1 measures 501,693 raw /
+143,461 gzip bytes. Regenerating the client changes only about 100 source bytes and does not close
+the dependency growth gap. All CSS, map, latency, heap, DOM, coverage and security
+limits remain unchanged. Canonical verification and exact-image qualification
+remain required; the budget approval does not waive any failed check.

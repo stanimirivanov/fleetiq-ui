@@ -223,8 +223,8 @@ importers:
         specifier: 1.0.1
         version: 1.0.1(solid-js@1.9.18)
       effect:
-        specifier: 4.0.5
-        version: 4.0.5
+        specifier: 4.1.4
+        version: 4.1.4
       maplibre-gl:
         specifier: 6.16.0
         version: 6.16.0
@@ -275,8 +275,8 @@ importers:
         specifier: 24.19.1
         version: 24.19.1
       effect:
-        specifier: 4.0.5
-        version: 4.0.5
+        specifier: 4.1.4
+        version: 4.1.4
       typescript:
         specifier: 7.0.2
         version: 7.0.2
@@ -1239,8 +1239,8 @@ packages:
   earcut@3.2.4:
     resolution: {integrity: sha512-FHc6yNpnTORB0tM5kmZ03iD2mDuNakDE2lvf4Hw1XkfxtEHIGVi01B/GqUSwx+NcC1WGjidAfpTXzeALtPtfpg==}
 
-  effect@4.0.5:
-    resolution: {integrity: sha512-BY4/28NlpOd99yzmV741xbVGmp+1U7tks4oB7F/Png64bTa5tm5eCA6W0RiXsnuLDDoJpjfVSo4Dnq4BZb/89Q==}
+  effect@4.1.4:
+    resolution: {integrity: sha512-Tgrv/9FN+TZYyOn8XSli+fVqAfwDrDAkiX5Uu9vztINb675VTQdhD0gWI5Kzvhlh9QqzjZvw72iugqw5pwoghQ==}
 
   effect@4.1.4:
     resolution: {integrity: sha512-Tgrv/9FN+TZYyOn8XSli+fVqAfwDrDAkiX5Uu9vztINb675VTQdhD0gWI5Kzvhlh9QqzjZvw72iugqw5pwoghQ==}
@@ -3031,7 +3031,7 @@ snapshots:
 
   earcut@3.2.4: {}
 
-  effect@4.0.5: {}
+  effect@4.1.4: {}
 
   effect@4.1.4: {}
 

@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
-    "@biomejs/biome": "2.6.7",
+    "@biomejs/biome": "2.6.8",
     "@effect/openapi-generator": "4.1.4",
     "@effect/platform-node": "4.1.4",
     "@playwright/test": "1.65.0",

@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import { runEntrypoint } from '../sensors/entrypoint.mjs';
 import { makeOwnedDirectory, ownedFile, temporary } from './owned.mjs';
@@ -13,8 +14,10 @@ export function verifyArchive(bytes, digest) {
       'Gitleaks archive checksum mismatch; installation refused.',
     );
 }
-/** Retain a checksum-verifiable archive, never trust a mutable binary receipt. */
-export async function installDetector(root, fetcher = fetch) {
+/** Retry transient download failures at most twice; integrity failures remain fatal.
+ * Retain a checksum-verifiable archive, never trust a mutable binary receipt.
+ */
+export async function installDetector(root, fetcher = fetch, wait = delay) {
   const release = releaseFor();
   const directory = makeOwnedDirectory(root, '.verification/tools/gitleaks');
   const destination = path.join(directory, release.name);
@@ -26,10 +29,26 @@ export async function installDetector(root, fetcher = fetch) {
     verifyArchive(readFileSync(cached), release.digest);
     return { version: GITLEAKS_VERSION };
   }
-  const response = await fetcher(
-    `https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${release.name}`,
-    { signal: AbortSignal.timeout(120_000), redirect: 'follow' },
-  );
+  let response;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      response = await fetcher(
+        `https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${release.name}`,
+        { signal: AbortSignal.timeout(120_000), redirect: 'follow' },
+      );
+    } catch {
+      if (attempt === 2)
+        throw new Error(
+          'Official Gitleaks archive download failed; no scan performed.',
+        );
+    }
+    const transient =
+      !response || [408, 429, 500, 502, 503, 504].includes(response.status);
+    if (!transient || attempt === 2) break;
+    await response?.body?.cancel();
+    response = undefined;
+    await wait(250 * (attempt + 1));
+  }
   if (!response.ok)
     throw new Error(
       'Official Gitleaks archive download failed; no scan performed.',

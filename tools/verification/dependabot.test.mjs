@@ -68,11 +68,7 @@ for (const [name, from, to] of [
     '    directory: /',
     '    directory: /\n    ignore:\n      - dependency-name: "*"',
   ],
-  [
-    'separated coverage provider',
-    "          - '@vitest/coverage-v8'",
-    "          - '@vitest/other'",
-  ],
+  ['separated coverage provider', '@vitest/coverage-v8', '@vitest/other'],
 ]) {
   test(`Dependabot drift is rejected: ${name}`, () => {
     const source = readFileSync(file, 'utf8');

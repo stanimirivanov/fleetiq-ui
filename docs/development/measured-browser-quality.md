@@ -50,7 +50,7 @@ service cannot be shipped in production. Legitimate generated wire examples are
 not blanket-searched for words such as sample or locomotive.
 
 The measured baseline is approximately 254 kB JS / 76 kB gzip and 37 kB CSS / 8 kB
-gzip. Reviewed caps are 487,000 / 139,000 JS bytes and 60,000 / 16,000 CSS bytes.
+gzip. Reviewed caps are 506,000 / 145,000 JS bytes and 60,000 / 16,000 CSS bytes.
 The owner approved the PR 27 live-inspector increase from 350,000 / 100,000
 to 375,000 / 110,000 JS bytes after measuring approximately 364 kB / 105 kB
 and adding a 200-replacement burst/disposal workload under unchanged latency,
@@ -124,10 +124,10 @@ ignored .verification/quality-performance-*.json and inspected browser attachmen
 Initial 12 October 2026 qualification used Windows and Ubuntu WSL, frozen installs,
 Node 24.18.0 and the same Chromium build:
 
-| Workload | Observed maximum navigation | Observed maximum filter | Retained nodes |
-| --- | ---: | ---: | ---: |
-| Windows desktop/narrow development calibration | <390 ms | <211 ms | 0 |
-| Linux desktop/narrow development calibration | <418 ms | <205 ms | 0 |
+| Workload                                       | Observed maximum navigation | Observed maximum filter | Retained nodes |
+| ---------------------------------------------- | --------------------------: | ----------------------: | -------------: |
+| Windows desktop/narrow development calibration |                     <390 ms |                 <211 ms |              0 |
+| Linux desktop/narrow development calibration   |                     <418 ms |                 <205 ms |              0 |
 
 Heap growth was below 0.4 MiB across these runs. Conservative blocking limits are
 2,000 ms maximum navigation, 1,000 ms filtering, 16 MiB post-GC heap growth and
@@ -267,7 +267,6 @@ CSS, latency, heap, node and security limits are unchanged.
 Final binding-authoring production output is 428,166 raw / 120,479 gzip non-map
 JavaScript bytes, within the owner-approved 440,000 / 125,000 limits.
 
-
 ## M05 connected alerts qualification
 
 M05-PR13 adds desktop/narrow light/dark alert accessibility, keyboard filtering
@@ -283,7 +282,6 @@ shares identical primitive constraints and omits runtime documentation strings,
 with whole-published-schema constraint equivalence tests. No byte, map, latency,
 heap, node, existing coverage or security threshold is increased or removed.
 
-
 ## M05 alert-command budget review
 
 On 2026-10-30 the owner explicitly approved non-map JavaScript caps of 460,000
@@ -295,7 +293,6 @@ rule-form accessibility tests cover desktop/narrow light/dark and keyboard use.
 The isolated rule-authoring slice passes all required groups: 78 production,
 24 development and 46 measured-quality scenarios. Final non-map JS measures
 444,820 raw / 128,043 gzip bytes within the approved caps.
-
 
 ## M05 exact-version acknowledgement workload
 
@@ -309,7 +306,6 @@ The combined acknowledgement slice passes 81 production, 24 development and
 50 quality scenarios. Final non-map JS measures 448,822 raw / 129,023 gzip bytes;
 no further budget or other threshold changes are introduced by this slice.
 
-
 ## M06 archive-aware history budget review
 
 On 2026-11-07 the owner explicitly approved non-map JavaScript caps of 480,000
@@ -319,10 +315,20 @@ heap, DOM, coverage and security limits remain unchanged. The pinned contract,
 strict numeric/coverage decoders, cancellation and accessible summary tables ship
 inside this reviewed envelope.
 
-
 ## M06 restore and export budget review
 
 The owner approved non-map JavaScript caps of 487,000 raw and 139,000 gzip bytes
 for M06-PR16. The combined restore and export controls measure 484,386 raw and
 137,840 gzip bytes. The controls share command ownership and the generated
 client shares repeated response dispatch, path prefixes and mutation headers.
+
+## Effect 4.1.4 dependency budget review
+
+On 2026-11-19 the owner explicitly approved non-map JavaScript caps of 506,000
+raw / 145,000 gzip bytes for the Effect 4.1.4 dependency update in PR 110.
+The coordinated runtime, Node adapter and generator update measured 501,366 raw /
+143,394 gzip bytes before the separately qualified Solid and router patches.
+Regenerating the client changes only about 100 source bytes and does not close
+the dependency growth gap. All CSS, map, latency, heap, DOM, coverage and security
+limits remain unchanged. Canonical verification and exact-image qualification
+remain required; the budget approval does not waive any failed check.

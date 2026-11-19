@@ -8,7 +8,7 @@ RUN pnpm install --frozen-lockfile && pnpm build
 RUN node tools/images/inline-csp.mjs apps/web/dist/index.html /tmp/csp.conf
 # Keep graph evidence outside the public document root.
 RUN cp apps/web/dist/quality-manifest.json /tmp/quality-manifest.json && rm apps/web/dist/quality-manifest.json
-FROM nginx:1.30.6-alpine-slim@sha256:8f06fd647c6687eae0fd7bee8a43df66e61edb9f093bb0a9079d69cb355b879b AS runtime
+FROM nginx:1.30.7-alpine-slim@sha256:8c950211a641ec5b23f265450517001f6bcca533666120ebe36cb4cff3d00a55 AS runtime
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.title="FleetIQ UI" org.opencontainers.image.description="FleetIQ production static edge" org.opencontainers.image.source="https://github.com/stanimirivanov/fleetiq-ui" org.opencontainers.image.revision=$SOURCE_REVISION
 # Use the official package-owned native binary; no Go/JOSE overlay or APK download.

@@ -27,16 +27,16 @@ restrict the agent host's tools, network or filesystem permissions.
 [The catalogue](../../tools/verification/catalogue.mjs) owns explicit check IDs,
 package scripts and required CI routes. Use pnpm verify --list to inspect groups.
 
-| Command | Checks | Intended use |
-| --- | --- | --- |
-| pnpm check | Harness fixtures/policy, quality configuration, scoped coverage/obligations, assertion mutants, output budgets, style, graph/AST boundaries, view size, docs, design, contract, source/history secrets, advisory review, types, unit/component tests, guide tests, build | Complete acceptance group |
-| pnpm verify --group structural | Harness fixtures/policy, quality configuration, style, graph/AST boundaries, view size, docs, design, contract | Portable harness qualification |
-| pnpm verify --group product | Types, unit/component tests, build | Focused product feedback |
-| pnpm e2e | Built-production and development browser scenarios | Browser behavior and sample isolation |
-| pnpm verify --group browser-quality | Production-fixture accessibility/rendering/resource checks and actual page-error fixture qualification | Measured browser regression envelope |
-| pnpm image:qualify | Producer fixtures/policy and real OCI/runtime/browser/TLS/scan/registry checks | Source-owned D03 artifact qualification |
-| pnpm security:image | Producer fixtures/policy and exact production OCI security scan | Local image-security preflight; excludes runtime/browser/registry qualification |
-| pnpm verify --group security | Source/index/history secret scans and frozen-lock registry audit | Focused security feedback |
+| Command                             | Checks                                                                                                                                                                                                                                                                   | Intended use                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| pnpm check                          | Harness fixtures/policy, quality configuration, scoped coverage/obligations, assertion mutants, output budgets, style, graph/AST boundaries, view size, docs, design, contract, source/history secrets, advisory review, types, unit/component tests, guide tests, build | Complete acceptance group                                                       |
+| pnpm verify --group structural      | Harness fixtures/policy, quality configuration, style, graph/AST boundaries, view size, docs, design, contract                                                                                                                                                           | Portable harness qualification                                                  |
+| pnpm verify --group product         | Types, unit/component tests, build                                                                                                                                                                                                                                       | Focused product feedback                                                        |
+| pnpm e2e                            | Built-production and development browser scenarios                                                                                                                                                                                                                       | Browser behavior and sample isolation                                           |
+| pnpm verify --group browser-quality | Production-fixture accessibility/rendering/resource checks and actual page-error fixture qualification                                                                                                                                                                   | Measured browser regression envelope                                            |
+| pnpm image:qualify                  | Producer fixtures/policy and real OCI/runtime/browser/TLS/scan/registry checks                                                                                                                                                                                           | Source-owned D03 artifact qualification                                         |
+| pnpm security:image                 | Producer fixtures/policy and exact production OCI security scan                                                                                                                                                                                                          | Local image-security preflight; excludes runtime/browser/registry qualification |
+| pnpm verify --group security        | Source/index/history secret scans and frozen-lock registry audit                                                                                                                                                                                                         | Focused security feedback                                                       |
 
 pnpm verify defaults to acceptance. Existing individual scripts remain available
 for focused feedback; they do not establish a complete-group verdict. Acceptance
@@ -170,7 +170,7 @@ Graph/model/type-only and AST transport fixtures now cover the registered produc
 - Markdown/GFM parsing covers links, references, heading anchors, encoded paths,
   exact casing, visible routes, budgets and plan metadata. Git discovery excludes
   ignored IDE documents, includes new sources and handles intentional tracked
-deletions.
+  deletions.
 - Architecture probes execute installed dependency-cruiser and Biome with copied
   production configs. They check named runtime/type-only violations, valid public
   entries, cycles, graph completeness and extraction capabilities. Missing tools

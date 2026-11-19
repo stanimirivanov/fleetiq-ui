@@ -132,13 +132,11 @@ app composition. Registered endpoints and protocol-authorized observations remai
 distinct; target eligibility uses the asset type’s exact property references. See
 [decision 0011](docs/design-docs/0011-binding-authoring.md).
 
-
 The [alert read decision](docs/design-docs/0013-connected-alerts.md) keeps alert
 models and validated calculator evidence inside the alerts feature. App composition
 supplies a separate port, tenant selector and session invalidation. Alerts do not
 inherit metadata.read or telemetry.read from discovery hints. URL selection and
 bounded cursor changes dispose superseded reads, including non-cooperative results.
-
 
 The operations feature owns sampled work diagnostics and reviewed recovery commands.
 App composition injects the managed gateway, current actor, explicit tenant grants

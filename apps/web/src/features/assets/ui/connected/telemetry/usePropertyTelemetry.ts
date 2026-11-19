@@ -1,5 +1,5 @@
 import { useLocation } from '@solidjs/router';
-import { createMemo } from 'solid-js';
+import { createEffect, createMemo, onCleanup } from 'solid-js';
 import { RequestFailure } from '#shared/model';
 import { readEvidenceQuery } from '../../../model/evidence-query';
 import type { SummaryRequest } from '../../../model/history-review-types';
@@ -8,6 +8,7 @@ import type {
   HistoryRequest,
   PropertyRequest,
 } from '../../../model/property-evidence';
+import { useMetadataReader } from '../MetadataReaderProvider';
 import { useMetadataRead } from '../useMetadataRead';
 import type { useMetadataWorkspace } from '../useMetadataWorkspace';
 import { usePropertyLive } from './usePropertyLive';
@@ -19,6 +20,7 @@ export function usePropertyTelemetry(props: {
   readonly workspace: ReturnType<typeof useMetadataWorkspace>;
 }) {
   const location = useLocation();
+  const context = useMetadataReader();
   const selection = createMemo(() =>
     readEvidenceQuery(
       location.search,
@@ -89,23 +91,54 @@ export function usePropertyTelemetry(props: {
     if (!reader.summary) throw new RequestFailure('unavailable');
     return reader.summary(query, options);
   });
+  const provenanceRequest = () => {
+    const s = selection();
+    const p = request();
+    const actions = context.actions?.();
+    if (
+      !p ||
+      s.kind !== 'ready' ||
+      !s.interpretation ||
+      props.workspace.query()?.tenantId !== p.tenantId ||
+      (actions && !actions.includes('telemetry.read'))
+    )
+      return null;
+    return {
+      selection: s.restore,
+      lookup: {
+        ...p,
+        interpretation: s.interpretation,
+        ...(s.restore && !s.interpretationSource ? { restore: s.restore } : {}),
+      },
+    };
+  };
   const provenance = useTelemetryRead(
-    () => {
-      const s = selection(),
-        p = request();
-      return p && s.kind === 'ready' && s.interpretation
-        ? { ...p, interpretation: s.interpretation }
-        : null;
-    },
-    (reader, query, options) => reader.interpretation(query, options),
+    provenanceRequest,
+    (reader, query, options) => reader.interpretation(query.lookup, options),
   );
-  const inspect = (interpretation: string) => {
+  // The wire receipt has no expiry timestamp. Revalidate while selected
+  // evidence is visible, stopping on expiry, denial or scope change.
+  createEffect(() => {
+    if (
+      !provenanceRequest()?.lookup.restore ||
+      provenance.state().kind !== 'ready'
+    )
+      return;
+    const timeout = setTimeout(provenance.retry, 30_000);
+    onCleanup(() => clearTimeout(timeout));
+  });
+  const refreshHistory = () => {
+    history.retry();
+    if (provenanceRequest()?.lookup.restore) provenance.retry();
+  };
+  const inspect = (interpretation: string, source?: 'current' | 'hot') => {
     const p = selected();
     if (p)
       props.workspace.update({
         property: p.id,
         property_version: String(p.version),
         interpretation,
+        interpretation_source: source ?? null,
       });
   };
   const ready = () => {
@@ -127,6 +160,7 @@ export function usePropertyTelemetry(props: {
     current,
     live,
     history,
+    refreshHistory,
     summary,
     provenance,
     inspect,

@@ -75,7 +75,6 @@ Start with [AGENTS.md](AGENTS.md) and [docs/README.md](docs/README.md).
 [ARCHITECTURE.md](ARCHITECTURE.md) explains dependency and lifetime ownership;
 [docs/PLANS.md](docs/PLANS.md) tracks reviewable work.
 
-
 ## Read alert evidence
 
 Open `/alerts`, select an authorized tenant and choose a phase filter. Select an

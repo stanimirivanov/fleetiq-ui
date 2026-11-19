@@ -2,10 +2,10 @@ packages:
   - apps/*
   - packages/*
 minimumReleaseAgeExclude:
-  - '@effect/atom-solid@4.0.1'
+  - "@effect/atom-solid@4.0.1"
   - effect@4.0.1
-  - '@effect/openapi-generator@4.0.1'
-  - '@effect/platform-node@4.0.1'
+  - "@effect/openapi-generator@4.0.1"
+  - "@effect/platform-node@4.0.1"
 # The native TS7 compiler stays at the root; this tool needs the TS compiler API.
 packageExtensions:
   dependency-cruiser@*:

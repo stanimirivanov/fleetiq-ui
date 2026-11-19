@@ -90,7 +90,7 @@ export function HistoryReview(props: {
                 <EvidenceReadContent
                   state={props.model.history.state()}
                   label="property history"
-                  retry={props.model.history.retry}
+                  retry={props.model.refreshHistory}
                 >
                   {(page) => (
                     <HistoryEvidence
@@ -105,7 +105,7 @@ export function HistoryReview(props: {
                           interpretation: null,
                         })
                       }
-                      refresh={props.model.history.retry}
+                      refresh={props.model.refreshHistory}
                     />
                   )}
                 </EvidenceReadContent>

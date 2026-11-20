@@ -1,5 +1,8 @@
 # Completed execution plans
 
+Historical planning records: new work follows the installed Matt Pocock skill
+and `docs/agents/issue-tracker.md`. These records do not establish a parallel workflow.
+
 - [Self-validating harness context and verification](2026-10-harness-context-verification.md) — M02.
 - [Executable browser trust boundaries and secure delivery](2026-10-harness-trust-delivery.md) — M02.
 

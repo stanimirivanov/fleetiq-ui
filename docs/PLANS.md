@@ -14,9 +14,9 @@ to **M04 - Semantic Twin and Live UI**.
 - [Shell and theme decision](design-docs/0002-persistent-shell-theme.md)
 - [Asset contract decision](design-docs/0003-pinned-asset-catalogue-contract.md)
 
-Each plan records its status, goal, scope, decisions, acceptance criteria, and
-evidence. Move a plan to completed only after required checks pass or material
-limitations are explicitly recorded.
+Existing plans retain historical scope and evidence. New work follows the
+selected `mattpocock/skills` workflow and its issue tracker configuration; creating
+a parallel execution plan is optional. Do not infer completion from this index.
 
 The [completed schematic map workbench slice](exec-plans/completed/2026-10-map-workbench.md)
 pairs a filtered asset list with an illustrative site canvas and in-place
@@ -50,8 +50,8 @@ Its reads cover identity, pinned definitions, directed relationships, and exact
 source/target bindings. Live operational values, locations, and alert lifecycle
 remain separate backend-dependent work.
 
-The accepted [three-PR harness sequence](exec-plans/completed/2026-10-harness-hardening.md)
-in **M02** takes priority: context/verification, executable trust boundaries and
+The historical [three-PR harness sequence](exec-plans/completed/2026-10-harness-hardening.md)
+in **M02** recorded context/verification, executable trust boundaries and
 secure delivery, then measured browser quality. The
 [context slice](exec-plans/completed/2026-10-harness-context-verification.md) and
 [trust/delivery slice](exec-plans/completed/2026-10-harness-trust-delivery.md) are

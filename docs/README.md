@@ -49,3 +49,6 @@ homes rather than growing the root README.
 - [Binding authoring and attribution review](design-docs/0011-binding-authoring.md): exact source discovery, target membership, revision commands and immutable facts.
 
 - [Connected alerts](design-docs/0013-connected-alerts.md): bounded lifecycle triage and exact calculator evidence with separate permissions.
+
+Workflow configuration: [issue tracker](agents/issue-tracker.md),
+[triage labels](agents/triage-labels.md), [domain docs](agents/domain.md).

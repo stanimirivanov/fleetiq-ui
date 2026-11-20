@@ -1,29 +1,25 @@
-## Goal
+## Summary
 
-Describe the operator or engineering outcome.
+Describe the problem and resulting behavior using the smallest useful diagram,
+diff sketch or tree. Link the owning issue and relevant milestone.
 
-Milestone: Mxx - Title
-Issue: #
+Feature/model/service boundaries, pinned contract compatibility, browser identity and data handling. For dependency changes, record maintained tool, exact pin, runtime/tooling role, alternatives, license and security review.
 
-## Scope and design decisions
+## Evidence
 
-- Explain changed boundaries and any necessary supporting refactor.
-- For dependency changes, explain the maintained tool, exact pin, runtime/tooling
-  role, alternatives, license and relevant security review.
-- Link the active/completed execution plan.
+- **Before:** Reproduction, output or previous behavior.
+- **After:** Verified result and exact commands.
 
-## Acceptance evidence
+`pnpm check`; browser/harness changes also require `pnpm e2e` and `pnpm verify --group browser-quality`.
 
-Record passed, failed or not-run for the selected checks and give the source
-revision/digest from the fresh verification evidence. A partial group pass does
-not establish browser or deployment qualification.
+Checks not run, blocking conditions, and residual risk:
 
-- pnpm check:
-- pnpm e2e (browser or verification workflow changes):
-- Focused fixtures / clean install:
-- Material limitations:
+## Merge Danger
 
-## Out of scope
+**Door:** one-way or two-way
 
-State deferred work. Do not claim GitHub rulesets, code-owner review or hosting
-permissions were enforced without separately verified evidence.
+**Blast Radius:** affected scope
+
+Describe material compatibility, security and operational risks, limitations and
+rollback. Evidence and checked boxes do not grant publication, merge or live
+infrastructure authority.

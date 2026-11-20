@@ -260,8 +260,25 @@ test('every agreed guidance owner retains its mandatory routing sensor', (contex
       .join('\n')}\n`;
   }
   const owned = fixture(context, files);
+  // A standalone checkout needs skill configuration, but no legacy plan tree.
+  assert.deepEqual(check(owned, documentationPolicy).diagnostics, []);
+  for (const name of ['issue-tracker', 'triage-labels', 'domain']) {
+    const target = `docs/agents/${name}.md`;
+    owned.write(
+      'AGENTS.md',
+      files['AGENTS.md'].replace(`- [Guide](${target})`, ''),
+    );
+    assert.ok(
+      check(owned, documentationPolicy).diagnostics.some(
+        (diagnostic) =>
+          diagnostic.code === 'docs.routes' &&
+          diagnostic.message.includes(target),
+      ),
+    );
+    owned.write('AGENTS.md', files['AGENTS.md']);
+  }
   const expectedOwners = [
-    ['AGENTS.md', 4],
+    ['AGENTS.md', 8],
     ['docs/README.md', 7],
     ['apps/web/src/app/AGENTS.md', 3],
     ['apps/web/src/features/AGENTS.md', 3],

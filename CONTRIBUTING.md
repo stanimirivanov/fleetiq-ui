@@ -7,11 +7,11 @@ Make one PR-sized change with a clear outcome. Update its docs and run
 could not run.
 
 Start with [AGENTS.md](AGENTS.md), then use the [documentation map](docs/README.md).
-Create a plan in `docs/exec-plans/active` for multi-step changes with Status,
-Milestone, Goal, Scope, Design decisions, Acceptance criteria, Acceptance evidence
-and Out of scope. Move it to
-`completed` when verified. Record durable design decisions in
-`docs/design-docs`.
+Installed `mattpocock/skills` owns planning, implementation and review workflows.
+See [issue tracker](docs/agents/issue-tracker.md), [triage labels](docs/agents/triage-labels.md)
+and [domain docs](docs/agents/domain.md). Existing execution plans are historical
+scope/evidence records; new work follows the selected skill's artifact format.
+Durable design decisions remain in `docs/design-docs`.
 
 Use strict TypeScript and explicit boundaries. Keep Solid components small
 around one interaction, place pure rules in a feature model, and keep Effect
@@ -43,9 +43,8 @@ When the backend UI contract changes, follow the
 [snapshot update process](contracts/http/README.md) and verify its published
 examples against the runtime boundary.
 
-For handoff, include the repository name, milestone, GitHub issue title and
-copy-ready issue body with Goal, Scope, Design decisions, Acceptance criteria,
-and Out of scope. State exactly which checks passed, failed, or were not run.
+For handoff, use the selected skill's format and state exactly which checks
+passed, failed or were not run, with material limitations.
 
 Security and delivery changes follow [the trust guide](docs/development/security-delivery.md). Install the pinned scanner before full acceptance. Exceptions require explicit review; incomplete scans cannot be called clean.
 

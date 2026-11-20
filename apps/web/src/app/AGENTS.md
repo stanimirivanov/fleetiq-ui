@@ -1,5 +1,7 @@
 # Application composition
 
+Technical constraints for this scope; the repository root `AGENTS.md` owns workflow routing.
+
 Read [architecture](../../../../ARCHITECTURE.md),
 [frontend structure](../../../../docs/development/frontend-structure.md) and
 [verification](../../../../docs/development/verification.md) for this scope.

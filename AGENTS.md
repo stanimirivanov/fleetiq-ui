@@ -2,11 +2,11 @@
 
 ## TL;DR
 
-Build one reviewable SolidJS web slice at a time. Keep product features
+Keep product features
 independent, parse external data at the boundary, and run `pnpm check` before
 handoff. Mobile development is deferred and will use native platforms.
 
-[CONTRIBUTING.md](CONTRIBUTING.md) owns the contribution workflow. The
+[CONTRIBUTING.md](CONTRIBUTING.md) owns technical verification. The
 [documentation map](docs/README.md) routes work to the relevant guide. The
 [frontend structure guide](docs/development/frontend-structure.md) defines
 component, reactivity, and presentation review criteria.
@@ -14,13 +14,17 @@ Read the nearest scoped AGENTS.md before editing app, feature, shared, browser
 scenario or harness code. The [verification guide](docs/development/verification.md)
 owns canonical groups, sensor fixtures and source-bound evidence.
 
-## Before changing code
+## Workflow authority
 
-1. Inspect the branch and working tree; preserve unrelated changes.
-2. Read the documentation map and only the guides relevant to the task.
-3. Check [ARCHITECTURE.md](ARCHITECTURE.md) before adding a dependency or
-   crossing a feature boundary.
-4. Keep the [execution plan](docs/PLANS.md) current for the reviewable slice.
+Use installed `mattpocock/skills` as the primary workflow for matching tasks.
+Discover and load skills on demand. When workflows overlap, use the matching
+Matt Pocock skill rather than a parallel workflow. Use other skills only for
+capabilities not covered by that workflow or when explicitly requested.
+
+Repository guidance supplies technical constraints, architecture boundaries and
+verification requirements. Scoped `AGENTS.md` files are subordinate for workflow
+decisions and add only module-specific constraints. Explicit user instructions
+and host permissions remain authoritative.
 
 ## Architecture rules
 
@@ -59,10 +63,24 @@ owns canonical groups, sensor fixtures and source-bound evidence.
 ## Evidence
 
 Run focused checks during development, then `pnpm check` and `pnpm e2e`
-for browser changes before handoff. A skipped check is not a pass. Document
-the repository, milestone, copy-ready
-issue, and exact pass/fail/not-run status per [CONTRIBUTING.md](CONTRIBUTING.md).
+for browser changes before handoff. A skipped check is not a pass. Report exact pass/fail/not-run status per [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Read [browser trust and secure delivery](docs/development/security-delivery.md) when changing transport, capture, dependencies or CI publication.
 
 Browser/harness handoff also requires pnpm verify --group browser-quality. Read [measured browser quality](docs/development/measured-browser-quality.md) for critical obligations, calibrated workloads and recovery.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues in `stanimirivanov/fleetiq-ui`.
+See [issue tracker](docs/agents/issue-tracker.md).
+
+### Triage labels
+
+Use the five configured roles. See [triage labels](docs/agents/triage-labels.md).
+
+### Domain docs
+
+Single-context glossary and repository-owned decisions.
+See [domain docs](docs/agents/domain.md).

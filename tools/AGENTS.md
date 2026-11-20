@@ -1,7 +1,9 @@
 # Harness sensors
 
+Technical constraints for this scope; the repository root `AGENTS.md` owns workflow routing.
+
 Read [verification](../docs/development/verification.md),
-[contribution workflow](../CONTRIBUTING.md) and
+[technical verification](../CONTRIBUTING.md) and
 [contract ownership](../contracts/http/README.md) for this scope.
 
 Use maintained parsers for Markdown, YAML and source graphs. Tooling parser

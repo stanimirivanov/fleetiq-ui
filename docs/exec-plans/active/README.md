@@ -1,5 +1,8 @@
 # Active execution plans
 
+Historical planning records: new work follows the installed Matt Pocock skill
+and `docs/agents/issue-tracker.md`. These records do not establish a parallel workflow.
+
 The [three-PR harness sequence](../completed/2026-10-harness-hardening.md) is implemented in **M02 - Product Foundation**. Its [measured browser-quality slice](../completed/2026-10-measured-browser-quality.md) records qualification and limits.
 
 The [connected operator user guide](../completed/2026-10-connected-operator-guide.md)

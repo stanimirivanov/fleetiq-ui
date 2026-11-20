@@ -115,7 +115,7 @@ cannot establish publication acceptance; legacy or incomplete receipts also fail
 4. Report passed, failed and not-run separately. Complete the slice's plan with
    results and limitations; preserve an unfinished parent sequence.
 
-Parsed execution plans require status, milestone, goal, scope and acceptance
+Retained historical execution plans require status, milestone, goal, scope and acceptance
 evidence (or evidence), matching the historical common format. New plans also
 include design decisions, acceptance criteria and out of scope under the
 contribution guide. Those additional sections remain author/reviewer-owned;

@@ -1,5 +1,7 @@
 # Browser scenarios and executable guides
 
+Technical constraints for this scope; the repository root `AGENTS.md` owns workflow routing.
+
 Read [testing](../../docs/development/testing.md) and
 [verification](../../docs/development/verification.md) before changing this scope.
 

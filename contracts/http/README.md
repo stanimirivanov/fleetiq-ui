@@ -44,10 +44,12 @@ decimal strings to preserve u64. Metadata review milliseconds must be safe JS in
 retain the full signed-i64 range as exact strings; values outside Date
 representation are displayed as exact epoch milliseconds.
 
-Search and type filtering are local to the loaded catalogue page. There is no
-server filter/total endpoint, complete source inventory, fleet-wide telemetry stream,
-position or alert lifecycle consumed by this UI. Current property snapshots and
-bounded hot history are now connected.
+Search and type filtering are local to the loaded catalogue page. The catalogue does not provide server-side filtering or complete source inventory.
+Separate connected fleet reads provide server-owned inventory totals and explicit
+position evidence; alert APIs provide lifecycle evidence. Current property
+snapshots and bounded history are connected, while live property delivery is
+scoped rather than a fleet-wide telemetry stream. See the
+[domain map](../../docs/domain-model.md) for ownership and terminology.
 
 An opaque `after` cursor is exclusive. Preserve tenant, resource/source, cutoffs,
 and limit on each corresponding next-page request. Relationship, target, and source

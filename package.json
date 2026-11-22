@@ -57,7 +57,7 @@
     "@effect/platform-node": "4.1.4",
     "@playwright/test": "1.65.1",
     "@types/node": "24.19.1",
-    "dependency-cruiser": "18.7.2",
+    "dependency-cruiser": "18.8.0",
     "github-slugger": "2.0.0",
     "remark-gfm": "4.0.1",
     "remark-parse": "11.0.0",
